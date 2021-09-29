@@ -74,6 +74,7 @@ public class CompanyService {
 
     public void create(String companyId, CompanyDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to create Company with null payload"));
+        resource.setCompanyId(companyId);
         Company entity = CompanyConverter.toEntityModel(resource);
         saveEntity(entity);
         log.info(() -> String.format("Company[%s] successfully created", entity.getCompanyId()));
