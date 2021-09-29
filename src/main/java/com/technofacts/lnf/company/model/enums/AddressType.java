@@ -3,14 +3,14 @@ package com.technofacts.lnf.company.model.enums;
 public enum AddressType {
 
     //@formatter:off
-    Communication("Communication"),
-    Permanent("Permanent"),
-    Work("Work");
+    Primary("Primary"),
+    Secondary("Secondary"),
+    Other("Other");
     //@formatter:on
 
     private final String label;
 
-    private AddressType(String label) {
+    AddressType(String label) {
         this.label = label;
     }
 
