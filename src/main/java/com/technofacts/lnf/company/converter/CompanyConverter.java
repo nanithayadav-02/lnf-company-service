@@ -3,6 +3,7 @@ package com.technofacts.lnf.company.converter;
 import com.technofacts.lnf.company.dto.CompanyDto;
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.CompanyAddress;
+import com.technofacts.lnf.company.model.Image;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +33,16 @@ public class CompanyConverter {
                 .arnIssueDate(entity.getArnIssueDate())
                 .sacCode(entity.getSacCode())
                 .address(new ArrayList<>())
+                .image(new ArrayList<>())
                 .build();
+
         dto.getAddress().addAll(entity.getAddress().stream()
                 .map(AddressConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList()));
+        dto.getImage().addAll(entity.getImage().stream()
+                .map(ImageConverter::toTransportModel)
+                .filter(Objects::nonNull).collect(Collectors.toList()));
+
         return dto;
     }
 
@@ -60,6 +67,7 @@ public class CompanyConverter {
         entity.setSacCode(transport.getSacCode());
 
         addAddressToEntityModel(transport, entity);
+        imageToEntityModel(transport, entity);
 
         return entity;
     }
@@ -72,6 +80,16 @@ public class CompanyConverter {
             entityList.add(entity);
         });
         company.getAddress().addAll(entityList);
+    }
+
+    private static void imageToEntityModel(CompanyDto transport, Company company) {
+        List<Image> entityList = new ArrayList<>();
+        transport.getImage().stream().filter(Objects::nonNull).forEach(dto -> {
+            Image entity = ImageConverter.toEntityModel(dto, new Image());
+            entity.setCompany(company);
+            entityList.add(entity);
+        });
+        company.getImage().addAll(entityList);
     }
 
 }

@@ -59,4 +59,6 @@ public class CompanyDto {
 
     private List<AddressDto> address = new ArrayList<>();
 
+    private List<ImageDto> image = new ArrayList<>();
+
 }
