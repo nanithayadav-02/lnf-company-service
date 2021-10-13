@@ -61,4 +61,8 @@ public class Company extends AuditableEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<CompanyAddress> address = new HashSet<>();
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private Set<Image> image = new HashSet<>();
+
 }
