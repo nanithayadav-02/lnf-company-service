@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -43,7 +44,7 @@ public class ImageService {
     public ImageDto findByCompanyId(String companyId) {
         searchForCompany(companyId);
         List<Image> entities = repository.findByCompanyId(companyId);
-        if (entities.size() == 0) {
+        if (CollectionUtils.isEmpty(entities)) {
             throw new LnFEntityNotFoundException(String.format("Image for company [%s] does not exist", companyId));
         }
         ImageDto imageDto = ImageConverter.toTransportModel(entities.get(0));
