@@ -42,12 +42,12 @@ public class ImageService {
 
     public ImageDto findByCompanyId(String companyId) {
         searchForCompany(companyId);
-        List<Image> entities = repository.findByCompanyId(companyId);
-        if (entities.size() == 0) {
+        Image companyImage = repository.findByCompanyId(companyId);
+        if (companyImage == null) {
             throw new LnFEntityNotFoundException(String.format("Image for company [%s] does not exist", companyId));
         }
-        ImageDto imageDto = ImageConverter.toTransportModel(entities.get(0));
-        String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+        ImageDto imageDto = ImageConverter.toTransportModel(companyImage);
+        var downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(String.format("/lnf/company/%s/image/", companyId))
                 .path(imageDto.getId().toString())
                 .toUriString();
@@ -66,15 +66,15 @@ public class ImageService {
     }
 
     public void create(String companyId, MultipartFile file) {
-        Company company = searchForCompany(companyId);
-        List<Image> entities = repository.findByCompanyId(companyId);
+        var company = searchForCompany(companyId);
+        Image companyImage = repository.findByCompanyId(companyId);
 
         try {
             LnFBadRequestException.throwOnCondition(Objects::isNull, file,
                     String.format("Failed to create Image for company [%s] with null payload", companyId));
             Image entity = ImageConverter.toEntityModel(file);
-            if (entities.size() > 0) {
-                entity.setId(entities.get(0).getId());
+            if (companyImage != null) {
+                entity.setId(companyImage.getId());
             }
             entity.setCompany(company);
             save(entity);
@@ -83,7 +83,7 @@ public class ImageService {
 
         } catch (RuntimeException | IOException e) {
 
-            String errorMessage = String.format("Failed to create image[%s] for company [%s]", companyId,
+            var errorMessage = String.format("Failed to create image[%s] for company [%s]", companyId,
                     file.getOriginalFilename());
             throw new LnFException(errorMessage, e);
         }
@@ -99,7 +99,7 @@ public class ImageService {
             Image updatedEntity = ImageConverter.toEntityModel(file, entity);
             save(updatedEntity);
         } catch (RuntimeException | IOException e) {
-            String errorMessage = String.format("Failed to update file[%s] for company [%s]", fileId, companyId);
+            var errorMessage = String.format("Failed to update file[%s] for company [%s]", fileId, companyId);
             throw new LnFException(errorMessage, e);
         }
         log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
@@ -107,11 +107,11 @@ public class ImageService {
 
     public void deleteByCompanyId(String companyId) {
         searchForCompany(companyId);
-        List<Image> entities = repository.findByCompanyId(companyId);
+        Image companyImage = repository.findByCompanyId(companyId);
         try {
-            repository.deleteAll(entities);
+            repository.delete(companyImage);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete image for company [%s]", companyId);
+            var errorMessage = String.format("Failed to delete image for company [%s]", companyId);
             throw new LnFException(errorMessage, e);
         }
     }
@@ -123,7 +123,7 @@ public class ImageService {
             repository.delete(entity);
             log.info(() -> String.format("Image[%s] for company [%s] successfully deleted", fileId, companyId));
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
+            var errorMessage = String.format("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
             throw new LnFException(errorMessage);
         }
     }

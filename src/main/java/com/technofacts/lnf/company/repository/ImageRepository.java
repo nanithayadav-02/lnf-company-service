@@ -6,13 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface ImageRepository extends JpaRepository<Image, UUID> {
 
     @Query("SELECT i FROM Image i WHERE i.company.companyId = :company_id")
-    List<Image> findByCompanyId(@Param("company_id") String company_id);
+    Image findByCompanyId(@Param("company_id") String company_id);
 
 }

@@ -33,8 +33,8 @@ public class ImageController {
 
     @PostMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final String companyId, @RequestParam MultipartFile images) {
-        service.create(companyId, images);
+    public void create(@PathVariable("companyId") final String companyId, @RequestParam MultipartFile image) {
+        service.create(companyId, image);
     }
 
     @PutMapping(value = "/company/{companyId}/image/{imageId}")

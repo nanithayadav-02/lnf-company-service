@@ -43,10 +43,11 @@ public class ImageConverter {
         return entity;
     }
 
-    public static Image toEntityModel(ImageDto transport, Image entity) {
-        if (transport == null || entity == null) {
+    public static Image toEntityModel(ImageDto transport) {
+        if (transport == null) {
             return null;
         }
+        Image entity = new Image();
         entity.setName(transport.getName());
         entity.setContentType(transport.getContentType());
         entity.setSize(transport.getSize());
