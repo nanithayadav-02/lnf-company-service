@@ -3,6 +3,7 @@ package com.technofacts.lnf.company.converter;
 import com.technofacts.lnf.company.dto.CompanyDto;
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.CompanyAddress;
+import com.technofacts.lnf.company.model.CompanyGst;
 import com.technofacts.lnf.company.model.Image;
 
 import java.util.ArrayList;
@@ -42,15 +43,27 @@ public class CompanyConverter {
         dto.getImage().addAll(entity.getImage().stream()
                 .map(ImageConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList()));
+        dto.getGst().addAll(entity.getGst().stream().map(GstConverter::toTransportModel)
+                .filter(Objects::nonNull).collect(Collectors.toList()));
 
         return dto;
     }
 
     public static Company toEntityModel(CompanyDto transport) {
-        if (transport == null) {
+        Company entity = toEntityModel(transport, new Company());
+
+        addAddressToEntityModel(transport, entity);
+        imageToEntityModel(transport, entity);
+        addGstToEntityModel(transport, entity);
+
+        return entity;
+    }
+
+    private static Company toEntityModel(CompanyDto transport, Company entity) {
+        if (transport == null || entity == null) {
             return null;
         }
-        Company entity = new Company();
+
         entity.setId(transport.getId());
         entity.setCompanyId(transport.getCompanyId());
         entity.setName(transport.getName());
@@ -65,9 +78,6 @@ public class CompanyConverter {
         entity.setArn(transport.getArn());
         entity.setArnIssueDate(transport.getArnIssueDate());
         entity.setSacCode(transport.getSacCode());
-
-        addAddressToEntityModel(transport, entity);
-        imageToEntityModel(transport, entity);
 
         return entity;
     }
@@ -90,6 +100,16 @@ public class CompanyConverter {
             entityList.add(entity);
         });
         company.getImage().addAll(entityList);
+    }
+
+    private static void addGstToEntityModel(CompanyDto transport, Company company) {
+        List<CompanyGst> gstList = new ArrayList<>();
+        transport.getGst().stream().filter(Objects::nonNull).forEach(dto -> {
+            CompanyGst entity = GstConverter.toEntityModel(dto);
+            entity.setCompany(company);
+            gstList.add(entity);
+        });
+        company.getGst().addAll(gstList);
     }
 
 }

@@ -61,4 +61,6 @@ public class CompanyDto {
 
     private List<ImageDto> image = new ArrayList<>();
 
+    private List<GstDto> gst = new ArrayList<>();
+
 }
