@@ -35,6 +35,7 @@ public class CompanyConverter {
                 .sacCode(entity.getSacCode())
                 .address(new ArrayList<>())
                 .image(new ArrayList<>())
+                .gst(new ArrayList<>())
                 .build();
 
         dto.getAddress().addAll(entity.getAddress().stream()
