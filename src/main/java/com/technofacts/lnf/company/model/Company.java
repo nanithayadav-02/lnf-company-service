@@ -69,4 +69,8 @@ public class Company extends AuditableEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<CompanyGst> gst = new HashSet<>();
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private Set<Account> account = new HashSet<>();
+
 }

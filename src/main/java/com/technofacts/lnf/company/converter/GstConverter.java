@@ -24,6 +24,7 @@ public class GstConverter {
         if (transport == null) {
             return null;
         }
+
         CompanyGst entity = new CompanyGst();
         entity.setId(transport.getId());
         entity.setLocation(transport.getLocation());

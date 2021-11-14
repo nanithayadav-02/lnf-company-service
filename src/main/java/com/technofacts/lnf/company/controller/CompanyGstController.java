@@ -17,7 +17,7 @@ public class CompanyGstController {
     private final CompanyGstService service;
 
     @GetMapping(value = "/company/{companyId}/gst")
-    public List<GstDto> findBycompanyId(@PathVariable("companyId") final String companyId) {
+    public List<GstDto> findByCompanyId(@PathVariable("companyId") final String companyId) {
         return service.findByCompanyId(companyId);
     }
 

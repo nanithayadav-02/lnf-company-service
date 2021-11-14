@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "company_image")
-public class Image extends AuditableEntity{
+public class Image extends AuditableEntity {
 
     @Column(name = "name", nullable = false)
     private String name;

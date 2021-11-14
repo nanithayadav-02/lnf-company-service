@@ -63,4 +63,6 @@ public class CompanyDto {
 
     private List<GstDto> gst = new ArrayList<>();
 
+    private List<AccountDto> account = new ArrayList<>();
+
 }

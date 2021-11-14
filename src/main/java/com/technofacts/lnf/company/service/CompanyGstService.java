@@ -31,13 +31,17 @@ public class CompanyGstService {
 
     public List<GstDto> findAll() {
         List<CompanyGst> entities = repository.findAll();
-        return entities.stream().map(GstConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(GstConverter::toTransportModel)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public List<GstDto> findByCompanyId(String companyId) {
         searchForCompany(companyId);
         List<CompanyGst> entities = repository.findByCompanyId(companyId);
-        return entities.stream().map(GstConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(GstConverter::toTransportModel)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public GstDto findById(String companyId, UUID gstId) {

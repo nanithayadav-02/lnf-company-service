@@ -1,10 +1,7 @@
 package com.technofacts.lnf.company.converter;
 
 import com.technofacts.lnf.company.dto.CompanyDto;
-import com.technofacts.lnf.company.model.Company;
-import com.technofacts.lnf.company.model.CompanyAddress;
-import com.technofacts.lnf.company.model.CompanyGst;
-import com.technofacts.lnf.company.model.Image;
+import com.technofacts.lnf.company.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +33,7 @@ public class CompanyConverter {
                 .address(new ArrayList<>())
                 .image(new ArrayList<>())
                 .gst(new ArrayList<>())
+                .account(new ArrayList<>())
                 .build();
 
         dto.getAddress().addAll(entity.getAddress().stream()
@@ -45,6 +43,8 @@ public class CompanyConverter {
                 .map(ImageConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList()));
         dto.getGst().addAll(entity.getGst().stream().map(GstConverter::toTransportModel)
+                .filter(Objects::nonNull).collect(Collectors.toList()));
+        dto.getAccount().addAll(entity.getAccount().stream().map(AccountConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList()));
 
         return dto;
@@ -56,6 +56,7 @@ public class CompanyConverter {
         addAddressToEntityModel(transport, entity);
         imageToEntityModel(transport, entity);
         addGstToEntityModel(transport, entity);
+        addAccountToEntityModel(transport, entity);
 
         return entity;
     }
@@ -111,6 +112,16 @@ public class CompanyConverter {
             gstList.add(entity);
         });
         company.getGst().addAll(gstList);
+    }
+
+    private static void addAccountToEntityModel(CompanyDto transport, Company company) {
+        List<Account> accountList = new ArrayList<>();
+        transport.getAccount().stream().filter(Objects::nonNull).forEach(dto -> {
+            Account entity = AccountConverter.toEntityModel(dto);
+            entity.setCompany(company);
+            accountList.add(entity);
+        });
+        company.getAccount().addAll(accountList);
     }
 
 }
