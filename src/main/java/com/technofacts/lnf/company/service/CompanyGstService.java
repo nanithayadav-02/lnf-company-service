@@ -39,8 +39,7 @@ public class CompanyGstService {
     public List<GstDto> findByCompanyId(String companyId) {
         searchForCompany(companyId);
         List<CompanyGst> entities = repository.findByCompanyId(companyId);
-        return entities.stream().map(GstConverter::toTransportModel)
-                .filter(Objects::nonNull)
+        return entities.stream().map(GstConverter::toTransportModel).filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -77,7 +76,7 @@ public class CompanyGstService {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, 
                 String.format("Failed to gst company[%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
-        CompanyGst entity = searchForGst(gstId);
+        searchForGst(gstId);
         CompanyGst updatedEntity = GstConverter.toEntityModel(resource);
         updatedEntity.setCompany(companyEntity);
         save(updatedEntity);
