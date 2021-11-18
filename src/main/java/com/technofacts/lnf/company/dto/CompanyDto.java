@@ -21,7 +21,7 @@ public class CompanyDto {
 
     @NotNull(message = "companyId cannot be null")
     @NotBlank(message = "companyId cannot be blank")
-    private String companyId;
+    private String code;
 
     @NotNull(message = "name cannot be null")
     @NotBlank(message = "name cannot be blank")
@@ -62,5 +62,7 @@ public class CompanyDto {
     private List<ImageDto> image = new ArrayList<>();
 
     private List<GstDto> gst = new ArrayList<>();
+
+    private List<AccountDto> account = new ArrayList<>();
 
 }

@@ -1,6 +1,7 @@
 package com.technofacts.lnf.company.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.technofacts.lnf.company.dto.CompanyDto;
 import com.technofacts.lnf.company.service.CompanyService;
@@ -44,26 +45,26 @@ public class CompanyController {
     }
 
     @GetMapping(value = "/company/{companyId}")
-    public CompanyDto findOne(@PathVariable("companyId") final String companyId) {
+    public CompanyDto findOne(@PathVariable("companyId") final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
-    @PostMapping(value = "/company/{companyId}")
+    @PostMapping(value = "/company")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final String companyId, @RequestBody final CompanyDto resource) {
-        service.create(companyId, resource);
+    public void create(@RequestBody final CompanyDto resource) {
+        service.create(resource);
     }
 
     @PutMapping(value = "/company/{companyId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final String companyId, @RequestBody final CompanyDto resource) {
+    public void update(@PathVariable("companyId") final UUID companyId, @RequestBody final CompanyDto resource) {
         service.update(companyId, resource);
     }
 
     // delete
     @DeleteMapping(value = "/company/{companyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final String companyId) {
+    public void delete(@PathVariable("companyId") final UUID companyId) {
         service.delete(companyId);
     }
 }

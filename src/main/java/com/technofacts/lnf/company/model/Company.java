@@ -18,8 +18,8 @@ import java.util.Set;
 @Table(name = "company")
 public class Company extends AuditableEntity {
 
-    @Column(name = "company_id", nullable = false, unique = true)
-    private String companyId;
+    @Column(name = "code", nullable = false, unique = true)
+    private String code;
 
     @Column(unique = true, nullable = false)
     private String name;
@@ -68,5 +68,9 @@ public class Company extends AuditableEntity {
     @ToString.Exclude
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<CompanyGst> gst = new HashSet<>();
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private Set<Account> account = new HashSet<>();
 
 }

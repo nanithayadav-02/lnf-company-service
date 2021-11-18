@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "company_image")
-public class Image extends AuditableEntity{
+public class Image extends AuditableEntity {
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -30,7 +30,7 @@ public class Image extends AuditableEntity{
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "company_id", referencedColumnName="company_id", nullable = false)
+    @JoinColumn(name = "company_id", referencedColumnName="id", nullable = false)
     private Company company;
 
 }

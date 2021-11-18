@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface CompanyGstRepository extends JpaRepository<CompanyGst, UUID> {
 
-    @Query("SELECT g FROM CompanyGst g WHERE g.company.companyId = :company_id")
-    List<CompanyGst> findByCompanyId(@Param("company_id") String company_id);
+    @Query("SELECT g FROM CompanyGst g WHERE g.company.id = :id")
+    List<CompanyGst> findByCompanyId(@Param("id") UUID id);
 
 }
