@@ -21,38 +21,38 @@ public class ImageController {
 
     @GetMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.CREATED)
-    public ImageDto findByEmployeeId(@PathVariable("companyId") final String companyId) throws IOException {
+    public ImageDto findByEmployeeId(@PathVariable("companyId") final UUID companyId) throws IOException {
         return service.findByCompanyId(companyId);
     }
 
     @GetMapping(value = "/company/{companyId}/image/{imageId}")
-    public ResponseEntity<byte[]> findById(@PathVariable("companyId") final String companyId,
+    public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId,
                                            @PathVariable("imageId") final UUID imageId) {
         return service.findById(companyId, imageId);
     }
 
     @PostMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final String companyId, @RequestParam MultipartFile image) {
+    public void create(@PathVariable("companyId") final UUID companyId, @RequestParam MultipartFile image) {
         service.create(companyId, image);
     }
 
     @PutMapping(value = "/company/{companyId}/image/{imageId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final String companyId, @PathVariable("imageId") final UUID imageId,
+    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("imageId") final UUID imageId,
                        @RequestParam MultipartFile image) throws IOException {
         service.update(companyId, imageId, image);
     }
 
     @DeleteMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final String companyId) {
+    public void delete(@PathVariable("companyId") final UUID companyId) {
         service.deleteByCompanyId(companyId);
     }
 
     @DeleteMapping(value = "/company/{companyId}/image/{imageId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final String companyId,
+    public void delete(@PathVariable("companyId") final UUID companyId,
                        @PathVariable("imageId") final UUID imageId) {
         service.deleteById(companyId, imageId);
     }

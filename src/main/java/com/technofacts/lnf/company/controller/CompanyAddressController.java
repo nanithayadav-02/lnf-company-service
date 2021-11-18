@@ -17,39 +17,39 @@ public class CompanyAddressController {
     private final CompanyAddressService service;
 
     @GetMapping(value = "/company/{companyId}/address")
-    public List<AddressDto> findByCompanyId(@PathVariable("companyId") final String companyId) {
+    public List<AddressDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
     @GetMapping(value = "/company/{companyId}/address/{addressId}")
-    public AddressDto findById(@PathVariable("companyId") final String companyId,
+    public AddressDto findById(@PathVariable("companyId") final UUID companyId,
                                @PathVariable("addressId") final UUID addressId) {
         return service.findById(companyId, addressId);
     }
 
     @PostMapping(value = "/company/{companyId}/address")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final String companyId,
+    public void create(@PathVariable("companyId") final UUID companyId,
                        @RequestBody final List<AddressDto> resource) {
         service.create(companyId, resource);
     }
 
     @PutMapping(value = "/company/{companyId}/address/{addressId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final String companyId,
+    public void update(@PathVariable("companyId") final UUID companyId,
                        @PathVariable("addressId") final UUID addressId, @RequestBody final AddressDto resource) {
         service.update(companyId, addressId, resource);
     }
 
     @DeleteMapping(value = "/company/{companyId}/address")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final String companyId) {
+    public void delete(@PathVariable("companyId") final UUID companyId) {
         service.deleteByCompanyId(companyId);
     }
 
     @DeleteMapping(value = "/company/{companyId}/address/{addressId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final String companyId,
+    public void delete(@PathVariable("companyId") final UUID companyId,
                        @PathVariable("addressId") final UUID addressId) {
         service.deleteById(companyId, addressId);
     }

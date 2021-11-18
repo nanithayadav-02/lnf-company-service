@@ -11,6 +11,6 @@ import java.util.UUID;
 
 public interface AccountRepository extends JpaRepository<Account, UUID>, JpaSpecificationExecutor<Account> {
 
-    @Query("SELECT g FROM Account g WHERE g.company.companyId = :company_id")
-    List<Account> findByCompanyId(@Param("company_id") String company_id);
+    @Query("SELECT g FROM Account g WHERE g.company.id = :id")
+    List<Account> findByCompanyId(@Param("id") UUID id);
 }

@@ -35,19 +35,19 @@ public class CompanyAddressService {
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public List<AddressDto> findByCompanyId(String companyId) {
+    public List<AddressDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyAddress> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(AddressConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public AddressDto findById(String companyId, UUID addressId) {
+    public AddressDto findById(UUID companyId, UUID addressId) {
         searchForCompany(companyId);
         return AddressConverter.toTransportModel(searchForAddress(addressId));
     }
 
-    public void create(String companyId, List<AddressDto> resource) {
+    public void create(UUID companyId, List<AddressDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to create Address for company [%s] with null payload", companyId));
         Company company = searchForCompany(companyId);
@@ -61,7 +61,7 @@ public class CompanyAddressService {
         log.info(() -> String.format("Address for Company[%s] successfully created", companyId));
     }
 
-    public void create(String companyId, AddressDto resource) {
+    public void create(UUID companyId, AddressDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to create Address with null payload"));
         Company companyEntity = searchForCompany(companyId);
@@ -71,7 +71,7 @@ public class CompanyAddressService {
         log.info(() -> String.format("Address for Company[%s] successfully created", companyId));
     }
 
-    public void update(String companyId, UUID addressId, AddressDto resource) {
+    public void update(UUID companyId, UUID addressId, AddressDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to update Address with null payload"));
         searchForCompany(companyId);
@@ -80,7 +80,7 @@ public class CompanyAddressService {
         log.info(() -> String.format("Address for Company[%s] successfully created", companyId));
     }
 
-    public void deleteById(String companyId, UUID addressId) {
+    public void deleteById(UUID companyId, UUID addressId) {
         searchForCompany(companyId);
         CompanyAddress entity = searchForAddress(addressId);
         try {
@@ -92,7 +92,7 @@ public class CompanyAddressService {
         }
     }
 
-    public void deleteByCompanyId(String companyId) {
+    public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyAddress> entities = repository.findByCompanyId(companyId);
         try {
@@ -109,7 +109,7 @@ public class CompanyAddressService {
             repository.save(entity);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to save Address for company [%s]",
-                    entity.getCompany().getCompanyId());
+                    entity.getCompany().getCode());
             throw new LnFException(errorMessage);
         }
     }
@@ -119,12 +119,12 @@ public class CompanyAddressService {
             repository.saveAll(entities);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to save Address for company [%s]",
-                    entities.get(0).getCompany().getCompanyId());
+                    entities.get(0).getCompany().getCode());
             throw new LnFException(errorMessage);
         }
     }
 
-    private Company searchForCompany(String companyId) {
+    private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist",
                         companyId)));

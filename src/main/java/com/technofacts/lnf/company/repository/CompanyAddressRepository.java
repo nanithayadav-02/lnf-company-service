@@ -12,11 +12,11 @@ import java.util.UUID;
 
 public interface CompanyAddressRepository extends JpaRepository<CompanyAddress, UUID> {
 
-    @Query("SELECT ad FROM CompanyAddress ad WHERE ad.company.companyId = :company_id")
-    List<CompanyAddress> findByCompanyId(@Param("company_id") String company_id);
+    @Query("SELECT ad FROM CompanyAddress ad WHERE ad.company.id = :id")
+    List<CompanyAddress> findByCompanyId(@Param("id") UUID id);
 
-    @Query("SELECT ad FROM CompanyAddress ad WHERE ad.company.companyId = :company_id AND ad.type = :type")
-    Optional<CompanyAddress> findByCompanyIdAndType(@Param("company_id") String company_id,
+    @Query("SELECT ad FROM CompanyAddress ad WHERE ad.company.id = :id AND ad.type = :type")
+    Optional<CompanyAddress> findByCompanyIdAndType(@Param("id") String UUID,
                                                     @Param("type") AddressType type);
 
 }

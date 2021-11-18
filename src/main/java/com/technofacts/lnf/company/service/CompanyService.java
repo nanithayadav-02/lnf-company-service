@@ -2,6 +2,7 @@ package com.technofacts.lnf.company.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -67,21 +68,20 @@ public class CompanyService {
         return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public CompanyDto findByCompanyId(String companyId) {
+    public CompanyDto findByCompanyId(UUID companyId) {
         Company entity = search(companyId);
         return CompanyConverter.toTransportModel(entity);
     }
 
-    public void create(String companyId, CompanyDto resource) {
+    public void create(CompanyDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to create Company with null payload"));
-        resource.setCompanyId(companyId);
         Company entity = CompanyConverter.toEntityModel(resource);
         saveEntity(entity);
-        log.info(() -> String.format("Company[%s] successfully created", entity.getCompanyId()));
+        log.info(() -> String.format("Company[%s] successfully created", entity.getCode()));
     }
 
     @Transactional
-    public void update(String companyId, CompanyDto resource) {
+    public void update(UUID companyId, CompanyDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to update Company with null payload"));
         Company entity = search(companyId);
         Company updatedEntity = CompanyConverter.toEntityModel(resource);
@@ -90,13 +90,13 @@ public class CompanyService {
         log.info(() -> String.format("Company[%s] successfully updated", companyId));
     }
 
-    public void delete(String companyId) {
+    public void delete(UUID companyId) {
         Company entity = search(companyId);
         try {
             repository.delete(entity);
-            log.info(() -> String.format("Company[%s] successfully deleted", entity.getCompanyId()));
+            log.info(() -> String.format("Company[%s] successfully deleted", entity.getCode()));
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Company [%s]", entity.getCompanyId());
+            String errorMessage = String.format("Failed to delete Company [%s]", entity.getCode());
             throw new LnFException(errorMessage, e);
         }
     }
@@ -113,13 +113,13 @@ public class CompanyService {
         try {
             return repository.save(entity);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to save company [%s]", entity.getCompanyId());
+            String errorMessage = String.format("Failed to save company [%s]", entity.getCode());
             throw new LnFException(errorMessage, e);
         }
     }
 
-    private Company search(String companyId) {
-        return repository.findByCompanyId(companyId).
+    private Company search(UUID companyId) {
+        return repository.findById(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
     }
 }

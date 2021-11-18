@@ -35,19 +35,19 @@ public class AccountService {
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public List<AccountDto> findByCompanyId(String companyId) {
+    public List<AccountDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<Account> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(AccountConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public AccountDto findById(String companyId, UUID accountId) {
+    public AccountDto findById(UUID companyId, UUID accountId) {
         searchForCompany(companyId);
         return AccountConverter.toTransportModel(searchForAccount(accountId));
     }
 
-    public void create(String companyId, List<AccountDto> resource) {
+    public void create(UUID companyId, List<AccountDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to create account for company [%s] with null payload", companyId));
         Company company = searchForCompany(companyId);
@@ -61,7 +61,7 @@ public class AccountService {
         log.info(() -> String.format("Account for company[%s] successfully created", companyId));
     }
 
-    public void create(String companyId, AccountDto resource) {
+    public void create(UUID companyId, AccountDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to create Account with null payload"));
         Company companyEntity = searchForCompany(companyId);
@@ -71,7 +71,7 @@ public class AccountService {
         log.info(() -> String.format("Account for company[%s] successfully created", companyId));
     }
 
-    public void update(String companyId, UUID addressId, AccountDto resource) {
+    public void update(UUID companyId, UUID addressId, AccountDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to update Account with null payload"));
         Company companyEntity = searchForCompany(companyId);
@@ -82,7 +82,7 @@ public class AccountService {
         log.info(() -> String.format("Account for company[%s] successfully created", companyId));
     }
 
-    public void deleteById(String companyId, UUID addressId) {
+    public void deleteById(UUID companyId, UUID addressId) {
         searchForCompany(companyId);
         Account entity = searchForAccount(addressId);
         try {
@@ -94,7 +94,7 @@ public class AccountService {
         }
     }
 
-    public void deleteByCompanyId(String companyId) {
+    public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<Account> entities = repository.findByCompanyId(companyId);
         try {
@@ -111,7 +111,7 @@ public class AccountService {
             repository.save(entity);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to save account for company [%s]",
-                    entity.getCompany().getCompanyId());
+                    entity.getCompany().getCode());
             throw new LnFException(errorMessage);
         }
     }
@@ -121,12 +121,12 @@ public class AccountService {
             repository.saveAll(entities);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to save account for company [%s]",
-                    entities.get(0).getCompany().getCompanyId());
+                    entities.get(0).getCompany().getCode());
             throw new LnFException(errorMessage);
         }
     }
 
-    private Company searchForCompany(String companyId) {
+    private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist",
                         companyId)));

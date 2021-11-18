@@ -31,7 +31,7 @@ public class Account extends AuditableEntity {
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", referencedColumnName = "company_id",  nullable = false)
+    @JoinColumn(name = "company_id", referencedColumnName = "id",  nullable = false)
     private Company company;
 
 }

@@ -41,7 +41,7 @@ public class ImageService {
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public ImageDto findByCompanyId(String companyId) {
+    public ImageDto findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<Image> entities = repository.findByCompanyId(companyId);
         if (CollectionUtils.isEmpty(entities)) {
@@ -57,7 +57,7 @@ public class ImageService {
         return imageDto;
     }
 
-    public ResponseEntity<byte[]> findById(String companyId, UUID imageId) {
+    public ResponseEntity<byte[]> findById(UUID companyId, UUID imageId) {
         searchForCompany(companyId);
         Image file = searchForImage(imageId);
         return ResponseEntity.ok()
@@ -66,7 +66,7 @@ public class ImageService {
                 .body(file.getContent());
     }
 
-    public void create(String companyId, MultipartFile file) {
+    public void create(UUID companyId, MultipartFile file) {
         Company company = searchForCompany(companyId);
         List<Image> entities = repository.findByCompanyId(companyId);
 
@@ -91,7 +91,7 @@ public class ImageService {
 
     }
 
-    public void update(String companyId, UUID fileId, MultipartFile file) {
+    public void update(UUID companyId, UUID fileId, MultipartFile file) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, file,
                 String.format("Failed to update file for company [%s] with null payload", companyId));
         searchForCompany(companyId);
@@ -106,7 +106,7 @@ public class ImageService {
         log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
     }
 
-    public void deleteByCompanyId(String companyId) {
+    public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<Image> entities = repository.findByCompanyId(companyId);
         try {
@@ -117,7 +117,7 @@ public class ImageService {
         }
     }
 
-    public void deleteById(String companyId, UUID fileId) {
+    public void deleteById(UUID companyId, UUID fileId) {
         searchForCompany(companyId);
         Image entity = searchForImage(fileId);
         try {
@@ -134,12 +134,12 @@ public class ImageService {
             repository.save(entity);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to save Image for company [%s]",
-                    entity.getCompany().getCompanyId());
+                    entity.getCompany().getCode());
             throw new LnFException(errorMessage);
         }
     }
 
-    private Company searchForCompany(String companyId) {
+    private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist",
                         companyId)));

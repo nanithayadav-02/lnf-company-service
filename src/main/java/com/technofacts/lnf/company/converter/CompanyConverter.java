@@ -17,7 +17,7 @@ public class CompanyConverter {
         }
         CompanyDto dto = CompanyDto.builder()
                 .id(entity.getId())
-                .companyId(entity.getCompanyId())
+                .code(entity.getCode())
                 .name(entity.getName())
                 .status(entity.getStatus())
                 .email(entity.getEmail())
@@ -67,7 +67,7 @@ public class CompanyConverter {
         }
 
         entity.setId(transport.getId());
-        entity.setCompanyId(transport.getCompanyId());
+        entity.setCode(transport.getCode());
         entity.setName(transport.getName());
         entity.setStatus(transport.getStatus());
         entity.setEmail(transport.getEmail());

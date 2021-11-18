@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface ImageRepository extends JpaRepository<Image, UUID> {
 
-    @Query("SELECT i FROM Image i WHERE i.company.companyId = :company_id")
-    List<Image> findByCompanyId(@Param("company_id") String company_id);
+    @Query("SELECT i FROM Image i WHERE i.company.id = :id")
+    List<Image> findByCompanyId(@Param("id") UUID id);
 
 }

@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface CompanyRepository extends JpaRepository<Company, UUID>, JpaSpecificationExecutor<Company> {
 
-    @Query("select e from Company e where e.companyId = :company_id")
-    Optional<Company> findByCompanyId(@Param("company_id") String company_id);
+    @Query("select c from Company c where c.id = :id")
+    Optional<Company> findByCompanyId(@Param("id") UUID id);
 
 }

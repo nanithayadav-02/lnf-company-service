@@ -36,19 +36,19 @@ public class CompanyGstService {
                 .collect(Collectors.toList());
     }
 
-    public List<GstDto> findByCompanyId(String companyId) {
+    public List<GstDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyGst> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(GstConverter::toTransportModel).filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    public GstDto findById(String companyId, UUID gstId) {
+    public GstDto findById(UUID companyId, UUID gstId) {
         searchForCompany(companyId);
         return GstConverter.toTransportModel(searchForGst(gstId));
     }
 
-    public void create(String companyId, List<GstDto> resource) {
+    public void create(UUID companyId, List<GstDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to create gst for company [%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
@@ -62,7 +62,7 @@ public class CompanyGstService {
         log.info(() -> String.format("Gst for company[%s] successfully created", companyId));
     }
 
-    public void create(String companyId, GstDto resource) {
+    public void create(UUID companyId, GstDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, 
                 String.format("Failed to create gst for company [%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
@@ -72,7 +72,7 @@ public class CompanyGstService {
         log.info(() -> String.format("Gst for company[%s] successfully created", companyId));
     }
 
-    public void update(String companyId, UUID gstId, GstDto resource) {
+    public void update(UUID companyId, UUID gstId, GstDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, 
                 String.format("Failed to gst company[%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
@@ -83,7 +83,7 @@ public class CompanyGstService {
         log.info(() -> String.format("Gst for company[%s] successfully updated", companyId));
     }
 
-    public void deleteById(String companyId, UUID gstId) {
+    public void deleteById(UUID companyId, UUID gstId) {
         searchForCompany(companyId);
         CompanyGst entity = searchForGst(gstId);
         try {
@@ -95,7 +95,7 @@ public class CompanyGstService {
         }
     }
 
-    public void deleteByCompanyId(String companyId) {
+    public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyGst> entities = repository.findByCompanyId(companyId);
         try {
@@ -125,7 +125,7 @@ public class CompanyGstService {
         }
     }
 
-    private Company searchForCompany(String companyId) {
+    private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
     }
