@@ -44,9 +44,10 @@ public class CompanyController {
         return service.findAll(search);
     }
 
-    @GetMapping(value = "/company/{companyId}")
-    public CompanyDto findOne(@PathVariable("companyId") final UUID companyId) {
-        return service.findByCompanyId(companyId);
+
+    @GetMapping(value = "/company/{companyCode}")
+    public CompanyDto findCompany(@PathVariable("companyCode") final String companyCode) {
+        return service.findByCompanyCode(companyCode);
     }
 
     @PostMapping(value = "/company")
