@@ -68,8 +68,8 @@ public class CompanyService {
         return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public CompanyDto findByCompanyId(UUID companyId) {
-        Company entity = search(companyId);
+    public CompanyDto findByCompanyCode(String companyCode) {
+        Company entity = search(companyCode);
         return CompanyConverter.toTransportModel(entity);
     }
 
@@ -121,6 +121,11 @@ public class CompanyService {
     private Company search(UUID companyId) {
         return repository.findById(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
+    }
+
+    private Company search(String companyCode) {
+        return repository.findByCompanyCode(companyCode).
+                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with code [%s] does not exist", companyCode)));
     }
 }
 
