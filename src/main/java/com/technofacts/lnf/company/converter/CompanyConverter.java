@@ -34,6 +34,7 @@ public class CompanyConverter {
                 .image(new ArrayList<>())
                 .gst(new ArrayList<>())
                 .account(new ArrayList<>())
+                .theme(new ArrayList<>())
                 .build();
 
         dto.getAddress().addAll(entity.getAddress().stream()
@@ -46,6 +47,8 @@ public class CompanyConverter {
                 .filter(Objects::nonNull).collect(Collectors.toList()));
         dto.getAccount().addAll(entity.getAccount().stream().map(AccountConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList()));
+        dto.getTheme().addAll(entity.getTheme().stream().map(ThemeConverter::toTransportModel)
+                .filter(Objects::nonNull).collect(Collectors.toList()));
 
         return dto;
     }
@@ -57,6 +60,7 @@ public class CompanyConverter {
         imageToEntityModel(transport, entity);
         addGstToEntityModel(transport, entity);
         addAccountToEntityModel(transport, entity);
+        addThemeToEntityModel(transport, entity);
 
         return entity;
     }
@@ -122,6 +126,16 @@ public class CompanyConverter {
             accountList.add(entity);
         });
         company.getAccount().addAll(accountList);
+    }
+
+    private static void addThemeToEntityModel(CompanyDto transport, Company company) {
+        List<Theme> themeList = new ArrayList<>();
+        transport.getTheme().stream().filter(Objects::nonNull).forEach(dto -> {
+            Theme entity = ThemeConverter.toEntityModel(dto);
+            entity.setCompany(company);
+            themeList.add(entity);
+        });
+        company.getTheme().addAll(themeList);
     }
 
 }
