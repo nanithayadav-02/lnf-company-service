@@ -65,4 +65,6 @@ public class CompanyDto {
 
     private List<AccountDto> account = new ArrayList<>();
 
+    private List<ThemeDto> theme = new ArrayList<>();
+
 }
