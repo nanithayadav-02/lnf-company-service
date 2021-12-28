@@ -78,7 +78,7 @@ pipeline {
                                .withRun('--network=lnf-app-network')
                                .withRun('-p 8083:8081')
                                .withRun('-e DATABASE_HOST=postgresdb -e DATABASE_PORT=5432 -e DATABASE_NAME=tsdb -e DATABASE_USERNAME=tsuser -e DATABASE_PASSWORD=ts@12345 -e SPRING_PROFILES_ACTIVE=dev'){ c ->
-                                   sh "curl -i http://${hostIp(c)}:8083/"
+                                   sh "echo ${c.id}"
                          }
 
                     }
