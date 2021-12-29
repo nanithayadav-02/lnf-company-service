@@ -1,5 +1,3 @@
-@Library('jenkins-shared-library@feature/feature/HRMW-247-create-jenkins-shared-lib-2')_
-
 lnfJavaPipelineWithCD ([repo: 'lnf-company-service', awsAccount: "433686923958", awsRegion: "us-east-1"], {
     return {
         echo '=== Deploying Container Image on EC2 Docker  ==='
