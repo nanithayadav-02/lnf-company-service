@@ -1,7 +1,6 @@
 package com.technofacts.lnf.company.service;
 
 import com.technofacts.lnf.company.converter.ThemeConverter;
-import com.technofacts.lnf.company.dto.ThemeDto;
 import com.technofacts.lnf.company.exception.LnFBadRequestException;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.exception.LnFException;
@@ -9,6 +8,7 @@ import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.Theme;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.ThemeRepository;
+import com.technofacts.lnf.dto.company.ThemeDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;

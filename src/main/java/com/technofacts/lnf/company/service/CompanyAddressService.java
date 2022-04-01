@@ -1,7 +1,6 @@
 package com.technofacts.lnf.company.service;
 
 import com.technofacts.lnf.company.converter.AddressConverter;
-import com.technofacts.lnf.company.dto.AddressDto;
 import com.technofacts.lnf.company.exception.LnFBadRequestException;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.exception.LnFException;
@@ -9,6 +8,7 @@ import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.CompanyAddress;
 import com.technofacts.lnf.company.repository.CompanyAddressRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
+import com.technofacts.lnf.dto.company.AddressDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -63,7 +63,7 @@ public class CompanyAddressService {
 
     public void create(UUID companyId, AddressDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create Address with null payload"));
+                String.format("Failed to create Address for company [%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
         CompanyAddress entity = (CompanyAddress) AddressConverter.toEntityModel(resource, new CompanyAddress());
         entity.setCompany(companyEntity);
@@ -73,7 +73,7 @@ public class CompanyAddressService {
 
     public void update(UUID companyId, UUID addressId, AddressDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to update Address with null payload"));
+                String.format("Failed to create Address for company [%s] with null payload", companyId));
         searchForCompany(companyId);
         CompanyAddress entity = searchForAddress(addressId);
         save((CompanyAddress) AddressConverter.toEntityModel(resource, entity));

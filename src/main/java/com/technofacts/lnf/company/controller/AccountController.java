@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.controller;
 
-import com.technofacts.lnf.company.dto.AccountDto;
 import com.technofacts.lnf.company.service.AccountService;
+import com.technofacts.lnf.dto.company.AccountDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

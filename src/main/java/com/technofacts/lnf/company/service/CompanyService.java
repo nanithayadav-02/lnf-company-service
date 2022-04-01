@@ -1,15 +1,7 @@
 package com.technofacts.lnf.company.service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.Lists;
 import com.technofacts.lnf.company.converter.CompanyConverter;
-import com.technofacts.lnf.company.dto.CompanyDto;
 import com.technofacts.lnf.company.exception.LnFBadRequestException;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.exception.LnFException;
@@ -17,6 +9,7 @@ import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.specification.company.CompanySpecificationBuilder;
 import com.technofacts.lnf.company.util.RestUtil;
+import com.technofacts.lnf.dto.company.CompanyDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
@@ -25,6 +18,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
