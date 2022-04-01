@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.controller;
 
-import com.technofacts.lnf.company.dto.GstDto;
 import com.technofacts.lnf.company.service.CompanyGstService;
+import com.technofacts.lnf.dto.company.GstDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
