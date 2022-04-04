@@ -50,5 +50,5 @@ public class CompanyGstController {
     public void delete(@PathVariable("companyId") final UUID companyId, @PathVariable("gstId") final UUID gstId) {
         service.deleteById(companyId, gstId);
     }
-}
 
+}
