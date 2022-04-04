@@ -1,18 +1,18 @@
 package com.technofacts.lnf.company.converter;
 
 import com.technofacts.lnf.company.model.CompanyPolicy;
-import com.technofacts.lnf.dto.company.PolicyDto;
+import com.technofacts.lnf.dto.company.CompanyPolicyDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 public class CompanyPolicyConverter {
 
-    public static PolicyDto toTransportModel(CompanyPolicy entity) {
+    public static CompanyPolicyDto toTransportModel(CompanyPolicy entity) {
         if (entity == null) {
             return null;
         }
-        PolicyDto dto = new PolicyDto();
+        CompanyPolicyDto dto = new CompanyPolicyDto();
 
         dto.setId(entity.getId());
         dto.setName(entity.getName());

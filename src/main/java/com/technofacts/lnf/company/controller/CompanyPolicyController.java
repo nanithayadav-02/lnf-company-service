@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.controller;
 
 import com.technofacts.lnf.company.service.CompanyPolicyService;
-import com.technofacts.lnf.dto.company.PolicyDto;
+import com.technofacts.lnf.dto.company.CompanyPolicyDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class CompanyPolicyController {
     private final CompanyPolicyService service;
 
     @GetMapping(value = "/company/{companyId}/policies")
-    public List<PolicyDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) throws IOException {
+    public List<CompanyPolicyDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) throws IOException {
         return service.findByCompanyId(companyId);
     }
 
