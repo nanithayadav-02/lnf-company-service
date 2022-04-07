@@ -19,6 +19,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log
 public class CompanyService {
+
+    private static final String SEARCH_REGEX_PATTERN = "([\\w+?\\-_]+)(:|<|>)([\\w+?\\-_.@\\s]+),";
 
     private final CompanyRepository repository;
 
@@ -58,14 +62,16 @@ public class CompanyService {
 
     public List<CompanyDto> findAll(String search) {
         CompanySpecificationBuilder builder = new CompanySpecificationBuilder();
-        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),");
-        Matcher matcher = pattern.matcher(search + ",");
+        Pattern pattern = Pattern.compile(SEARCH_REGEX_PATTERN, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(URLDecoder.decode(search, StandardCharsets.UTF_8) + ",");
         while (matcher.find()) {
             builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
         }
         Specification<Company> specification = builder.build();
         List<Company> entities = repository.findAll(specification);
-        return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(CompanyConverter::toTransportModel)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public CompanyDto findByCompanyCode(String companyCode) {
@@ -74,7 +80,8 @@ public class CompanyService {
     }
 
     public void create(CompanyDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to create Company with null payload"));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
+                "Failed to create Company with null payload");
         Company entity = CompanyConverter.toEntityModel(resource);
         saveEntity(entity);
         log.info(() -> String.format("Company[%s] successfully created", entity.getCode()));
@@ -82,7 +89,8 @@ public class CompanyService {
 
     @Transactional
     public void update(UUID companyId, CompanyDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to update Company with null payload"));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
+                "Failed to update Company with null payload");
         Company entity = search(companyId);
         Company updatedEntity = CompanyConverter.toEntityModel(resource);
         updatedEntity.setId(entity.getId());
@@ -103,10 +111,13 @@ public class CompanyService {
 
     private List<CompanyDto> validateAndGetPages(int page, Page<Company> resultPage) {
         if (page > resultPage.getTotalPages()) {
-            throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], requested page [%d] does not exist", resultPage.getTotalPages(), page));
+            throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " +
+                    "requested page [%d] does not exist", resultPage.getTotalPages(), page));
         }
         List<Company> entities = Lists.newArrayList(resultPage.getContent());
-        return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(CompanyConverter::toTransportModel)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private Company saveEntity(Company entity) {
