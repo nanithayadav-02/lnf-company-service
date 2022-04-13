@@ -50,7 +50,7 @@ public class CompanyPolicyService {
                 .collect(Collectors.toList());
         companyPolicyDtos.forEach(f -> {
             String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(String.format("/lnf/employees/%s/policies/", companyId))
+                    .path(String.format("/lnf/company/%s/policies/", companyId))
                     .path(f.getId().toString())
                     .toUriString();
             f.setUrl(downloadURL);
