@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.dto.AccountDto;
 import com.technofacts.lnf.company.model.Account;
+import com.technofacts.lnf.dto.company.AccountDto;
 
 public class AccountConverter {
 
@@ -10,7 +10,8 @@ public class AccountConverter {
         if (entity == null) {
             return null;
         }
-        AccountDto dto = AccountDto.builder()
+
+        return AccountDto.builder()
                 .id(entity.getId())
                 .branch(entity.getBranch())
                 .ibanNumber(entity.getIbanNumber())
@@ -18,8 +19,6 @@ public class AccountConverter {
                 .number(entity.getNumber())
                 .address(entity.getAddress())
                 .build();
-
-        return dto;
     }
 
     public static Account toEntityModel(AccountDto transport) {

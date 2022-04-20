@@ -77,4 +77,8 @@ public class Company extends AuditableEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<Theme> theme = new HashSet<>();
 
+    @ToString.Exclude
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private Set<CompanyPolicy> policies = new HashSet<>();
+
 }

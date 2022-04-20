@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.dto.CompanyDto;
 import com.technofacts.lnf.company.model.*;
+import com.technofacts.lnf.dto.company.CompanyDto;
 
 import java.util.ArrayList;
 import java.util.List;
