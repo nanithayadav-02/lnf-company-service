@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.dto.ImageDto;
 import com.technofacts.lnf.company.model.Image;
+import com.technofacts.lnf.dto.company.ImageDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

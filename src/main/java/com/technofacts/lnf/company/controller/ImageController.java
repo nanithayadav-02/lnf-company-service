@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.controller;
 
-import com.technofacts.lnf.company.dto.ImageDto;
 import com.technofacts.lnf.company.service.ImageService;
+import com.technofacts.lnf.dto.company.ImageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class ImageController {
 
     @GetMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.CREATED)
-    public ImageDto findByEmployeeId(@PathVariable("companyId") final UUID companyId) throws IOException {
+    public ImageDto findByCompanyId(@PathVariable("companyId") final UUID companyId) throws IOException {
         return service.findByCompanyId(companyId);
     }
 

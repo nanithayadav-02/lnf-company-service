@@ -1,7 +1,6 @@
 package com.technofacts.lnf.company.service;
 
 import com.technofacts.lnf.company.converter.ImageConverter;
-import com.technofacts.lnf.company.dto.ImageDto;
 import com.technofacts.lnf.company.exception.LnFBadRequestException;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.exception.LnFException;
@@ -9,6 +8,7 @@ import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.Image;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.ImageRepository;
+import com.technofacts.lnf.dto.company.ImageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpHeaders;

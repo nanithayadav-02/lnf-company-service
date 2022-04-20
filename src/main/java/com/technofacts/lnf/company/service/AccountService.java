@@ -1,7 +1,6 @@
 package com.technofacts.lnf.company.service;
 
 import com.technofacts.lnf.company.converter.AccountConverter;
-import com.technofacts.lnf.company.dto.AccountDto;
 import com.technofacts.lnf.company.exception.LnFBadRequestException;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.exception.LnFException;
@@ -9,6 +8,7 @@ import com.technofacts.lnf.company.model.Account;
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.repository.AccountRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
+import com.technofacts.lnf.dto.company.AccountDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -58,12 +58,12 @@ public class AccountService {
             entities.add(entity);
         });
         save(entities);
-        log.info(() -> String.format("Account for company[%s] successfully created", companyId));
+        log.info(() -> "Account for company[" + companyId + "] successfully created");
     }
 
     public void create(UUID companyId, AccountDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create Account with null payload"));
+                String.format("Failed to create the account for company [%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
         Account entity = AccountConverter.toEntityModel(resource);
         entity.setCompany(companyEntity);
@@ -73,7 +73,7 @@ public class AccountService {
 
     public void update(UUID companyId, UUID addressId, AccountDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to update Account with null payload"));
+                String.format("Failed to update the account for company [%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
         searchForAccount(addressId);
         Account updatedEntity = AccountConverter.toEntityModel(resource);

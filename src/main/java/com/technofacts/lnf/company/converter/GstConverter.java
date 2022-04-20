@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.dto.GstDto;
 import com.technofacts.lnf.company.model.CompanyGst;
+import com.technofacts.lnf.dto.company.GstDto;
 
 public class GstConverter {
 
@@ -10,13 +10,11 @@ public class GstConverter {
             return null;
         }
 
-        GstDto dto = GstDto.builder()
+        return GstDto.builder()
                 .id(entity.getId())
                 .location(entity.getLocation())
                 .number(entity.getNumber())
                 .build();
-
-        return dto;
     }
 
     public static CompanyGst toEntityModel(GstDto transport) {
@@ -32,4 +30,5 @@ public class GstConverter {
 
         return entity;
     }
+
 }

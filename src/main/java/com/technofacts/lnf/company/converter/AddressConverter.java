@@ -1,8 +1,8 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.dto.AddressDto;
 import com.technofacts.lnf.company.model.Address;
 import com.technofacts.lnf.company.model.enums.AddressType;
+import com.technofacts.lnf.dto.company.AddressDto;
 
 public class AddressConverter {
 
@@ -11,7 +11,7 @@ public class AddressConverter {
             return null;
         }
 
-        AddressDto dto = AddressDto.builder()
+        return AddressDto.builder()
                 .id(entity.getId())
                 .addressLine1(entity.getAddressLine1())
                 .addressLine2(entity.getAddressLine2())
@@ -22,8 +22,6 @@ public class AddressConverter {
                 .postCode(entity.getPostCode())
                 .type(entity.getType().name())
                 .build();
-
-        return dto;
     }
 
     public static Address toEntityModel(AddressDto transport, Address entity) {

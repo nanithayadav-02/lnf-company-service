@@ -1,7 +1,7 @@
 package com.technofacts.lnf.company.controller;
 
-import com.technofacts.lnf.company.dto.AddressDto;
 import com.technofacts.lnf.company.service.CompanyAddressService;
+import com.technofacts.lnf.dto.company.AddressDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

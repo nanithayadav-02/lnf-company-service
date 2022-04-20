@@ -1,8 +1,8 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.dto.ThemeDto;
 import com.technofacts.lnf.company.model.Theme;
 import com.technofacts.lnf.company.model.enums.ThemeType;
+import com.technofacts.lnf.dto.company.ThemeDto;
 
 public class ThemeConverter {
 
@@ -10,12 +10,12 @@ public class ThemeConverter {
         if (entity == null) {
             return null;
         }
-        ThemeDto dto = ThemeDto.builder()
+
+        return ThemeDto.builder()
                 .id(entity.getId())
                 .type(entity.getType().name())
                 .value(entity.getValue())
                 .build();
-        return dto;
     }
 
     public static Theme toEntityModel(ThemeDto transport) {
