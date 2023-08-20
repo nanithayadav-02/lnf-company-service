@@ -1,12 +1,12 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.model.*;
-import com.technofacts.lnf.dto.company.CompanyDto;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import com.technofacts.lnf.company.model.*;
+import com.technofacts.lnf.dto.company.CompanyDto;
 
 public class CompanyConverter {
 

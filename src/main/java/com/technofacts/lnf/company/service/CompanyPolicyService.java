@@ -1,5 +1,11 @@
 package com.technofacts.lnf.company.service;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import com.technofacts.lnf.company.converter.CompanyPolicyConverter;
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.CompanyPolicy;
@@ -18,12 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional

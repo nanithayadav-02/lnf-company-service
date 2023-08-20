@@ -1,12 +1,11 @@
 package com.technofacts.lnf.company.model;
 
 import com.technofacts.lnf.company.model.enums.AddressType;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.MappedSuperclass;
 import lombok.*;
-
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.MappedSuperclass;
 
 @ToString
 @Getter

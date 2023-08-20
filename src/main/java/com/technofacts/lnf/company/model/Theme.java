@@ -1,9 +1,8 @@
 package com.technofacts.lnf.company.model;
 
 import com.technofacts.lnf.company.model.enums.ThemeType;
+import jakarta.persistence.*;
 import lombok.*;
-
-import javax.persistence.*;
 
 @ToString
 @Entity

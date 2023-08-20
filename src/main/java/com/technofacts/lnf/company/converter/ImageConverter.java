@@ -1,10 +1,10 @@
 package com.technofacts.lnf.company.converter;
 
+import java.io.IOException;
+
 import com.technofacts.lnf.company.model.Image;
 import com.technofacts.lnf.dto.company.ImageDto;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 public class ImageConverter {
 
