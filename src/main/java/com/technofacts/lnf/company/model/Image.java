@@ -22,7 +22,6 @@ public class Image extends AuditableEntity {
     @Column(name = "content_type", nullable = false)
     private String contentType;
 
-    @Lob
     @Column(name = "content", nullable = false)
     private byte[] content;
 
