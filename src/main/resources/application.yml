@@ -109,14 +109,14 @@ spring:
 
 printStackTrace: true
 ---
-
+KEYCLOAK_HOST: "keycloak:8080"
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://${keycloak.host:localhost:8080}/auth/realms/lnf
-          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+          issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
+          jwk-set-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf/protocol/openid-connect/certs
       client:
         registration:
           company-service:
@@ -127,4 +127,4 @@ spring:
             provider: keycloak
         provider:
           keycloak:
-            issuer-uri: http://${keycloak.host:localhost:8080}/auth/realms/lnf
+            issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
