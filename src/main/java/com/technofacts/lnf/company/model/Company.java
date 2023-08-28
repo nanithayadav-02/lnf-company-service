@@ -1,6 +1,8 @@
+
 package com.technofacts.lnf.company.model;
 
 import javax.persistence.*;
+
 
 import lombok.*;
 
@@ -61,9 +63,8 @@ public class Company extends AuditableEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<CompanyAddress> address = new HashSet<>();
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    private Set<Image> image = new HashSet<>();
+    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL)
+    private Image image;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
@@ -82,3 +83,5 @@ public class Company extends AuditableEntity {
     private Set<CompanyPolicy> policies = new HashSet<>();
 
 }
+
+

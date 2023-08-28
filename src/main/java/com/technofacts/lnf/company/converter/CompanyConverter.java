@@ -2,6 +2,7 @@ package com.technofacts.lnf.company.converter;
 
 import com.technofacts.lnf.company.model.*;
 import com.technofacts.lnf.dto.company.CompanyDto;
+import com.technofacts.lnf.dto.company.ImageDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,6 @@ public class CompanyConverter {
                 .arnIssueDate(entity.getArnIssueDate())
                 .sacCode(entity.getSacCode())
                 .address(new ArrayList<>())
-                .image(new ArrayList<>())
                 .gst(new ArrayList<>())
                 .account(new ArrayList<>())
                 .theme(new ArrayList<>())
@@ -39,9 +39,6 @@ public class CompanyConverter {
 
         dto.getAddress().addAll(entity.getAddress().stream()
                 .map(AddressConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
-        dto.getImage().addAll(entity.getImage().stream()
-                .map(ImageConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList()));
         dto.getGst().addAll(entity.getGst().stream().map(GstConverter::toTransportModel)
                 .filter(Objects::nonNull).collect(Collectors.toList()));
@@ -57,7 +54,6 @@ public class CompanyConverter {
         Company entity = toEntityModel(transport, new Company());
 
         addAddressToEntityModel(transport, entity);
-        imageToEntityModel(transport, entity);
         addGstToEntityModel(transport, entity);
         addAccountToEntityModel(transport, entity);
         addThemeToEntityModel(transport, entity);
@@ -99,14 +95,14 @@ public class CompanyConverter {
     }
 
     private static void imageToEntityModel(CompanyDto transport, Company company) {
-        List<Image> entityList = new ArrayList<>();
-        transport.getImage().stream().filter(Objects::nonNull).forEach(dto -> {
-            Image entity = ImageConverter.toEntityModel(dto, new Image());
+        ImageDto imageDto = transport.getImage();
+        if (imageDto != null) {
+            Image entity = ImageConverter.toEntityModel(imageDto, new Image());
             entity.setCompany(company);
-            entityList.add(entity);
-        });
-        company.getImage().addAll(entityList);
+            company.setImage(entity);
+        }
     }
+
 
     private static void addGstToEntityModel(CompanyDto transport, Company company) {
         List<CompanyGst> gstList = new ArrayList<>();

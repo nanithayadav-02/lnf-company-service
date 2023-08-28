@@ -1,3 +1,4 @@
+
 package com.technofacts.lnf.company.converter;
 
 import com.technofacts.lnf.company.model.Image;
@@ -30,7 +31,6 @@ public class ImageConverter {
         return toEntityModel(transport, entity);
 
     }
-
     public static Image toEntityModel(MultipartFile transport, Image entity) throws IOException {
         if (transport == null || entity == null) {
             return null;
@@ -42,6 +42,7 @@ public class ImageConverter {
 
         return entity;
     }
+
 
     public static Image toEntityModel(ImageDto transport, Image entity) {
         if (transport == null || entity == null) {
