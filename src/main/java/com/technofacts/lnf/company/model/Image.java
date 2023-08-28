@@ -31,6 +31,7 @@ public class Image extends AuditableEntity implements Serializable {
     @Column(name = "content", nullable = false)
     private byte[] content;
 
+    //foreign key relationship
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
