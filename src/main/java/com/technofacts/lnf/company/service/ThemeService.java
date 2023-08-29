@@ -9,10 +9,10 @@ import com.technofacts.lnf.company.model.Theme;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.ThemeRepository;
 import com.technofacts.lnf.dto.company.ThemeDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;

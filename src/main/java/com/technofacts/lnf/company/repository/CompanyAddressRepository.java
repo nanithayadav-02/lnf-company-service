@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
 public interface CompanyAddressRepository extends JpaRepository<CompanyAddress, UUID> {
 
     @Query("SELECT ad FROM CompanyAddress ad WHERE ad.company.id = :id")

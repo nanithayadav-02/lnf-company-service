@@ -1,9 +1,9 @@
 package com.technofacts.lnf.company.repository.specification.company;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.util.SpecSearchCriteria;

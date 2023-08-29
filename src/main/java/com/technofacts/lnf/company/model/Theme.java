@@ -1,9 +1,9 @@
 package com.technofacts.lnf.company.model;
 
 import com.technofacts.lnf.company.model.enums.ThemeType;
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 
 @ToString
 @Entity
@@ -21,6 +21,7 @@ public class Theme extends AuditableEntity {
 
     @Column(name = "value", nullable = false)
     private String value;
+
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -1,11 +1,8 @@
 package com.technofacts.lnf.company.model;
 
 import com.technofacts.lnf.model.AuditableEntity;
+import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
-
-import javax.persistence.*;
-
 @ToString
 @Entity
 @Getter
@@ -25,7 +22,7 @@ public class CompanyPolicy extends AuditableEntity {
     @Column(name = "content_type", nullable = false)
     private String contentType;
 
-    @Type(type="org.hibernate.type.BinaryType")
+
     @Column(name = "content", nullable = false)
     private byte[] content;
 

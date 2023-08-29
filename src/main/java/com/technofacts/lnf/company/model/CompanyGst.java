@@ -1,8 +1,7 @@
 package com.technofacts.lnf.company.model;
 
+import jakarta.persistence.*;
 import lombok.*;
-
-import javax.persistence.*;
 
 @ToString
 @Entity
@@ -19,6 +18,7 @@ public class CompanyGst extends AuditableEntity {
 
     @Column(name = "number", nullable = false)
     private String number;
+
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

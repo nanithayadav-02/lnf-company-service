@@ -1,8 +1,9 @@
 package com.technofacts.lnf.company.model;
 
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
+
 
 @ToString
 @Entity
@@ -28,6 +29,7 @@ public class Account extends AuditableEntity {
 
     @Column(nullable = false)
     private String address;
+
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)

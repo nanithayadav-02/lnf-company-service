@@ -1,8 +1,7 @@
 package com.technofacts.lnf.company.model;
 
+import jakarta.persistence.*;
 import lombok.*;
-
-import javax.persistence.*;
 
 @ToString
 @Entity
@@ -16,6 +15,9 @@ public class CompanyAddress extends Address {
 
     @Column(name = "branch_name")
     private String branch_name;
+
+
+
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)

@@ -10,6 +10,7 @@ import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.specification.company.CompanySpecificationBuilder;
 import com.technofacts.lnf.company.util.RestUtil;
 import com.technofacts.lnf.dto.company.CompanyDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -27,9 +28,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-@Service
 @Transactional
+@Service
 @RequiredArgsConstructor
 @Log
 public class CompanyService {

@@ -62,7 +62,7 @@ spring:
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
     properties:
-      javax:
+      jakarta:
         persistence:
           schema-generation:
             database:
@@ -95,7 +95,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
-      javax:
+      jakarta:
         persistence:
           schema-generation:
             scripts:
@@ -115,10 +115,22 @@ spring:
 
 printStackTrace: true
 ---
-
+KEYCLOAK_HOST: "keycloak:8080"
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://${keycloak.host:ec2-34-204-0-170.compute-1.amazonaws.com\:8079}/auth/realms/lnf/protocol/openid-connect/certs
+          issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
+          jwk-set-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf/protocol/openid-connect/certs
+      client:
+        registration:
+          employee-service:
+            client-id: lnf-employee-api
+            client-secret: ${client-secret:lnf-employee-api-secret}
+            scope: openid,profile,roles
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
