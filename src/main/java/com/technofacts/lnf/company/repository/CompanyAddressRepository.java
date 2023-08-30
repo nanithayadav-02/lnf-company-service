@@ -1,14 +1,14 @@
 package com.technofacts.lnf.company.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import com.technofacts.lnf.company.model.CompanyAddress;
 import com.technofacts.lnf.company.model.enums.AddressType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 public interface CompanyAddressRepository extends JpaRepository<CompanyAddress, UUID> {
 

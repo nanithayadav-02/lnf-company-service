@@ -1,13 +1,11 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.model.*;
-import com.technofacts.lnf.dto.company.CompanyDto;
-import com.technofacts.lnf.dto.company.ImageDto;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import com.technofacts.lnf.company.model.*;
+import com.technofacts.lnf.dto.company.CompanyDto;
 
 public class CompanyConverter {
 
@@ -39,13 +37,13 @@ public class CompanyConverter {
 
         dto.getAddress().addAll(entity.getAddress().stream()
                 .map(AddressConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
+                .filter(Objects::nonNull).toList());
         dto.getGst().addAll(entity.getGst().stream().map(GstConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
+                .filter(Objects::nonNull).toList());
         dto.getAccount().addAll(entity.getAccount().stream().map(AccountConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
+                .filter(Objects::nonNull).toList());
         dto.getTheme().addAll(entity.getTheme().stream().map(ThemeConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
+                .filter(Objects::nonNull).toList());
 
         return dto;
     }
@@ -93,16 +91,6 @@ public class CompanyConverter {
         });
         company.getAddress().addAll(entityList);
     }
-
-    private static void imageToEntityModel(CompanyDto transport, Company company) {
-        ImageDto imageDto = transport.getImage();
-        if (imageDto != null) {
-            Image entity = ImageConverter.toEntityModel(imageDto, new Image());
-            entity.setCompany(company);
-            company.setImage(entity);
-        }
-    }
-
 
     private static void addGstToEntityModel(CompanyDto transport, Company company) {
         List<CompanyGst> gstList = new ArrayList<>();

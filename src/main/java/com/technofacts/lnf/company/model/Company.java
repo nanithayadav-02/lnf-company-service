@@ -1,14 +1,11 @@
-
 package com.technofacts.lnf.company.model;
-
-import javax.persistence.*;
-
-
-import lombok.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 @ToString
 @Entity
@@ -60,6 +57,7 @@ public class Company extends AuditableEntity {
     private Long sacCode;
 
     @ToString.Exclude
+    @Builder.Default
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<CompanyAddress> address = new HashSet<>();
 
@@ -67,21 +65,23 @@ public class Company extends AuditableEntity {
     private Image image;
 
     @ToString.Exclude
+    @Builder.Default
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<CompanyGst> gst = new HashSet<>();
 
     @ToString.Exclude
+    @Builder.Default
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<Account> account = new HashSet<>();
 
     @ToString.Exclude
+    @Builder.Default
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<Theme> theme = new HashSet<>();
 
     @ToString.Exclude
+    @Builder.Default
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<CompanyPolicy> policies = new HashSet<>();
 
 }
-
-
