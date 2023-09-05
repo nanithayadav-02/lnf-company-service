@@ -1,12 +1,11 @@
 package com.technofacts.lnf.company.converter;
 
+import com.technofacts.lnf.company.model.*;
+import com.technofacts.lnf.dto.company.CompanyDto;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.technofacts.lnf.company.model.*;
-import com.technofacts.lnf.dto.company.CompanyDto;
-import com.technofacts.lnf.dto.company.NotesDto;
 
 public class CompanyConverter {
 
@@ -15,39 +14,14 @@ public class CompanyConverter {
         if (entity == null) {
             return null;
         }
-        CompanyDto dto = CompanyDto.builder()
-                .id(entity.getId())
-                .code(entity.getCode())
-                .name(entity.getName())
-                .status(entity.getStatus())
-                .email(entity.getEmail())
-                .telephone(entity.getTelephone())
-                .mobile(entity.getMobile())
-                .website(entity.getWebsite())
-                .businessCategory(entity.getBusinessCategory())
-                .businessDescription(entity.getBusinessDescription())
-                .pan(entity.getPan())
-                .arn(entity.getArn())
-                .arnIssueDate(entity.getArnIssueDate())
-                .sacCode(entity.getSacCode())
-                .address(new ArrayList<>())
-                .gst(new ArrayList<>())
-                .account(new ArrayList<>())
-                .theme(new ArrayList<>())
-                .notes(new ArrayList<>())
-                .build();
+        CompanyDto dto = CompanyDto.builder().id(entity.getId()).code(entity.getCode()).name(entity.getName()).status(entity.getStatus()).email(entity.getEmail()).telephone(entity.getTelephone()).mobile(entity.getMobile()).website(entity.getWebsite()).businessCategory(entity.getBusinessCategory()).businessDescription(entity.getBusinessDescription()).pan(entity.getPan()).arn(entity.getArn()).arnIssueDate(entity.getArnIssueDate()).sacCode(entity.getSacCode()).address(new ArrayList<>()).gst(new ArrayList<>()).account(new ArrayList<>()).theme(new ArrayList<>()).notes(new ArrayList<>()).companyEvent(new ArrayList<>()).build();
 
-        dto.getAddress().addAll(entity.getAddress().stream()
-                .map(AddressConverter::toTransportModel)
-                .filter(Objects::nonNull).toList());
-        dto.getGst().addAll(entity.getGst().stream().map(GstConverter::toTransportModel)
-                .filter(Objects::nonNull).toList());
-        dto.getAccount().addAll(entity.getAccount().stream().map(AccountConverter::toTransportModel)
-                .filter(Objects::nonNull).toList());
-        dto.getTheme().addAll(entity.getTheme().stream().map(ThemeConverter::toTransportModel)
-                .filter(Objects::nonNull).toList());
-        dto.getNotes().addAll(entity.getCompanyNotes().stream().map(CompanyNotesConverter::toTransportModel)
-                .filter(Objects::nonNull).toList());
+        dto.getAddress().addAll(entity.getAddress().stream().map(AddressConverter::toTransportModel).filter(Objects::nonNull).toList());
+        dto.getGst().addAll(entity.getGst().stream().map(GstConverter::toTransportModel).filter(Objects::nonNull).toList());
+        dto.getAccount().addAll(entity.getAccount().stream().map(AccountConverter::toTransportModel).filter(Objects::nonNull).toList());
+        dto.getTheme().addAll(entity.getTheme().stream().map(ThemeConverter::toTransportModel).filter(Objects::nonNull).toList());
+        dto.getNotes().addAll(entity.getCompanyNotes().stream().map(CompanyNotesConverter::toTransportModel).filter(Objects::nonNull).toList());
+        dto.getCompanyEvent().addAll(entity.getCompanyEvent().stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList());
         return dto;
     }
 
@@ -59,6 +33,7 @@ public class CompanyConverter {
         addAccountToEntityModel(transport, entity);
         addThemeToEntityModel(transport, entity);
         addNotesToEntityModel(transport, entity);
+        addCompanyEventToEntityModel(transport, entity);
 
         return entity;
     }
@@ -134,6 +109,16 @@ public class CompanyConverter {
             notesList.add(entity);
         });
         company.getCompanyNotes().addAll(notesList);
+    }
+
+    private static void addCompanyEventToEntityModel(CompanyDto transport, Company company) {
+        List<CompanyEvent> companyEventList = new ArrayList<>();
+        transport.getCompanyEvent().stream().filter(Objects::nonNull).forEach(dto -> {
+            CompanyEvent entity = CompanyEventConverter.toEntityModel(dto, new CompanyEvent());
+            entity.setCompany(company);
+            companyEventList.add(entity);
+        });
+        company.getCompanyEvent().addAll(companyEventList);
     }
 
 
