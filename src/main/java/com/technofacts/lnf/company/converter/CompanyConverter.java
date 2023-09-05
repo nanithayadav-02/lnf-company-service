@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.technofacts.lnf.company.model.*;
 import com.technofacts.lnf.dto.company.CompanyDto;
+import com.technofacts.lnf.dto.company.NotesDto;
 
 public class CompanyConverter {
 
@@ -33,6 +34,7 @@ public class CompanyConverter {
                 .gst(new ArrayList<>())
                 .account(new ArrayList<>())
                 .theme(new ArrayList<>())
+                .notes(new ArrayList<>())
                 .build();
 
         dto.getAddress().addAll(entity.getAddress().stream()
@@ -44,7 +46,8 @@ public class CompanyConverter {
                 .filter(Objects::nonNull).toList());
         dto.getTheme().addAll(entity.getTheme().stream().map(ThemeConverter::toTransportModel)
                 .filter(Objects::nonNull).toList());
-
+        dto.getNotes().addAll(entity.getCompanyNotes().stream().map(CompanyNotesConverter::toTransportModel)
+                .filter(Objects::nonNull).toList());
         return dto;
     }
 
@@ -55,6 +58,7 @@ public class CompanyConverter {
         addGstToEntityModel(transport, entity);
         addAccountToEntityModel(transport, entity);
         addThemeToEntityModel(transport, entity);
+        addNotesToEntityModel(transport, entity);
 
         return entity;
     }
@@ -121,5 +125,16 @@ public class CompanyConverter {
         });
         company.getTheme().addAll(themeList);
     }
+
+    private static void addNotesToEntityModel(CompanyDto transport, Company company) {
+        List<CompanyNotes> notesList = new ArrayList<>();
+        transport.getNotes().stream().filter(Objects::nonNull).forEach(dto -> {
+            CompanyNotes entity = CompanyNotesConverter.toEntityModel(dto);
+            entity.setCompany(company);
+            notesList.add(entity);
+        });
+        company.getCompanyNotes().addAll(notesList);
+    }
+
 
 }

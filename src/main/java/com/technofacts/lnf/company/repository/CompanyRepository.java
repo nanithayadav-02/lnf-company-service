@@ -1,5 +1,6 @@
 package com.technofacts.lnf.company.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

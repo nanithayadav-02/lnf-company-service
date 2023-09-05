@@ -1,11 +1,11 @@
 package com.technofacts.lnf.company.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-
-import jakarta.persistence.*;
-import lombok.*;
 
 @ToString
 @Entity
@@ -83,5 +83,10 @@ public class Company extends AuditableEntity {
     @Builder.Default
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Set<CompanyPolicy> policies = new HashSet<>();
+
+    @ToString.Exclude
+    @Builder.Default
+    @OneToMany(mappedBy = "company",cascade = CascadeType.ALL)
+    private Set<CompanyNotes> companyNotes= new HashSet<>();
 
 }
