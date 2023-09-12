@@ -8,7 +8,7 @@ public enum EventType {
 
     Release("Release"),
 
-    MeetingTownHall("Meeting Town hall");
+    MeetingTownHall("Meeting Town Hall");
 
     private final String label;
 

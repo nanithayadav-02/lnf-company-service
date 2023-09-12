@@ -31,9 +31,11 @@ public class CompanyEvent extends AuditableEntity {
     @Column(name = "event_description", nullable = false)
     private String eventDescription;
 
+    @Column(name = "status", nullable = false)
+    private String status;
 
     @ToString.Exclude
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "company_id", referencedColumnName = "id", nullable = false)
     private Company company;
 
