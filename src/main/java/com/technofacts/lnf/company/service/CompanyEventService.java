@@ -7,6 +7,7 @@ import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.exception.LnFException;
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.CompanyEvent;
+import com.technofacts.lnf.company.model.enums.EventType;
 import com.technofacts.lnf.company.repository.CompanyEventRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.util.RestUtil;
@@ -16,9 +17,11 @@ import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,9 +34,7 @@ import java.util.stream.Collectors;
 @Log
 public class CompanyEventService {
 
-
     private final CompanyEventRepository companyEventRepository;
-
     private final CompanyRepository companyRepository;
 
     public Page<CompanyEventDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -51,6 +52,7 @@ public class CompanyEventService {
         Page<CompanyEvent> resultPage = companyEventRepository.findAll(PageRequest.of(page, size));
         return validateAndGetPages(page, resultPage);
     }
+
 
     public List<CompanyEventDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
@@ -99,7 +101,6 @@ public class CompanyEventService {
         log.info(() -> String.format("companyEvents for Company[%s] successfully created", companyId));
     }
 
-
     private void save(CompanyEvent entity) {
         try {
             companyEventRepository.save(entity);
@@ -126,7 +127,6 @@ public class CompanyEventService {
         searchForCompany(companyId);
         return CompanyEventConverter.toTransportModel(searchForCompanyEvent(eventId));
     }
-
 
     public void update(UUID companyId, UUID eventId, CompanyEventDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to create companyEvent for company [%s] with null payload", companyId));
@@ -161,3 +161,6 @@ public class CompanyEventService {
         }
     }
 }
+
+
+
