@@ -24,7 +24,7 @@ public class CompanyEventSchedulerController {
         return companyEventSchedulerService.findEventsByTypeAndDate(eventType, date);
     }
 
-    @GetMapping("/eventTpe/startDate/endDate")
+    @GetMapping("/eventType/startDate/endDate")
     public List<CompanyEventDto> findEventsByEventTypeAndDateRange(@RequestParam("eventType") EventType eventType, @RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
         return companyEventSchedulerService.findEventsByEventTypeAndDateRange(eventType, startDate, endDate);
     }
@@ -34,17 +34,17 @@ public class CompanyEventSchedulerController {
         return companyEventSchedulerService.findEventsByWeek(eventType, week);
     }
 
-    @GetMapping("/eventTpe/month")
+    @GetMapping("/eventType/month")
     public List<CompanyEventDto> findEventsByMonth(@RequestParam("eventType") EventType eventType, @RequestParam("month") int month) {
         return companyEventSchedulerService.findEventsByMonth(eventType, month);
     }
 
-    @GetMapping("/eventTpe/year")
+    @GetMapping("/eventType/year")
     public List<CompanyEventDto> findEventsByYear(@RequestParam("eventType") EventType eventType, @RequestParam("year") int year) {
         return companyEventSchedulerService.findEventsByYear(eventType, year);
     }
 
-    @GetMapping("/eventTpe/month/year")
+    @GetMapping("/eventType/month/year")
     public List<CompanyEventDto> findEventsByMonthAndYear(@RequestParam("eventType") EventType eventType, @RequestParam("month") int month, @RequestParam("year") int year) {
         return companyEventSchedulerService.findEventsByMonthAndYear(eventType, month, year);
     }
