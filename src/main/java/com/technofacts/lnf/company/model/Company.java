@@ -64,6 +64,9 @@ public class Company extends AuditableEntity {
     @OneToOne(mappedBy = "company", cascade = CascadeType.ALL)
     private Image image;
 
+    @OneToOne(mappedBy = "company")
+    private PayrollConfiguration payrollConfiguration;
+
     @ToString.Exclude
     @Builder.Default
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
