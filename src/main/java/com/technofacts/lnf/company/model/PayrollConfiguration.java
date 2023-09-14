@@ -21,6 +21,9 @@ public class PayrollConfiguration extends AuditableEntity{
     @Column(name = "component_value", nullable = false)
     private String  componentValue;
 
+    @Column(name = "component_code", nullable = false)
+    private String componentCode;
+
     @Column(name = "percentage", nullable = false)
     private Double percentage;
 
