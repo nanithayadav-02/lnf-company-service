@@ -154,7 +154,7 @@ public class CompanyEventService {
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
         try {
             companyEventRepository.deleteAll(entities);
-            log.info(() -> String.format("Notes for company[%s] successfully deleted", companyId));
+            log.info(() -> String.format("CompanyEvent for company[%s] successfully deleted", companyId));
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete event for company [%s]", companyId);
             throw new LnFException(errorMessage);

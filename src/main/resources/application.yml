@@ -105,7 +105,7 @@ spring:
       on-profile: dev-ide
 
   datasource:
-#    url: jdbc:postgresql://${database.host:ec2-34-202-158-22.compute-1.amazonaws.com}:${database.port:5432}/${database.name:tsdb}
+    #    url: jdbc:postgresql://${database.host:ec2-34-202-158-22.compute-1.amazonaws.com}:${database.port:5432}/${database.name:tsdb}
     url: jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name:company_db}
     username: ${database.username:company_user}
     password: ${database.password:company@12345}
