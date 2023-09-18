@@ -15,22 +15,22 @@ import lombok.*;
 @Table(name = "payroll_component_configuration")
 public class PayrollComponentConfiguration extends AuditableEntity {
 
-    @Column(name = "component_code", nullable = false)
+    @Column(name = "component_code",nullable = false)
     private String componentCode;
 
-    @Column(name = "component_name", nullable = false)
+    @Column(name = "component_name",nullable = false)
     private String componentName;
 
-    @Column(name = "component_value", nullable = false)
+    @Column(name = "component_value",nullable = false)
     private String componentValue;
 
-    @Column(name = "percentage", nullable = false)
+    @Column(name = "percentage",nullable = false)
     private Double percentage;
 
-    @Column(name = "financial_year", nullable = false)
+    @Column(name = "financial_year",nullable = false)
     private String financialYear;
 
-    @Column(name = "componentStatus", nullable = false)
+    @Column(name = "componentStatus",nullable = false)
     @Enumerated(EnumType.STRING)
     private ComponentStatus componentStatus;
 
