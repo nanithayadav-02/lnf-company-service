@@ -1,13 +1,13 @@
 package com.technofacts.lnf.company.converter;
 
-import com.technofacts.lnf.company.model.PayrollConfiguration;
+import com.technofacts.lnf.company.model.PayrollComponentConfiguration;
 import com.technofacts.lnf.company.model.enums.ComponentStatus;
-import com.technofacts.lnf.dto.company.PayrollConfigurationDto;
+import com.technofacts.lnf.dto.company.PayrollComponentConfigurationDto;
 
-public class PayrollConfigurationConverter {
+public class PayrollComponentConfigurationConverter {
 
-    public static PayrollConfigurationDto toTransportModel(PayrollConfiguration entity) {
-        PayrollConfigurationDto payrollConfigurationDto = PayrollConfigurationDto.builder()
+    public static PayrollComponentConfigurationDto toTransportModel(PayrollComponentConfiguration entity) {
+        PayrollComponentConfigurationDto payrollComponentConfigurationDto = PayrollComponentConfigurationDto.builder()
                 .id(entity.getId())
                 .componentName(entity.getComponentName())
                 .componentValue(entity.getComponentValue())
@@ -16,18 +16,13 @@ public class PayrollConfigurationConverter {
                 .financialYear(entity.getFinancialYear())
                 .componentStatus(entity.getComponentStatus().name())
                 .build();
-        return payrollConfigurationDto;
+        return payrollComponentConfigurationDto;
     }
 
-    public static PayrollConfiguration toEntityModel(PayrollConfigurationDto transport, PayrollConfiguration entity) {
+    public static PayrollComponentConfiguration toEntityModel(PayrollComponentConfigurationDto transport, PayrollComponentConfiguration entity) {
         if (transport == null) {
             return null;
         }
-
-        if (entity == null || entity.getId() == null) {
-            entity = new PayrollConfiguration();
-        }
-
         entity.setComponentName(transport.getComponentName());
         entity.setComponentValue(transport.getComponentValue());
         entity.setComponentCode(transport.getComponentCode());
