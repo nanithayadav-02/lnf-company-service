@@ -78,23 +78,23 @@ spring:
               drop-source: metadata
               create-database-schemas: true
     open-in-view: false
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
-          jwk-set-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf/protocol/openid-connect/certs
-      client:
-        registration:
-          company-service:
-            client-id: lnf-company-api
-            client-secret: ${client-secret:lnf-company-api-secret}
-            scope: openid,profile,roles
-            authorization-grant-type: client_credentials
-            provider: keycloak
-        provider:
-          keycloak:
-            issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
+#          jwk-set-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf/protocol/openid-connect/certs
+#      client:
+#        registration:
+#          company-service:
+#            client-id: lnf-company-api
+#            client-secret: ${client-secret:lnf-company-api-secret}
+#            scope: openid,profile,roles
+#            authorization-grant-type: client_credentials
+#            provider: keycloak
+#        provider:
+#          keycloak:
+#            issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
 
 printStackTrace: true
 
@@ -129,24 +129,24 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
-          jwk-set-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf/protocol/openid-connect/certs
-      client:
-        registration:
-          company-service:
-            client-id: lnf-company-api
-            client-secret: ${client-secret:lnf-company-api-secret}
-            scope: openid,profile,roles
-            authorization-grant-type: client_credentials
-            provider: keycloak
-        provider:
-          keycloak:
-            issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
-printStackTrace: true
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
+#          jwk-set-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf/protocol/openid-connect/certs
+#      client:
+#        registration:
+#          company-service:
+#            client-id: lnf-company-api
+#            client-secret: ${client-secret:lnf-company-api-secret}
+#            scope: openid,profile,roles
+#            authorization-grant-type: client_credentials
+#            provider: keycloak
+#        provider:
+#          keycloak:
+#            issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
+#printStackTrace: true
 ---
 spring:
   config:
@@ -178,10 +178,10 @@ spring:
       ddl-auto: none
     show-sql: true
 
-  autoconfigure:
-    exclude:
-      - org.keycloak.adapters.springboot.KeycloakAutoConfiguration
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+#  autoconfigure:
+#    exclude:
+#      - org.keycloak.adapters.springboot.KeycloakAutoConfiguration
+#      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 
 printStackTrace: true
 ---

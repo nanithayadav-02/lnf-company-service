@@ -22,6 +22,7 @@ public class CompanyConverter {
         dto.getTheme().addAll(entity.getTheme().stream().map(ThemeConverter::toTransportModel).filter(Objects::nonNull).toList());
         dto.getNotes().addAll(entity.getCompanyNotes().stream().map(CompanyNotesConverter::toTransportModel).filter(Objects::nonNull).toList());
         dto.getCompanyEvent().addAll(entity.getCompanyEvent().stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList());
+        dto.getPayrollComponentConfiguration().addAll(entity.getPayrollComponentConfiguration().stream().map(PayrollComponentConfigurationConverter::toTransportModel).filter(Objects::nonNull).toList());
         return dto;
     }
 
@@ -34,6 +35,7 @@ public class CompanyConverter {
         addThemeToEntityModel(transport, entity);
         addNotesToEntityModel(transport, entity);
         addCompanyEventToEntityModel(transport, entity);
+        addPayrollComponentConfigurationToEntityModel(transport,entity);
 
         return entity;
     }
@@ -119,6 +121,16 @@ public class CompanyConverter {
             companyEventList.add(entity);
         });
         company.getCompanyEvent().addAll(companyEventList);
+    }
+
+    private static void addPayrollComponentConfigurationToEntityModel(CompanyDto transport, Company company) {
+        List<PayrollComponentConfiguration> payrollComponentConfigurationList = new ArrayList<>();
+        transport.getPayrollComponentConfiguration().stream().filter(Objects::nonNull).forEach(dto -> {
+            PayrollComponentConfiguration entity = PayrollComponentConfigurationConverter.toEntityModel(dto, new PayrollComponentConfiguration());
+            entity.setCompany(company);
+            payrollComponentConfigurationList.add(entity);
+        });
+        company.getPayrollComponentConfiguration().addAll(payrollComponentConfigurationList);
     }
 
 
