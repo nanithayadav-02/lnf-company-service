@@ -102,7 +102,7 @@ printStackTrace: true
 spring:
   config:
     activate:
-      on-profile: dev-ide
+      on-profile: dev
 
   datasource:
     #    url: jdbc:postgresql://${database.host:ec2-34-202-158-22.compute-1.amazonaws.com}:${database.port:5432}/${database.name:tsdb}
