@@ -22,7 +22,7 @@ public class PayrollComponentConfiguration extends AuditableEntity {
     private String componentName;
 
     @Column(name = "component_value",nullable = false)
-    private String componentValue;
+    private Double componentValue;
 
     @Column(name = "percentage",nullable = false)
     private Double percentage;
