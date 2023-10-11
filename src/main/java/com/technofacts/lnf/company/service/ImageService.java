@@ -15,6 +15,7 @@ import com.technofacts.lnf.company.model.Image;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.ImageRepository;
 import com.technofacts.lnf.dto.company.ImageDto;
+import com.technofacts.lnf.service.File.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +36,8 @@ public class ImageService {
 
     private final CompanyRepository companyRepository;
     private final ImageRepository repository;
+
+    private final FileUploadService fileUploadService;
 
     public List<ImageDto> findAll() {
         List<Image> entities = repository.findAll();
@@ -150,5 +153,13 @@ public class ImageService {
         return repository.findById(fileId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Image with id [%s] does not exist",
                         fileId)));
+    }
+
+    private String uploadFile(String folder, MultipartFile file) {
+        return fileUploadService.uploadFile(folder,file);
+    }
+
+    private void deleteObjects(List<String> keys) {
+        fileUploadService.deleteObjects(keys);
     }
 }

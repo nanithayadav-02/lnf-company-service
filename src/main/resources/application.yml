@@ -12,6 +12,11 @@ server:
   servlet:
     context-path: /api/v1
 
+file:
+  upload:
+    service:
+      url: "http://localhost:8081/api/v1"
+
 client:
   model:
     json: client.json
