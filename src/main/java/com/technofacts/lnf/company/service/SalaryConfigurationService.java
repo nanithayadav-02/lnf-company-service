@@ -2,15 +2,18 @@ package com.technofacts.lnf.company.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.technofacts.lnf.company.exception.LnFException;
+import lombok.extern.java.Log;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+@Log
 public class SalaryConfigurationService {
 
-    public JsonNode getDesiredSalaryConfigurations() {
+    public JsonNode retrieveSalaryConfigurations() {
         try {
             Resource resource = new ClassPathResource("SalaryConfigurations.json");
             ObjectMapper objectMapper = new ObjectMapper();
@@ -24,7 +27,7 @@ public class SalaryConfigurationService {
 
             return desiredJson;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve salary configurations.", e);
+            throw new LnFException("Failed to retrieve salary configurations", e);
         }
     }
 }

@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class SalaryConfigurationController {
 
     private final SalaryConfigurationService salaryConfigurationService;
+
     @GetMapping("/salary-configurations")
     public ResponseEntity<JsonNode> getSalaryConfigurations() {
 
-            JsonNode desiredJson = salaryConfigurationService.getDesiredSalaryConfigurations();
+            JsonNode desiredJson = salaryConfigurationService.retrieveSalaryConfigurations();
             return ResponseEntity.ok(desiredJson);
         }
 
