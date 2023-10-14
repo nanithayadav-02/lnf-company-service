@@ -64,8 +64,8 @@ public class ImageService {
                 ImageDto imageDto = new ImageDto();
 
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/api/v1/lnf/file/key")
-                        .queryParam("key", folderName + companyId + "/" + fileName)
+                        .path("/lnf/file/key")
+                        .queryParam("key", folderName + companyId  + fileName)
                         .toUriString();
                 imageDto.setUrl(downloadURL);
                 imageDto.setContent(s3Response.getBody());
@@ -98,7 +98,6 @@ public class ImageService {
                 .contentType(MediaType.valueOf(file.getContentType()))
                 .body(file.getContent());
     }
-
 
     public void create(UUID companyId, MultipartFile file) {
         Company company = searchForCompany(companyId);

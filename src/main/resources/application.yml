@@ -12,8 +12,8 @@ aws:
     bucket:
       enabled: true
       service: "/lnf/file"
-      folderName: "company/"
-      fileName: "TF.png"
+      folderName: "company"
+      fileName:
 
 application:
   maxInMemorySize: 10485760
