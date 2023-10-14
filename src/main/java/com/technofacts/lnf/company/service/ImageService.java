@@ -68,7 +68,7 @@ public class ImageService {
 
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("/api/v1/lnf/file/key")
-                        .queryParam("key", "company/" + companyId + "/" + fileName)
+                        .queryParam("key", folderName + companyId + "/" + fileName)
                         .toUriString();
                 imageDto.setUrl(downloadURL);
                 imageDto.setContent(s3Response.getBody());
