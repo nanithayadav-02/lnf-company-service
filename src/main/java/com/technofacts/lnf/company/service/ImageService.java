@@ -44,9 +44,6 @@ public class ImageService {
     @Value("${aws.s3.bucket.enabled}")
     private boolean awsS3BucketEnabled;
 
-    @Value("${aws.s3.bucket.service}")
-    private String s3Service;
-
     @Value("${aws.s3.bucket.folderName}")
     private String folderName;
 

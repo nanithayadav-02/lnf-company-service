@@ -28,7 +28,7 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     private final WebClient webClient;
 
-    @Value("${s3.service}")
+    @Value("${aws.s3.bucket.service}")
     private String s3Service;
 
     @Override
