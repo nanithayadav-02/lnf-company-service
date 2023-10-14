@@ -20,7 +20,6 @@ public class ImageController {
     private final ImageService service;
 
     @GetMapping(value = "/company/{companyId}/image")
-    @ResponseStatus(HttpStatus.CREATED)
     public ImageDto findByCompanyId(@PathVariable("companyId") final UUID companyId) throws IOException {
         return service.findByCompanyId(companyId);
     }
@@ -56,5 +55,4 @@ public class ImageController {
                        @PathVariable("imageId") final UUID imageId) {
         service.deleteById(companyId, imageId);
     }
-
 }

@@ -23,23 +23,24 @@ public class ImageConverter {
         return dto;
     }
 
-    public static Image toEntityModel(MultipartFile transport) throws IOException {
+    public static Image toEntityModel(MultipartFile transport, boolean awsS3BucketEnabled, String filePath) throws IOException {
         if (transport == null) {
             return null;
         }
         Image entity = new Image();
-        return toEntityModel(transport, entity);
+        return toEntityModel(transport, entity,awsS3BucketEnabled, filePath);
 
     }
 
-    public static Image toEntityModel(MultipartFile transport, Image entity) throws IOException {
+    public static Image toEntityModel(MultipartFile transport, Image entity,boolean awsS3BucketEnabled,
+                                      String filePath) throws IOException {
         if (transport == null || entity == null) {
             return null;
         }
         entity.setName(transport.getOriginalFilename() != null ? transport.getOriginalFilename() : transport.getName());
         entity.setContentType(transport.getContentType());
         entity.setSize(transport.getSize());
-        entity.setContent(transport.getBytes());
+        entity.setContent(awsS3BucketEnabled ? new byte[0] : transport.getBytes());
 
         return entity;
     }
