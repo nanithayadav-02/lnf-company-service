@@ -44,10 +44,13 @@ public class ImageService {
     @Value("${aws.s3.bucket.enabled}")
     private boolean awsS3BucketEnabled;
 
-    @Value("${s3.folderName}")
+    @Value("${aws.s3.bucket.service}")
+    private String s3Service;
+
+    @Value("${aws.s3.bucket.folderName}")
     private String folderName;
 
-    @Value("${s3.fileName}")
+    @Value("${aws.s3.bucket.fileName}")
     private String fileName;
 
     public List<ImageDto> findAll() {
@@ -63,7 +66,11 @@ public class ImageService {
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 ImageDto imageDto = new ImageDto();
 
-                imageDto.setUrl("http://localhost:8081/api/v1/lnf/file/key?key=company/" + companyId + fileName);
+                String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/api/v1/lnf/file/key")
+                        .queryParam("key", "company/" + companyId + "/" + fileName)
+                        .toUriString();
+                imageDto.setUrl(downloadURL);
                 imageDto.setContent(s3Response.getBody());
                 imageDto.setContentType("application/octet-stream");
                 return imageDto;
