@@ -7,6 +7,25 @@ spring:
 
 KEYCLOAK_HOST: "keycloak:8080"
 
+aws:
+  s3:
+    bucket:
+      enabled: true
+
+application:
+  maxInMemorySize: 10485760
+
+s3:
+  service: "/lnf/file"
+  folderName: "company/"
+  fileName: "/TF.png"
+
+
+file:
+  upload:
+    service:
+      url: "http://localhost:8081/api/v1"
+
 server:
   port: 8081
   servlet:
