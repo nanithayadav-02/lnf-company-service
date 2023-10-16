@@ -7,8 +7,7 @@ import com.technofacts.lnf.dto.company.PayrollComponentConfigurationDto;
 public class PayrollComponentConfigurationConverter {
 
     public static PayrollComponentConfigurationDto toTransportModel(PayrollComponentConfiguration entity) {
-        PayrollComponentConfigurationDto payrollComponentConfigurationDto = PayrollComponentConfigurationDto.builder()
-                .id(entity.getId())
+       return PayrollComponentConfigurationDto.builder()
                 .componentName(entity.getComponentName())
                 .componentValue(entity.getComponentValue())
                 .componentCode(entity.getComponentCode())
@@ -16,7 +15,6 @@ public class PayrollComponentConfigurationConverter {
                 .financialYear(entity.getFinancialYear())
                 .componentStatus(entity.getComponentStatus().name())
                 .build();
-        return payrollComponentConfigurationDto;
     }
 
     public static PayrollComponentConfiguration toEntityModel(PayrollComponentConfigurationDto transport, PayrollComponentConfiguration entity) {
