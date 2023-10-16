@@ -1,0 +1,69 @@
+{
+  "salary_components": {
+    "basic_salary": {
+      "calculation_type": "percentage",
+      "component_code": "BASAL",
+      "component_value": "50",
+      "display_name": "Basic Salary",
+      "description": "Basic Salary Component"
+    },
+    "hra": {
+      "calculation_type": "percentage",
+      "component_code": "HOREA",
+      "component_value": "30",
+      "display_name": "HRA",
+      "description": "House Rental Allowance"
+    },
+    "conveyance_allowances": {
+      "calculation_type": "percentage",
+      "component_code": "CONAL",
+      "component_value": "1.60",
+      "display_name": "Conveyance Allowances",
+      "description": "Conveyance Allowances"
+    },
+    "medical_allowances": {
+      "calculation_type": "percentage",
+      "component_code": "MEDAL",
+      "component_value": "1.25",
+      "display_name": "Medical Allowances",
+      "description": "Medical Allowances"
+    },
+    "special_allowances": {
+      "calculation_type": "percentage",
+      "component_code": "SPEAL",
+      "component_value": "17.15",
+      "display_name": "Special Allowances",
+      "description": "Special Allowances"
+    },
+    "professional_tax": {
+      "calculation_type": "value",
+      "component_code": "PROFT",
+      "component_value": "2400",
+      "display_name": "Professional Tax",
+      "description": "Professional Tax per year"
+    }
+  },
+  "salary_deductions": {
+    "employee_provident_fund": {
+      "calculation_type": "value",
+      "component_code": "EMPPF",
+      "component_value": "21600",
+      "display_name": "Employee PF",
+      "description": "Employee provident fund"
+    },
+    "employer_provident_fund": {
+      "calculation_type": "value",
+      "component_code": "EMRPF",
+      "component_value": "23400.00",
+      "display_name": "Employer PF",
+      "description": "Employer provident fund"
+    },
+    "health_insurance": {
+      "calculation_type": "value",
+      "component_code": "HEALI",
+      "component_value": "6000.00",
+      "display_name": "Health Insurance",
+      "description": "Health Insurance"
+    }
+  }
+}
