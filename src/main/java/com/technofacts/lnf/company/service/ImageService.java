@@ -62,14 +62,12 @@ public class ImageService {
             ResponseEntity<byte[]> s3Response = retrieveObject(folderName + companyId + fileName);
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 ImageDto imageDto = new ImageDto();
-
+                imageDto.setContentType("application/octet-stream");
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("/lnf/file/key")
                         .queryParam("key", folderName + companyId  + fileName)
                         .toUriString();
                 imageDto.setUrl(downloadURL);
-                imageDto.setContent(s3Response.getBody());
-                imageDto.setContentType("application/octet-stream");
                 return imageDto;
             }
         } else {
