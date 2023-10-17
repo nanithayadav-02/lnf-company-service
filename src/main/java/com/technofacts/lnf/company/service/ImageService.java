@@ -59,15 +59,16 @@ public class ImageService {
     public ImageDto findByCompanyId(UUID companyId) {
 
         if (awsS3BucketEnabled) {
-            ResponseEntity<byte[]> s3Response = retrieveObject(folderName + companyId + fileName);
+            ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId +  "/" + fileName);
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 ImageDto imageDto = new ImageDto();
-                imageDto.setContentType("application/octet-stream");
+
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/lnf/file/key")
-                        .queryParam("key", folderName + companyId  + fileName)
+                        .path("/lnf/file")
+                        .queryParam("filePath", folderName + "/" + companyId +  "/" + fileName)
                         .toUriString();
                 imageDto.setUrl(downloadURL);
+                imageDto.setContentType("application/octet-stream");
                 return imageDto;
             }
         } else {
@@ -106,7 +107,8 @@ public class ImageService {
                     String.format("Failed to create Image for company [%s] with null payload", companyId));
             String filePath = null;
             if (awsS3BucketEnabled) {
-                filePath = uploadFile(folderName, file);
+                String folder = folderName + "/" + companyId + "/";
+                filePath = uploadFile(folder, file);
                 log.info("File uploaded successfully to S3 bucket: " + filePath);
             } else {
                 Image entity = ImageConverter.toEntityModel(file, false, null);
@@ -135,26 +137,27 @@ public class ImageService {
         try {
             String filePath = null;
             if (awsS3BucketEnabled) {
-                filePath = uploadFile(folderName, file);
+                String folder = folderName + "/" + companyId + "/";
+                filePath = uploadFile(folder, file);
                 log.info("file uploaded successfully" + filePath);
+            } else {
+                Image updatedEntity = ImageConverter.toEntityModel(file, entity, false, null);
+                save(updatedEntity);
+                log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
             }
-
-            Image updatedEntity = ImageConverter.toEntityModel(file, entity,false, null);
-            save(updatedEntity);
         } catch (RuntimeException | IOException e) {
             String errorMessage = String.format("Failed to update file[%s] for company [%s]", fileId, companyId);
             throw new LnFException(errorMessage, e);
         }
-        log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
     }
 
     public void deleteByCompanyId(UUID companyId) {
 
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + companyId + fileName;
-            List<String> keys = Collections.singletonList(s3ObjectKey);
-            deleteObjects( keys);
-            log.info("S3 object deleted for employee");
+            String s3ObjectKey = folderName +"/" + companyId + "/" +  fileName;
+            List<String> filePaths = Collections.singletonList(s3ObjectKey);
+            delete( filePaths);
+            log.info("S3 object deleted for company");
         } else {
             searchForCompany(companyId);
             List<Image> entities = repository.findByCompanyId(companyId);
@@ -205,11 +208,11 @@ public class ImageService {
         return fileUploadService.uploadFile(folder,file);
     }
 
-    private void deleteObjects(List<String> keys) {
-        fileUploadService.deleteObjects(keys);
+    private void delete(List<String> filePaths) {
+        fileUploadService.delete(filePaths);
     }
 
-    public ResponseEntity<byte[]> retrieveObject(String key) {
-        return fileUploadService.retrieveObject(key);
+    public ResponseEntity<byte[]> findFile(String filePath) {
+        return fileUploadService.findFile(filePath);
     }
 }

@@ -1,10 +1,10 @@
 package com.technofacts.lnf.company.converter;
 
-import java.io.IOException;
-
 import com.technofacts.lnf.company.model.CompanyPolicy;
 import com.technofacts.lnf.dto.company.CompanyPolicyDto;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public class CompanyPolicyConverter {
 
@@ -22,18 +22,18 @@ public class CompanyPolicyConverter {
         return dto;
     }
 
-    public static CompanyPolicy toEntityModel(MultipartFile transport) throws IOException {
-        return toEntityModel(transport, new CompanyPolicy());
+    public static CompanyPolicy toEntityModel(MultipartFile transport, boolean awsS3BucketEnabled, String filePath) throws IOException {
+        return toEntityModel(transport, new CompanyPolicy(),awsS3BucketEnabled, filePath);
     }
 
-    public static CompanyPolicy toEntityModel(MultipartFile transport, CompanyPolicy entity) throws IOException {
+    public static CompanyPolicy toEntityModel(MultipartFile transport, CompanyPolicy entity,boolean awsS3BucketEnabled, String filePath) throws IOException {
         if (transport == null || entity == null) {
             return null;
         }
         entity.setName(transport.getOriginalFilename() != null ? transport.getOriginalFilename() : transport.getName());
         entity.setContentType(transport.getContentType());
         entity.setSize(transport.getSize());
-        entity.setContent(transport.getBytes());
+        entity.setContent(awsS3BucketEnabled ? new byte[0] : transport.getBytes());
 
         return entity;
     }
