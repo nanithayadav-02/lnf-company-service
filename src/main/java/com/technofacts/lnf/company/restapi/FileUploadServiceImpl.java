@@ -47,9 +47,9 @@ public class FileUploadServiceImpl implements FileUploadService {
                     .block();
             return uploadedFileUrl;
         } catch (LnFEntityNotFoundException ex) {
-            log.error("File Upload for Employee Is Failed",ex.getMessage());
+            log.error("File Upload for company Is Failed",ex.getMessage());
         } catch (RuntimeException ex) {
-            log.error("File Upload for Employee Is Failed", ex.getMessage());
+            log.error("File Upload for company Is Failed", ex.getMessage());
         }
         return null;
     }
@@ -67,8 +67,8 @@ public class FileUploadServiceImpl implements FileUploadService {
                     .toBodilessEntity()
                     .block();
         } catch (Exception e) {
-            log.error("Failed to delete files with keys {}: {}", filePaths, e.getMessage());
-            throw new LnFException("Failed to delete files with keys " + filePaths, e);
+            log.error("Failed to delete files with filePaths {}: {}", filePaths, e.getMessage());
+            throw new LnFException("Failed to delete files with filePaths " + filePaths, e);
         }
     }
 
