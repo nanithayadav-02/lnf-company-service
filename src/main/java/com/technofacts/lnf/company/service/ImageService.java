@@ -156,7 +156,7 @@ public class ImageService {
         if (awsS3BucketEnabled) {
             String s3ObjectKey = folderName +"/" + companyId + "/" +  fileName;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
-            deleteObjects( filePaths);
+            delete( filePaths);
             log.info("S3 object deleted for company");
         } else {
             searchForCompany(companyId);
@@ -208,8 +208,8 @@ public class ImageService {
         return fileUploadService.uploadFile(folder,file);
     }
 
-    private void deleteObjects(List<String> filePaths) {
-        fileUploadService.deleteObjects(filePaths);
+    private void delete(List<String> filePaths) {
+        fileUploadService.delete(filePaths);
     }
 
     public ResponseEntity<byte[]> findFile(String filePath) {
