@@ -56,13 +56,13 @@ public class CompanyPolicyService {
     public List<CompanyPolicyDto> findByCompanyId(UUID companyId) {
         if (awsS3BucketEnabled) {
             String policies = " ";
-            ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId +  "/" + policies + "/" + fileName);
+            ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/policies/" + fileName);
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 CompanyPolicyDto companyPolicyDto = new CompanyPolicyDto();
 
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("/lnf/file")
-                        .queryParam(folderName + "/" + companyId +  "/" + policies + "/" + fileName)
+                        .queryParam(folderName + "/" + companyId +  "/policies/" + fileName)
                         .toUriString();
                 companyPolicyDto.setUrl(downloadURL);
                 companyPolicyDto.setContentType("application/octet-stream");
@@ -104,7 +104,7 @@ public class CompanyPolicyService {
                         String.format("Failed to create Policy for company [%s] with null payload", companyId));
                 String filePath = null;
                 if (awsS3BucketEnabled) {
-                    String folder = folderName + "/" + companyId + "/" + policies + "/";
+                    String folder = folderName + "/" + companyId + "/policies/";
                     filePath = uploadFile(folder, policy);
                     log.info("File uploaded successfully to S3 bucket: " + filePath);
                 } else {
@@ -128,7 +128,7 @@ public class CompanyPolicyService {
             String filePath = null;
             if (awsS3BucketEnabled) {
                 String policies = " ";
-                String folder = folderName + "/" + companyId + "/" + policies + "/";
+                String folder = folderName + "/" + companyId + "/policies/";
                 filePath = uploadFile(folder, policy);
                 log.info("file uploaded successfully" + filePath);
             } else {
@@ -145,8 +145,7 @@ public class CompanyPolicyService {
 
     public void deleteByCompanyId(UUID companyId) {
         if (awsS3BucketEnabled) {
-            String policies = " ";
-            String s3ObjectKey = folderName + "/" + companyId + "/" + policies + "/" + fileName;
+            String s3ObjectKey = folderName + "/" + companyId +  "/policies/"  + fileName;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             delete( filePaths);
             log.info("S3 object deleted for employee");
