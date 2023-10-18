@@ -53,5 +53,5 @@ public class CompanyPolicyController {
     public void delete(@PathVariable("companyId") final UUID companyId, @PathVariable("policyId") final UUID policyId) {
         service.deleteById(companyId, policyId);
     }
-
 }
+
