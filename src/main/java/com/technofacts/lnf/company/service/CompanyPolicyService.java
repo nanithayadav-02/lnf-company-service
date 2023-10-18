@@ -55,14 +55,13 @@ public class CompanyPolicyService {
 
     public List<CompanyPolicyDto> findByCompanyId(UUID companyId) {
         if (awsS3BucketEnabled) {
-            String policies = " ";
             ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/policies/" + fileName);
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 CompanyPolicyDto companyPolicyDto = new CompanyPolicyDto();
 
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("/lnf/file")
-                        .queryParam(folderName + "/" + companyId +  "/policies/" + fileName)
+                        .queryParam("filePath",folderName + "/" + companyId +  "/policies/" + fileName)
                         .toUriString();
                 companyPolicyDto.setUrl(downloadURL);
                 companyPolicyDto.setContentType("application/octet-stream");
@@ -127,7 +126,6 @@ public class CompanyPolicyService {
         try {
             String filePath = null;
             if (awsS3BucketEnabled) {
-                String policies = " ";
                 String folder = folderName + "/" + companyId + "/policies/";
                 filePath = uploadFile(folder, policy);
                 log.info("file uploaded successfully" + filePath);

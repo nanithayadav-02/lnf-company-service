@@ -54,4 +54,9 @@ public class CompanyPolicyController {
         service.deleteById(companyId, policyId);
     }
 
+    @GetMapping("/file")
+    public ResponseEntity<byte[]> findFile(@RequestParam("filePath") String filePath) {
+        return service.findFile(filePath);
+    }
+
 }
