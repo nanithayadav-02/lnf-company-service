@@ -36,12 +36,6 @@ public class SalaryConfigurationController {
         return ResponseEntity.ok("payroll salary configuration uploaded successfully");
     }
 
-
-   /* @GetMapping(value = "/payroll/salary-configuration")
-    public ResponseEntity<byte[]> findFile(@RequestParam("filePath") String filePath,@RequestParam ("companyId") final UUID companyId, @RequestParam String financialYear) {
-        return salaryConfigurationService.findFile(filePath);
-    }*/
-
     @DeleteMapping("/payroll/salary-configuration/{companyId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void deleteByCompanyId(@PathVariable("companyId") final UUID companyId, @RequestParam String financialYear) {
