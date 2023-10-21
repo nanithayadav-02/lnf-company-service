@@ -111,7 +111,7 @@ public class ImageService {
                 filePath = uploadFile(folder, file);
                 log.info("File uploaded successfully to S3 bucket: " + filePath);
             } else {
-                Image entity = ImageConverter.toEntityModel(file, false, null);
+                Image entity = ImageConverter.toEntityModel(file, false, filePath);
                 if (entities.size() > 0) {
                     entity.setId(entities.get(0).getId());
                 }
@@ -141,7 +141,7 @@ public class ImageService {
                 filePath = uploadFile(folder, file);
                 log.info("file uploaded successfully" + filePath);
             } else {
-                Image updatedEntity = ImageConverter.toEntityModel(file, entity, false, null);
+                Image updatedEntity = ImageConverter.toEntityModel(file, entity, false, filePath);
                 save(updatedEntity);
                 log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
             }

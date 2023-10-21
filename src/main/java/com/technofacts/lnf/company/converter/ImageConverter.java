@@ -19,6 +19,7 @@ public class ImageConverter {
         dto.setName(entity.getName());
         dto.setContentType(entity.getContentType());
         dto.setSize(entity.getSize());
+        dto.setUrl(entity.getUrl());
 
         return dto;
     }
@@ -42,10 +43,12 @@ public class ImageConverter {
         entity.setSize(transport.getSize());
         entity.setContent(awsS3BucketEnabled ? new byte[0] : transport.getBytes());
 
+
         return entity;
     }
 
-    public static Image toEntityModel(ImageDto transport, Image entity) {
+    public static Image toEntityModel(ImageDto transport, Image entity,boolean awsS3BucketEnabled,
+                                      String filePath) {
         if (transport == null || entity == null) {
             return null;
         }
@@ -53,6 +56,7 @@ public class ImageConverter {
         entity.setContentType(transport.getContentType());
         entity.setSize(transport.getSize());
         entity.setContent(transport.getContent());
+        entity.setUrl(filePath);
 
         return entity;
     }
