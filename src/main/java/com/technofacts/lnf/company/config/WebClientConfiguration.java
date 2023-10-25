@@ -24,7 +24,7 @@ public class WebClientConfiguration {
     @Value("${application.maxInMemorySize}")
     private int maxInMemorySize;
 
-    @Value("${application.timeOut}")
+    @Value("${connection.timeout}")
     private int timeOut;
 
     @Bean

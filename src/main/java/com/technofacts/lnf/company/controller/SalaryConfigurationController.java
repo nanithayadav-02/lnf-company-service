@@ -24,14 +24,14 @@ public class SalaryConfigurationController {
             return ResponseEntity.ok(desiredJson);
         }
 
-    @PostMapping(value = "/payroll/salary-configuration/{companyId}")
+    @PostMapping(value = "/salary-configuration/{companyId}")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> create(@PathVariable("companyId") UUID companyId, @RequestParam String financialYear, @RequestParam MultipartFile file) {
         salaryConfigurationService.create(companyId,financialYear,file);
-        return ResponseEntity.ok("payroll salary configuration uploaded successfully");
+        return ResponseEntity.ok("payroll salary configurations uploaded successfully");
     }
 
-    @DeleteMapping("/payroll/salary-configuration/{companyId}")
+    @DeleteMapping("/salary-configuration/{companyId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void deleteByCompanyId(@PathVariable("companyId") final UUID companyId, @RequestParam String financialYear) {
         salaryConfigurationService.deleteByCompanyId(companyId,financialYear);

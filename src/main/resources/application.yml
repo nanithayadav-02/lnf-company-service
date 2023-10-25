@@ -15,11 +15,17 @@ aws:
       folderName: "company"
       financialYear: "2023-24"
       companyCode: "TF"
+      salaryConfigFile: "SalaryConfigurations.json"
+      investment:
+        declaration:
+          file: "Investment_declaration.json"
 
 
 application:
   maxInMemorySize: 10485760
-  timeOut: 2000
+
+connection:
+  timeout: 2000
 
 file:
   upload:

@@ -41,13 +41,16 @@ public class SalaryConfigurationService {
     @Value("${aws.s3.bucket.companyCode}")
     private String companyCode;
 
+    @Value("${aws.s3.bucket.salaryConfigFile}")
+    private String salaryConfigFile;
+
 
     public JsonNode retrieveSalaryConfigurations() {
         try {
             if (awsS3BucketEnabled) {
                 CompanyDto companyDto = service.findByCompanyCode(companyCode);
                 UUID companyId = companyDto.getId();
-                ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/" + "SalaryConfigurations.json");
+                ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/" + salaryConfigFile);
                 if (s3Response.getStatusCode() == HttpStatus.OK) {
                     byte[] fileContent = s3Response.getBody();
                     ObjectMapper objectMapper = new ObjectMapper();
@@ -82,7 +85,7 @@ public class SalaryConfigurationService {
 
     public void deleteByCompanyId(UUID companyId , String financialYear) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/" + "SalaryConfigurations.json";
+            String s3ObjectKey = folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/" + salaryConfigFile;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             delete(filePaths);
             log.info("S3 object deleted for company");

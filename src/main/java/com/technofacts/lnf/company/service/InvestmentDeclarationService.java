@@ -40,12 +40,15 @@ public class InvestmentDeclarationService {
     @Value("${aws.s3.bucket.companyCode}")
     private String companyCode;
 
+    @Value("${aws.s3.bucket.investment.declaration.file}")
+    private String investmentDeclarationFile;
+
     public JsonNode retrieveInvestmentDeclarations() {
         try {
             if (awsS3BucketEnabled) {
                 CompanyDto companyDto = service.findByCompanyCode(companyCode);
                 UUID companyId = companyDto.getId();
-                ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/payroll/investment-declaration/" + financialYear + "/" + "Investment_declaration.json");
+                ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/payroll/investment-declaration/" + financialYear + "/" + investmentDeclarationFile);
                 if (s3Response.getStatusCode() == HttpStatus.OK) {
                     byte[] fileContent = s3Response.getBody();
                     ObjectMapper objectMapper = new ObjectMapper();
@@ -53,7 +56,7 @@ public class InvestmentDeclarationService {
                 }
             }
         } catch (Exception e) {
-            throw new LnFException("Failed to retrieve salary configurations", e);
+            throw new LnFException("Failed to retrieve investment declarations", e);
         }
         return null;
     }
@@ -66,19 +69,9 @@ public class InvestmentDeclarationService {
         return "File upload to s3 is failed";
     }
 
-    public String findByCompanyId(UUID companyId , String financialYear) {
-        String filePath = folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/" + "Investment_declaration.json";
-        findFile(filePath);
-        String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/lnf/company/payroll/salary-configuration")
-                .queryParam("filePath", filePath)
-                .toUriString();
-        return downloadURL;
-    }
-
     public void deleteByCompanyId(UUID companyId , String financialYear) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + "/" + companyId + "/payroll/investment-declaration/" + financialYear + "/" + "Investment_declaration.json";
+            String s3ObjectKey = folderName + "/" + companyId + "/payroll/investment-declaration/" + financialYear + "/" + investmentDeclarationFile;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             delete(filePaths);
             log.info("S3 object deleted for company");

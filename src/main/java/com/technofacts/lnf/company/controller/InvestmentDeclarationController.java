@@ -24,15 +24,15 @@ public class InvestmentDeclarationController {
     }
 
 
-    @PostMapping(value = "/payroll/investment-declaration/{companyId}")
+    @PostMapping(value = "/investment-declaration/{companyId}")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> create(@PathVariable("companyId") UUID companyId, @RequestParam String financialYear, @RequestParam MultipartFile file) {
         investmentDeclarationService.create(companyId,financialYear,file);
-        return ResponseEntity.ok("payroll investment declaration uploaded successfully");
+        return ResponseEntity.ok("payroll investment declarations uploaded successfully");
     }
 
 
-    @DeleteMapping("/payroll/investment-declaration/{companyId}")
+    @DeleteMapping("/investment-declaration/{companyId}")
     @ResponseStatus(HttpStatus.CREATED)
     public void deleteByCompanyId(@PathVariable("companyId") final UUID companyId, @RequestParam String financialYear) {
         investmentDeclarationService.deleteByCompanyId(companyId,financialYear);
