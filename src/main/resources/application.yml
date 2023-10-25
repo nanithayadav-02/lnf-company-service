@@ -13,10 +13,13 @@ aws:
       enabled: true
       service: "/lnf/file"
       folderName: "company"
-      fileName:
+      financialYear: "2023-24"
+      companyCode: "TF"
+
 
 application:
   maxInMemorySize: 10485760
+  timeOut: 2000
 
 file:
   upload:

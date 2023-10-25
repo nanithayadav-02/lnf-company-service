@@ -24,11 +24,6 @@ public class SalaryConfigurationController {
             return ResponseEntity.ok(desiredJson);
         }
 
-    @GetMapping(value = "/payroll/salary-configuration/{companyId}")
-    public String findByCompanyId(@PathVariable("companyId") final UUID companyId , @RequestParam String financialYear) {
-        return salaryConfigurationService.findByCompanyId(companyId,financialYear);
-    }
-
     @PostMapping(value = "/payroll/salary-configuration/{companyId}")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<String> create(@PathVariable("companyId") UUID companyId, @RequestParam String financialYear, @RequestParam MultipartFile file) {

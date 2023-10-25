@@ -22,11 +22,11 @@ public class CompanyPolicyConverter {
         return dto;
     }
 
-    public static CompanyPolicy toEntityModel(MultipartFile transport, boolean awsS3BucketEnabled, String filePath) throws IOException {
-        return toEntityModel(transport, new CompanyPolicy(),awsS3BucketEnabled, filePath);
+    public static CompanyPolicy toEntityModel(MultipartFile transport, boolean awsS3BucketEnabled) throws IOException {
+        return toEntityModel(transport, new CompanyPolicy(),awsS3BucketEnabled);
     }
 
-    public static CompanyPolicy toEntityModel(MultipartFile transport, CompanyPolicy entity,boolean awsS3BucketEnabled, String filePath) throws IOException {
+    public static CompanyPolicy toEntityModel(MultipartFile transport, CompanyPolicy entity,boolean awsS3BucketEnabled) throws IOException {
         if (transport == null || entity == null) {
             return null;
         }

@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface ImageRepository extends JpaRepository<Image, UUID> {
 
     @Query("SELECT i FROM Image i WHERE i.company.id = :id")
-    List<Image> findByCompanyId(@Param("id") UUID id);
+    Image findByCompanyId(@Param("id") UUID id);
 
 }
