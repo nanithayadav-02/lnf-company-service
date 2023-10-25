@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.technofacts.lnf.company.exception.LnFException;
-import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.dto.company.CompanyDto;
 import com.technofacts.lnf.service.File.FileUploadService;
 import lombok.RequiredArgsConstructor;
