@@ -44,13 +44,15 @@ public class SalaryConfigurationService {
     @Value("${aws.s3.bucket.salaryConfigFile}")
     private String salaryConfigFile;
 
-
     public JsonNode retrieveSalaryConfigurations() {
         try {
             if (awsS3BucketEnabled) {
                 CompanyDto companyDto = service.findByCompanyCode(companyCode);
                 UUID companyId = companyDto.getId();
-                ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/" + salaryConfigFile);
+                String filePath = folderName + "/"
+                        + companyId + "/payroll/salary-configuration/"
+                        + financialYear + "/" + salaryConfigFile;
+                ResponseEntity<byte[]> s3Response = fileUploadService.findFile(filePath);
                 if (s3Response.getStatusCode() == HttpStatus.OK) {
                     byte[] fileContent = s3Response.getBody();
                     ObjectMapper objectMapper = new ObjectMapper();
@@ -58,6 +60,7 @@ public class SalaryConfigurationService {
                 }
             } else {
                 Resource resource = new ClassPathResource("SalaryConfigurations.json");
+
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode jsonData = objectMapper.readTree(resource.getInputStream());
                 JsonNode salaryComponents = jsonData.get("salary_components");
@@ -75,32 +78,24 @@ public class SalaryConfigurationService {
         return null;
     }
 
-    public String create(UUID companyId  , String financialYear, MultipartFile file) {
+    public String create(UUID companyId, String financialYear, MultipartFile file) {
         if (awsS3BucketEnabled) {
             String folder = folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/";
-            return uploadFile(folder, file);
+            return fileUploadService.uploadFile(folder,file);
         }
-        return "File upload to AWS S3 is not enabled";
+        return "File upload to AWS S3 bucket is not enabled";
     }
 
     public void deleteByCompanyId(UUID companyId , String financialYear) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/" + salaryConfigFile;
+            String s3ObjectKey = folderName + "/"
+                    + companyId + "/payroll/salary-configuration/"
+                    + financialYear + "/" + salaryConfigFile;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
-            delete(filePaths);
-            log.info("S3 object deleted for company");
+            fileUploadService.delete(filePaths);
+            log.info(() -> String.format("Salary configuration is deleted for the company [%s] and financial year " +
+                    "[%s}]", companyId, financialYear));
         }
     }
 
-    private String uploadFile(String folder, MultipartFile file) {
-        return fileUploadService.uploadFile(folder,file);
-    }
-
-    private void delete(List<String> filePaths) {
-        fileUploadService.delete(filePaths);
-    }
-
-    private ResponseEntity<byte[]> findFile(String filePath) {
-        return fileUploadService.findFile(filePath);
-    }
 }

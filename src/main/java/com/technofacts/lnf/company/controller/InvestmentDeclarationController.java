@@ -15,26 +15,26 @@ import java.util.UUID;
 @RequestMapping("/lnf/company")
 public class InvestmentDeclarationController {
 
-    private final InvestmentDeclarationService investmentDeclarationService;
+    private final InvestmentDeclarationService service;
 
     @GetMapping("/investment-declarations")
     public ResponseEntity<JsonNode> retrieveInvestmentDeclarations() {
-        JsonNode desiredJson = investmentDeclarationService.retrieveInvestmentDeclarations();
+        JsonNode desiredJson = service.retrieveInvestmentDeclarations();
         return ResponseEntity.ok(desiredJson);
     }
 
-
     @PostMapping(value = "/investment-declaration/{companyId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> create(@PathVariable("companyId") UUID companyId, @RequestParam String financialYear, @RequestParam MultipartFile file) {
-        investmentDeclarationService.create(companyId,financialYear,file);
+    public ResponseEntity<String> create(@PathVariable("companyId") UUID companyId, @RequestParam String financialYear,
+                                         @RequestParam MultipartFile file) {
+        service.create(companyId,financialYear,file);
         return ResponseEntity.ok("payroll investment declarations uploaded successfully");
     }
 
 
     @DeleteMapping("/investment-declaration/{companyId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteByCompanyId(@PathVariable("companyId") final UUID companyId, @RequestParam String financialYear) {
-        investmentDeclarationService.deleteByCompanyId(companyId,financialYear);
+        service.deleteByCompanyId(companyId,financialYear);
     }
 }

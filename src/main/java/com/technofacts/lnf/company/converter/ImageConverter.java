@@ -28,11 +28,16 @@ public class ImageConverter {
             return null;
         }
         Image entity = new Image();
-        return toEntityModel(transport, entity,awsS3BucketEnabled);
+        entity.setName(transport.getOriginalFilename() != null ? transport.getOriginalFilename() : transport.getName());
+        entity.setContentType(transport.getContentType());
+        entity.setSize(transport.getSize());
+        entity.setContent(awsS3BucketEnabled ? new byte[0] : transport.getBytes());
 
+        return entity;
     }
 
-    public static Image toEntityModel(MultipartFile transport, Image entity,boolean awsS3BucketEnabled) throws IOException {
+    public static Image toEntityModel(MultipartFile transport, Image entity,
+                                      boolean awsS3BucketEnabled) throws IOException {
         if (transport == null || entity == null) {
             return null;
         }

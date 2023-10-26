@@ -15,25 +15,25 @@ import java.util.UUID;
 @RequestMapping("/lnf/company")
 public class SalaryConfigurationController {
 
-    private final SalaryConfigurationService salaryConfigurationService;
+    private final SalaryConfigurationService service;
 
     @GetMapping("/salary-configurations")
     public ResponseEntity<JsonNode> getSalaryConfigurations() {
-
-            JsonNode desiredJson = salaryConfigurationService.retrieveSalaryConfigurations();
+            JsonNode desiredJson = service.retrieveSalaryConfigurations();
             return ResponseEntity.ok(desiredJson);
         }
 
     @PostMapping(value = "/salary-configuration/{companyId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> create(@PathVariable("companyId") UUID companyId, @RequestParam String financialYear, @RequestParam MultipartFile file) {
-        salaryConfigurationService.create(companyId,financialYear,file);
+    public ResponseEntity<String> create(@PathVariable("companyId") UUID companyId, @RequestParam String financialYear,
+                                         @RequestParam MultipartFile file) {
+        service.create(companyId, financialYear, file);
         return ResponseEntity.ok("payroll salary configurations uploaded successfully");
     }
 
     @DeleteMapping("/salary-configuration/{companyId}")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteByCompanyId(@PathVariable("companyId") final UUID companyId, @RequestParam String financialYear) {
-        salaryConfigurationService.deleteByCompanyId(companyId,financialYear);
+        service.deleteByCompanyId(companyId, financialYear);
     }
 }

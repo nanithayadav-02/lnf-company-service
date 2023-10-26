@@ -99,10 +99,9 @@ public class ImageService {
         try {
             LnFBadRequestException.throwOnCondition(Objects::isNull, file,
                     String.format("Failed to create Image for company [%s] with null payload", companyId));
-            String filePath = null;
             if (awsS3BucketEnabled) {
                 String folder = folderName + "/" + companyId + "/";
-                filePath = uploadFile(folder, file);
+                String filePath = uploadFile(folder, file);
                 log.info("File uploaded successfully to S3 bucket: " + filePath);
             }
             Image entity = ImageConverter.toEntityModel(file, false);
@@ -125,13 +124,12 @@ public class ImageService {
         searchForCompany(companyId);
         Image entity = searchForImage(fileId);
         try {
-            String filePath = null;
             if (awsS3BucketEnabled) {
                 String folder = folderName + "/" + companyId + "/";
-                filePath = uploadFile(folder, file);
+                String filePath = uploadFile(folder, file);
                 log.info("file uploaded successfully" + filePath);
             } else {
-                Image updatedEntity = ImageConverter.toEntityModel(file, entity, false);
+                Image updatedEntity = ImageConverter.toEntityModel(file, entity, awsS3BucketEnabled);
                 save(updatedEntity);
                 log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
             }

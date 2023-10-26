@@ -48,7 +48,10 @@ public class InvestmentDeclarationService {
             if (awsS3BucketEnabled) {
                 CompanyDto companyDto = service.findByCompanyCode(companyCode);
                 UUID companyId = companyDto.getId();
-                ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/payroll/investment-declaration/" + financialYear + "/" + investmentDeclarationFile);
+                String filePath = folderName + "/" + companyId
+                        + "/payroll/investment-declaration/"
+                        + financialYear + "/" + investmentDeclarationFile;
+                ResponseEntity<byte[]> s3Response = fileUploadService.findFile(filePath);
                 if (s3Response.getStatusCode() == HttpStatus.OK) {
                     byte[] fileContent = s3Response.getBody();
                     ObjectMapper objectMapper = new ObjectMapper();
@@ -61,32 +64,23 @@ public class InvestmentDeclarationService {
         return null;
     }
 
-    public String create(UUID companyId , String financialYear, MultipartFile file) {
+    public String create(UUID companyId, String financialYear, MultipartFile file) {
         if (awsS3BucketEnabled) {
             String folder = folderName + "/" + companyId + "/payroll/investment-declaration/" + financialYear + "/";
-            return uploadFile(folder, file);
+            return fileUploadService.uploadFile(folder, file);
         }
-        return "File upload to s3 is failed";
+        return "Investment declaration file upload to AWS s3 bucket is failed";
     }
 
     public void deleteByCompanyId(UUID companyId , String financialYear) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + "/" + companyId + "/payroll/investment-declaration/" + financialYear + "/" + investmentDeclarationFile;
+            String s3ObjectKey = folderName + "/" + companyId
+                    + "/payroll/investment-declaration/" + financialYear + "/" + investmentDeclarationFile;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
-            delete(filePaths);
-            log.info("S3 object deleted for company");
+            fileUploadService.delete(filePaths);
+            log.info(() -> String.format("Investment declaration is deleted for the company [%s] and financial year " +
+                    "[%s}]", companyId, financialYear));
         }
     }
 
-    private String uploadFile(String folder, MultipartFile file) {
-        return fileUploadService.uploadFile(folder,file);
-    }
-
-    private void delete(List<String> filePaths) {
-        fileUploadService.delete(filePaths);
-    }
-
-    private  ResponseEntity<byte[]> findFile(String filePath) {
-        return fileUploadService.findFile(filePath);
-    }
 }
