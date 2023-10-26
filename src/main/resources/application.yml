@@ -18,7 +18,7 @@ aws:
       salaryConfigFile: "SalaryConfigurations.json"
       investment:
         declaration:
-          file: "Investment_declaration.json"
+          file: "investment_declaration.json"
 
 
 application:
