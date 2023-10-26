@@ -13,10 +13,19 @@ aws:
       enabled: true
       service: "/lnf/file"
       folderName: "company"
-      fileName:
+      financialYear: "2023-24"
+      companyCode: "TF"
+      salaryConfigFile: "SalaryConfigurations.json"
+      investment:
+        declaration:
+          file: "investment_declaration.json"
+
 
 application:
   maxInMemorySize: 10485760
+
+connection:
+  timeout: 2000
 
 file:
   upload:

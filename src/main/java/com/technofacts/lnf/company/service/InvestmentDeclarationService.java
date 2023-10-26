@@ -1,20 +1,19 @@
 package com.technofacts.lnf.company.service;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.technofacts.lnf.company.exception.LnFException;
 import com.technofacts.lnf.dto.company.CompanyDto;
 import com.technofacts.lnf.service.File.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.UUID;
 @Service
 @Log
 @RequiredArgsConstructor
-public class SalaryConfigurationService {
+public class InvestmentDeclarationService {
 
     private final FileUploadService fileUploadService;
 
@@ -41,59 +40,45 @@ public class SalaryConfigurationService {
     @Value("${aws.s3.bucket.companyCode}")
     private String companyCode;
 
-    @Value("${aws.s3.bucket.salaryConfigFile}")
-    private String salaryConfigFile;
+    @Value("${aws.s3.bucket.investment.declaration.file}")
+    private String investmentDeclarationFile;
 
-    public JsonNode retrieveSalaryConfigurations() {
+    public JsonNode retrieveInvestmentDeclarations() {
         try {
             if (awsS3BucketEnabled) {
                 CompanyDto companyDto = service.findByCompanyCode(companyCode);
                 UUID companyId = companyDto.getId();
-                String filePath = folderName + "/"
-                        + companyId + "/payroll/salary-configuration/"
-                        + financialYear + "/" + salaryConfigFile;
+                String filePath = folderName + "/" + companyId
+                        + "/payroll/investment-declaration/"
+                        + financialYear + "/" + investmentDeclarationFile;
                 ResponseEntity<byte[]> s3Response = fileUploadService.findFile(filePath);
                 if (s3Response.getStatusCode() == HttpStatus.OK) {
                     byte[] fileContent = s3Response.getBody();
                     ObjectMapper objectMapper = new ObjectMapper();
                     return objectMapper.readTree(fileContent);
                 }
-            } else {
-                Resource resource = new ClassPathResource("SalaryConfigurations.json");
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode jsonData = objectMapper.readTree(resource.getInputStream());
-                JsonNode salaryComponents = jsonData.get("salary_components");
-                JsonNode salaryDeductions = jsonData.get("salary_deductions");
-                ObjectMapper newObjectMapper = new ObjectMapper();
-                ObjectNode desiredJson = newObjectMapper.createObjectNode();
-                desiredJson.set("salary_components", salaryComponents);
-                desiredJson.set("salary_deductions", salaryDeductions);
-
-                return desiredJson;
             }
         } catch (Exception e) {
-            throw new LnFException("Failed to retrieve salary configurations", e);
+            throw new LnFException("Failed to retrieve investment declarations", e);
         }
         return null;
     }
 
     public String create(UUID companyId, String financialYear, MultipartFile file) {
         if (awsS3BucketEnabled) {
-            String folder = folderName + "/" + companyId + "/payroll/salary-configuration/" + financialYear + "/";
-            return fileUploadService.uploadFile(folder,file);
+            String folder = folderName + "/" + companyId + "/payroll/investment-declaration/" + financialYear + "/";
+            return fileUploadService.uploadFile(folder, file);
         }
-        return "File upload to AWS S3 bucket is not enabled";
+        return "Investment declaration file upload to AWS s3 bucket is failed";
     }
 
     public void deleteByCompanyId(UUID companyId , String financialYear) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + "/"
-                    + companyId + "/payroll/salary-configuration/"
-                    + financialYear + "/" + salaryConfigFile;
+            String s3ObjectKey = folderName + "/" + companyId
+                    + "/payroll/investment-declaration/" + financialYear + "/" + investmentDeclarationFile;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileUploadService.delete(filePaths);
-            log.info(() -> String.format("Salary configuration is deleted for the company [%s] and financial year " +
+            log.info(() -> String.format("Investment declaration is deleted for the company [%s] and financial year " +
                     "[%s}]", companyId, financialYear));
         }
     }

@@ -32,19 +32,17 @@ import java.util.stream.Collectors;
 @Log
 public class CompanyPolicyService {
 
-    private final CompanyRepository companyRepository;
-    private final CompanyPolicyRepository repository;
-
-    private final FileUploadService fileUploadService;
-
     @Value("${aws.s3.bucket.enabled}")
     private boolean awsS3BucketEnabled;
 
     @Value("${aws.s3.bucket.folderName}")
     private String folderName;
 
-    @Value("${aws.s3.bucket.fileName}")
-    private String fileName;
+    private final CompanyRepository companyRepository;
+
+    private final CompanyPolicyRepository repository;
+
+    private final FileUploadService fileUploadService;
 
     public List<CompanyPolicyDto> findAll() {
         List<CompanyPolicy> entities = repository.findAll();
@@ -54,8 +52,13 @@ public class CompanyPolicyService {
     }
 
     public List<CompanyPolicyDto> findByCompanyId(UUID companyId) {
+        searchForCompany(companyId);
+        List<CompanyPolicy> entities = repository.findByCompanyId(companyId);
         if (awsS3BucketEnabled) {
-            ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/policies/" + fileName);
+            CompanyPolicy companyPolicy = new CompanyPolicy();
+            List<String> fileName = Collections.singletonList(companyPolicy.getName());
+            ResponseEntity<byte[]> s3Response =
+                    fileUploadService.findFile(folderName + "/" + companyId + "/policies/" + fileName);
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 CompanyPolicyDto companyPolicyDto = new CompanyPolicyDto();
 
@@ -70,8 +73,6 @@ public class CompanyPolicyService {
                 return companyPolicyDtos;
             }
         }
-        searchForCompany(companyId);
-        List<CompanyPolicy> entities = repository.findByCompanyId(companyId);
         List<CompanyPolicyDto> companyPolicyDtos = entities.stream()
                 .map(CompanyPolicyConverter::toTransportModel)
                 .filter(Objects::nonNull)
@@ -90,7 +91,8 @@ public class CompanyPolicyService {
         searchForCompany(companyId);
         CompanyPolicy companyPolicy = searchForPolicy(policyId);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + companyPolicy.getName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                        + companyPolicy.getName() + "\"")
                 .contentType(MediaType.valueOf(companyPolicy.getContentType()))
                 .body(companyPolicy.getContent());
     }
@@ -101,19 +103,21 @@ public class CompanyPolicyService {
             try {
                 LnFBadRequestException.throwOnCondition(Objects::isNull, policy,
                         String.format("Failed to create Policy for company [%s] with null payload", companyId));
-                String filePath = null;
+                String filePath;
                 if (awsS3BucketEnabled) {
                     String folder = folderName + "/" + companyId + "/policies/";
                     filePath = uploadFile(folder, policy);
                     log.info("File uploaded successfully to S3 bucket: " + filePath);
-                } else {
-                    CompanyPolicy entity = CompanyPolicyConverter.toEntityModel(policy,false,null);
-                    entity.setCompany(company);
-                    save(entity);
-                    log.info(() -> String.format("Policy [%s] for Company[%s] successfully created", policy.getOriginalFilename(), companyId));
                 }
+                CompanyPolicy entity = CompanyPolicyConverter.toEntityModel(policy, awsS3BucketEnabled);
+                entity.setCompany(company);
+                save(entity);
+                log.info(() -> String.format("Policy [%s] for Company[%s] successfully created",
+                        policy.getOriginalFilename(), companyId));
+
             } catch (RuntimeException | IOException e) {
-                String errorMessage = String.format("Failed to create policy[%s] for company [%s]", companyId, policy.getOriginalFilename());
+                String errorMessage = String.format("Failed to create policy[%s] for company [%s]",
+                        companyId, policy.getOriginalFilename());
                 throw new LnFException(errorMessage, e);
             }
         }
@@ -124,14 +128,14 @@ public class CompanyPolicyService {
                 String.format("Failed to update policy for company [%s] with null payload", companyId));
         searchForCompany(companyId);
         try {
-            String filePath = null;
+            String filePath;
             if (awsS3BucketEnabled) {
                 String folder = folderName + "/" + companyId + "/policies/";
                 filePath = uploadFile(folder, policy);
                 log.info("file uploaded successfully" + filePath);
             } else {
                 CompanyPolicy entity = searchForPolicy(fileId);
-                CompanyPolicy updatedEntity = CompanyPolicyConverter.toEntityModel(policy, entity, false, null);
+                CompanyPolicy updatedEntity = CompanyPolicyConverter.toEntityModel(policy, entity, awsS3BucketEnabled);
                 save(updatedEntity);
                 log.info(() -> String.format("Policy [%s] for Company[%s] successfully updated", fileId, companyId));
             }
@@ -142,19 +146,22 @@ public class CompanyPolicyService {
     }
 
     public void deleteByCompanyId(UUID companyId) {
+        searchForCompany(companyId);
         if (awsS3BucketEnabled) {
+            CompanyPolicy companyPolicy = new CompanyPolicy();
+            String fileName = companyPolicy.getName();
             String s3ObjectKey = folderName + "/" + companyId +  "/policies/"  + fileName;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
-            delete( filePaths);
+            fileUploadService.delete( filePaths);
             log.info("S3 object deleted for employee");
-        }
-        searchForCompany(companyId);
-        List<CompanyPolicy> entities = repository.findByCompanyId(companyId);
-        try {
-            repository.deleteAll(entities);
-        } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete policies for company [%s]", companyId);
-            throw new LnFException(errorMessage, e);
+        } else {
+            List<CompanyPolicy> entities = repository.findByCompanyId(companyId);
+            try {
+                repository.deleteAll(entities);
+            } catch (RuntimeException e) {
+                String errorMessage = String.format("Failed to delete policies for company [%s]", companyId);
+                throw new LnFException(errorMessage, e);
+            }
         }
     }
 
@@ -181,23 +188,18 @@ public class CompanyPolicyService {
 
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
+                orElseThrow(() -> new LnFEntityNotFoundException(
+                        String.format("Company with id [%s] does not exist", companyId)));
     }
 
     private CompanyPolicy searchForPolicy(UUID fileId) {
         return repository.findById(fileId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company policy with id [%s] does not exist", fileId)));
+                orElseThrow(() -> new LnFEntityNotFoundException(
+                        String.format("Company policy with id [%s] does not exist", fileId)));
     }
 
     private String uploadFile(String folder, MultipartFile file) {
         return fileUploadService.uploadFile(folder,file);
     }
 
-    private void delete(List<String> filePaths) {
-        fileUploadService.delete(filePaths);
-    }
-
-    public ResponseEntity<byte[]> findFile(String filePath) {
-        return fileUploadService.findFile(filePath);
-    }
 }
