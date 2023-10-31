@@ -58,7 +58,7 @@ public class SalaryConfigurationService {
                     ObjectMapper objectMapper = new ObjectMapper();
                     return objectMapper.readTree(fileContent);
                 }
-            } else {
+            }
                 Resource resource = new ClassPathResource("SalaryConfigurations.json");
 
                 ObjectMapper objectMapper = new ObjectMapper();
@@ -71,11 +71,10 @@ public class SalaryConfigurationService {
                 desiredJson.set("salary_deductions", salaryDeductions);
 
                 return desiredJson;
-            }
+
         } catch (Exception e) {
             throw new LnFException("Failed to retrieve salary configurations", e);
         }
-        return null;
     }
 
     public String create(UUID companyId, String financialYear, MultipartFile file) {
@@ -97,5 +96,4 @@ public class SalaryConfigurationService {
                     "[%s}]", companyId, financialYear));
         }
     }
-
 }
