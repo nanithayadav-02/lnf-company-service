@@ -4,8 +4,8 @@ import com.technofacts.lnf.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.exception.LnFException;
 import com.technofacts.lnf.service.File.FileUploadService;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,11 +22,14 @@ import java.util.List;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
 @Slf4j
-public class FileUploadServiceImpl implements FileUploadService {
+public class FileClientImpl implements FileUploadService {
 
     private final WebClient webClient;
+
+    public FileClientImpl(@Qualifier("FileService") WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     @Value("${aws.s3.bucket.service}")
     private String s3Service;
@@ -38,14 +41,13 @@ public class FileUploadServiceImpl implements FileUploadService {
         bodyBuilder.part("file", file.getResource());
 
         try {
-            String uploadedFileUrl = webClient.post()
+            return webClient.post()
                     .uri(s3Service + "/upload")
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            return uploadedFileUrl;
         } catch (LnFEntityNotFoundException ex) {
             log.error("File Upload for company Is Failed{}",ex.getMessage());
         }
@@ -56,14 +58,13 @@ public class FileUploadServiceImpl implements FileUploadService {
     public void delete(List<String> filePaths) {
         try {
             String joinedKeys = String.join(",", filePaths);
-
             webClient
-                    .delete()
-                    .uri(s3Service  +"?filePaths=" + joinedKeys)
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .retrieve()
-                    .toBodilessEntity()
-                    .block();
+                .delete()
+                .uri(s3Service  +"?filePaths=" + joinedKeys)
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .retrieve()
+                .toBodilessEntity()
+                .block();
         } catch (Exception e) {
             log.error("Failed to delete files with filePaths {}: {}", filePaths, e.getMessage());
             throw new LnFException("Failed to delete files with filePaths " + filePaths, e);

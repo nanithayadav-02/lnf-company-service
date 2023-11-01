@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class WebClientConfiguration {
 
-    @Value("${file.upload.service.url}")
-    private String fileUploadServiceUrl;
+    @Value("${file.service.url}")
+    private String fileServiceUrl;
 
     @Value("${application.maxInMemorySize}")
     private int maxInMemorySize;
@@ -28,8 +28,8 @@ public class WebClientConfiguration {
     private int timeOut;
 
     @Bean
-    @Qualifier("fileUploadService")
-    public WebClient fileUploadServiceWebClient() {
+    @Qualifier("FileService")
+    public WebClient fileWebClient() {
 
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(maxInMemorySize))
@@ -42,7 +42,7 @@ public class WebClientConfiguration {
                         .addHandlerLast(new WriteTimeoutHandler(timeOut, TimeUnit.MILLISECONDS)));
 
         return WebClient.builder()
-                .baseUrl(fileUploadServiceUrl)
+                .baseUrl(fileServiceUrl)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .exchangeStrategies(exchangeStrategies)
                 .build();
