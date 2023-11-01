@@ -27,19 +27,14 @@ application:
 connection:
   timeout: 2000
 
-file:
-  upload:
-    service:
-      url: "http://localhost:8081/api/v1"
-
 server:
-  port: 8081
+  port: 8082
   servlet:
     context-path: /api/v1
 
-client:
-  model:
-    json: client.json
+file:
+  service:
+    url: "http://localhost:8081/api/v1"
 
 # Metrics Configuration
 management:
