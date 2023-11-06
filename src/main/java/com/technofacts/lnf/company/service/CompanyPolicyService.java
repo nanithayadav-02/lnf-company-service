@@ -71,7 +71,7 @@ public class CompanyPolicyService {
                 companyPolicyDtos.add(companyPolicyDto);
                 return companyPolicyDtos;
             }
-        } else {
+        }
             List<CompanyPolicyDto> companyPolicyDtos = entities.stream()
                     .map(CompanyPolicyConverter::toTransportModel)
                     .filter(Objects::nonNull)
@@ -84,8 +84,6 @@ public class CompanyPolicyService {
                 f.setUrl(downloadURL);
             });
             return companyPolicyDtos;
-        }
-        return null;
     }
 
     public ResponseEntity<byte[]> findById(UUID companyId, UUID policyId) {
