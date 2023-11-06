@@ -61,17 +61,16 @@ public class ImageService {
         if (awsS3BucketEnabled) {
             ImageDto imageDto = new ImageDto();
             String fileName = entity.getName();
-            ResponseEntity<byte[]> s3Response = findFile(folderName + "/" + companyId + "/" + fileName);
+            ResponseEntity<byte[]> s3Response = fileUploadService.findFile(folderName + "/" + companyId + "/" + fileName);
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path("/lnf/file")
                         .queryParam("filePath", folderName + "/" + companyId + "/" + fileName)
                         .toUriString();
                 imageDto.setUrl(downloadURL);
-                imageDto.setContentType("application/octet-stream");
                 return imageDto;
             }
-        } else {
+        }
             ImageDto imageDto = ImageConverter.toTransportModel(entity);
             String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(String.format("/lnf/company/%s/image/", companyId))
@@ -80,8 +79,6 @@ public class ImageService {
             imageDto.setUrl(downloadURL);
 
             return imageDto;
-        }
-        return null;
     }
 
     public ResponseEntity<byte[]> findById(UUID companyId, UUID imageId) {
@@ -103,12 +100,13 @@ public class ImageService {
                 String folder = folderName + "/" + companyId + "/";
                 String filePath = uploadFile(folder, file);
                 log.info("File uploaded successfully to S3 bucket: " + filePath);
+            } else {
+                Image entity = ImageConverter.toEntityModel(file, false);
+                entity.setCompany(company);
+                save(entity);
+                log.info(() -> String.format("Image [%s] for Company[%s] successfully created",
+                        file.getOriginalFilename(), companyId));
             }
-            Image entity = ImageConverter.toEntityModel(file, false);
-            entity.setCompany(company);
-            save(entity);
-            log.info(() -> String.format("Image [%s] for Company[%s] successfully created",
-                    file.getOriginalFilename(), companyId));
 
         } catch (RuntimeException | IOException e) {
 
@@ -146,7 +144,7 @@ public class ImageService {
             String fileName = entity.getName();
             String s3ObjectKey = folderName + "/" + companyId + "/" + fileName;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
-            delete(filePaths);
+            fileUploadService.delete(filePaths);
             log.info("S3 object deleted for company");
         } else {
             try {
@@ -194,13 +192,5 @@ public class ImageService {
 
     private String uploadFile(String folder, MultipartFile file) {
         return fileUploadService.uploadFile(folder, file);
-    }
-
-    private void delete(List<String> filePaths) {
-        fileUploadService.delete(filePaths);
-    }
-
-    public ResponseEntity<byte[]> findFile(String filePath) {
-        return fileUploadService.findFile(filePath);
     }
 }

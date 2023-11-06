@@ -67,7 +67,6 @@ public class CompanyPolicyService {
                         .queryParam("filePath",folderName + "/" + companyId +  "/policies/" + fileName)
                         .toUriString();
                 companyPolicyDto.setUrl(downloadURL);
-                companyPolicyDto.setContentType("application/octet-stream");
                 List<CompanyPolicyDto> companyPolicyDtos = new ArrayList<>();
                 companyPolicyDtos.add(companyPolicyDto);
                 return companyPolicyDtos;
@@ -108,13 +107,13 @@ public class CompanyPolicyService {
                     String folder = folderName + "/" + companyId + "/policies/";
                     filePath = uploadFile(folder, policy);
                     log.info("File uploaded successfully to S3 bucket: " + filePath);
+                } else {
+                    CompanyPolicy entity = CompanyPolicyConverter.toEntityModel(policy, awsS3BucketEnabled);
+                    entity.setCompany(company);
+                    save(entity);
+                    log.info(() -> String.format("Policy [%s] for Company[%s] successfully created",
+                            policy.getOriginalFilename(), companyId));
                 }
-                CompanyPolicy entity = CompanyPolicyConverter.toEntityModel(policy, awsS3BucketEnabled);
-                entity.setCompany(company);
-                save(entity);
-                log.info(() -> String.format("Policy [%s] for Company[%s] successfully created",
-                        policy.getOriginalFilename(), companyId));
-
             } catch (RuntimeException | IOException e) {
                 String errorMessage = String.format("Failed to create policy[%s] for company [%s]",
                         companyId, policy.getOriginalFilename());
@@ -201,5 +200,4 @@ public class CompanyPolicyService {
     private String uploadFile(String folder, MultipartFile file) {
         return fileUploadService.uploadFile(folder,file);
     }
-
 }
