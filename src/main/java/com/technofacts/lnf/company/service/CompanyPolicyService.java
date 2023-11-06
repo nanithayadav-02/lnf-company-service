@@ -71,19 +71,21 @@ public class CompanyPolicyService {
                 companyPolicyDtos.add(companyPolicyDto);
                 return companyPolicyDtos;
             }
+        } else {
+            List<CompanyPolicyDto> companyPolicyDtos = entities.stream()
+                    .map(CompanyPolicyConverter::toTransportModel)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            companyPolicyDtos.forEach(f -> {
+                String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path(String.format("/lnf/company/%s/policies/", companyId))
+                        .path(f.getId().toString())
+                        .toUriString();
+                f.setUrl(downloadURL);
+            });
+            return companyPolicyDtos;
         }
-        List<CompanyPolicyDto> companyPolicyDtos = entities.stream()
-                .map(CompanyPolicyConverter::toTransportModel)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        companyPolicyDtos.forEach(f -> {
-            String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(String.format("/lnf/company/%s/policies/", companyId))
-                    .path(f.getId().toString())
-                    .toUriString();
-            f.setUrl(downloadURL);
-        });
-        return companyPolicyDtos;
+        return null;
     }
 
     public ResponseEntity<byte[]> findById(UUID companyId, UUID policyId) {
