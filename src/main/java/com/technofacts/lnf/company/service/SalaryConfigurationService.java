@@ -59,7 +59,7 @@ public class SalaryConfigurationService {
         retrieveSalaryConfigurations();
     }
 
-    @Cacheable(value = "SalaryConfiguration")
+    @Cacheable(value = "salaryConfiguration")
     public JsonNode retrieveSalaryConfigurations() {
         try {
             if (awsS3BucketEnabled) {
