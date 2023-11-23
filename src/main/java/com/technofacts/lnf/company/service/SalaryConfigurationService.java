@@ -52,14 +52,14 @@ public class SalaryConfigurationService {
     @Value("${aws.s3.bucket.salaryConfigFile}")
     private String salaryConfigFile;
 
-    @CacheEvict(value = "SalaryConfiguration", allEntries = true)
+    @CacheEvict(value = "salaryConfiguration", allEntries = true)
     public void reloadCacheBySalaryConfigurations() {
         cacheManager.getCacheNames()
                 .forEach(cacheName -> Objects.requireNonNull(cacheManager.getCache(cacheName)).clear());
         retrieveSalaryConfigurations();
     }
 
-    @Cacheable(value = "SalaryConfigurationService")
+    @Cacheable(value = "SalaryConfiguration")
     public JsonNode retrieveSalaryConfigurations() {
         try {
             if (awsS3BucketEnabled) {
