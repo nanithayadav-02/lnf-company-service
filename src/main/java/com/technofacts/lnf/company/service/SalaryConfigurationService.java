@@ -6,9 +6,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.technofacts.lnf.company.exception.LnFException;
 import com.technofacts.lnf.dto.company.CompanyDto;
 import com.technofacts.lnf.service.File.FileUploadService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -18,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -28,6 +33,9 @@ public class SalaryConfigurationService {
     private final FileUploadService fileUploadService;
 
     private final CompanyService service;
+
+
+    private final CacheManager cacheManager;
 
     @Value("${aws.s3.bucket.folderName}")
     private String folderName;
@@ -44,6 +52,14 @@ public class SalaryConfigurationService {
     @Value("${aws.s3.bucket.salaryConfigFile}")
     private String salaryConfigFile;
 
+    @CacheEvict(value = "SalaryConfigurationService", allEntries = true)
+    public void reloadCacheBySalaryConfigurations() {
+        cacheManager.getCacheNames()
+                .forEach(cacheName -> Objects.requireNonNull(cacheManager.getCache(cacheName)).clear());
+        retrieveSalaryConfigurations();
+    }
+
+    @Cacheable(value = "SalaryConfigurationService")
     public JsonNode retrieveSalaryConfigurations() {
         try {
             if (awsS3BucketEnabled) {
