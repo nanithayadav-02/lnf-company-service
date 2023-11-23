@@ -52,7 +52,7 @@ public class SalaryConfigurationService {
     @Value("${aws.s3.bucket.salaryConfigFile}")
     private String salaryConfigFile;
 
-    @CacheEvict(value = "SalaryConfigurationService", allEntries = true)
+    @CacheEvict(value = "SalaryConfiguration", allEntries = true)
     public void reloadCacheBySalaryConfigurations() {
         cacheManager.getCacheNames()
                 .forEach(cacheName -> Objects.requireNonNull(cacheManager.getCache(cacheName)).clear());
