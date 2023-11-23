@@ -34,13 +34,6 @@
       "component_value": "17.15",
       "display_name": "Special Allowances",
       "description": "Special Allowances"
-    },
-    "professional_tax": {
-      "calculation_type": "value",
-      "component_code": "PROFT",
-      "component_value": "2400",
-      "display_name": "Professional Tax",
-      "description": "Professional Tax per year"
     }
   },
   "salary_deductions": {
@@ -64,6 +57,20 @@
       "component_value": "6000.00",
       "display_name": "Health Insurance",
       "description": "Health Insurance"
+    },
+    "professional_tax": {
+      "calculation_type": "value",
+      "component_code": "PROFT",
+      "component_value": "2400",
+      "display_name": "Professional Tax",
+      "description": "Professional Tax per year"
+    },
+    "income_tax": {
+      "calculation_type": "value",
+      "component_code": "INTAX",
+      "component_value": "0.00",
+      "display_name": "Income Tax",
+      "description": "Income Tax per year"
     }
   }
 }
