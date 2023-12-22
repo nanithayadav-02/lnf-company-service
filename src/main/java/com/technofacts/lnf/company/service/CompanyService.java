@@ -1,5 +1,6 @@
 package com.technofacts.lnf.company.service;
 
+import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.specification.company.CompanySpecificationBuilder;
 import com.technofacts.lnf.company.util.RestUtil;
 import com.technofacts.lnf.dto.company.CompanyDto;
+import com.technofacts.lnf.dto.recruiter.ApplicantDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
@@ -34,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Log
 public class CompanyService {
 
-    private static final String SEARCH_REGEX_PATTERN = "([\\w+?\\-_]+)(:|<|>)([\\w+?\\-_.@\\s]+),";
+    private static final String SEARCH_REGEX_PATTERN = "([\\w]+)\\s*:\\s*([\\w.@\\- ]+?)(?=(,|$))";
 
     private final CompanyRepository repository;
 
@@ -61,17 +63,73 @@ public class CompanyService {
     }
 
     public List<CompanyDto> findAll(String search) {
-        CompanySpecificationBuilder builder = new CompanySpecificationBuilder();
-        Pattern pattern = Pattern.compile(SEARCH_REGEX_PATTERN, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(URLDecoder.decode(search, StandardCharsets.UTF_8) + ",");
-        while (matcher.find()) {
-            builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
-        }
-        Specification<Company> specification = builder.build();
+        Specification<Company> specification = buildCompanySpecification(search);
         List<Company> entities = repository.findAll(specification);
-        return entities.stream().map(CompanyConverter::toTransportModel)
+        return convertToDtos(entities);
+    }
+    private List<CompanyDto> convertToDtos(List<Company> entities) {
+        return entities.stream()
+                .map(CompanyConverter::toTransportModel)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
+    }
+    private Specification<Company> buildCompanySpecification(String search) {
+        final CompanySpecificationBuilder builder = new CompanySpecificationBuilder();
+        createSearchConditions(search, builder);
+        return builder.build();
+    }
+
+    private void createSearchConditions(String search, CompanySpecificationBuilder builder) {
+        log.info(() -> String.format("search [%s]", search));
+        log.info(() -> String.format("builder [%s]", builder.toString()));
+        final Matcher matcher = Pattern.compile(SEARCH_REGEX_PATTERN, Pattern.CASE_INSENSITIVE).matcher(search);
+        while (matcher.find()) {
+            processSearchGroup(matcher, builder);
+        }
+    }
+
+    private void processSearchGroup(final Matcher matcher, final CompanySpecificationBuilder builder) {
+        String key = matcher.group(1).trim();
+        String value = matcher.group(2).trim();
+        log.info("Key: " + key + ", Value: " + value);
+        Class<?> fieldType = getFieldClass(key);
+        addCondition(builder, key, fieldType, value);
+    }
+
+    private void addCondition(final CompanySpecificationBuilder builder, final String key, Class<?> fieldType, final String value) {
+        if (fieldType != null) {
+            Object convertedValue = convertToFieldType(fieldType, value);
+            builder.with(key, ":", convertedValue);
+        }
+    }
+    private Class<?> getFieldClass(String fieldName) {
+        try {
+            Class<?> clazz = Class.forName("com.technofacts.lnf.company.model.Company");
+            Field field = clazz.getDeclaredField(fieldName);
+            return field.getType();
+        } catch (ClassNotFoundException | NoSuchFieldException e) {
+            return null;
+        }
+    }
+
+    private Object convertToFieldType(Class<?> fieldType, String value) {
+        if (fieldType.isEnum()) {
+            return getEnumConstant(fieldType, value);
+        } else if (fieldType == Integer.class || fieldType == int.class) {
+            return Integer.valueOf(value);
+        } else {
+            return value;
+        }
+    }
+
+    private Enum<?> getEnumConstant(Class<?> fieldType, String value) {
+        String uppercaseValue = value.toUpperCase();
+        for (Enum<?> enumConstant : ((Class<? extends Enum>) fieldType).getEnumConstants()) {
+            if (enumConstant.name().toUpperCase().equals(uppercaseValue)) {
+                return enumConstant;
+            }
+        }
+        return null;
     }
 
     public CompanyDto findByCompanyCode(String companyCode) {

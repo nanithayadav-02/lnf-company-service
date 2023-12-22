@@ -1,12 +1,12 @@
 package com.technofacts.lnf.company.repository.specification.company;
 
+import com.technofacts.lnf.company.model.Company;
+import com.technofacts.lnf.util.SearchOperation;
+import com.technofacts.lnf.util.SpecSearchCriteria;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.technofacts.lnf.company.model.Company;
-import com.technofacts.lnf.company.util.SearchOperation;
-import com.technofacts.lnf.company.util.SpecSearchCriteria;
-import org.springframework.data.jpa.domain.Specification;
 
 public class CompanySpecificationBuilder {
 
@@ -21,7 +21,7 @@ public class CompanySpecificationBuilder {
     }
 
     public final CompanySpecificationBuilder with(final String orPredicate, final String key, final String operation,
-                                                 final Object value, final String prefix, final String suffix) {
+                                                    final Object value, final String prefix, final String suffix) {
         SearchOperation op = SearchOperation.getSimpleOperation(operation.charAt(0));
         if (op != null) {
             if (op == SearchOperation.EQUALITY) {
