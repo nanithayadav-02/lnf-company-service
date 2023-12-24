@@ -7,32 +7,30 @@ import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.exception.LnFException;
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.CompanyEvent;
-import com.technofacts.lnf.company.model.enums.EventType;
 import com.technofacts.lnf.company.repository.CompanyEventRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
-import com.technofacts.lnf.company.util.RestUtil;
 import com.technofacts.lnf.dto.company.CompanyEventDto;
+import com.technofacts.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Log
 public class CompanyEventService {
+    private static final String FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD = "Failed to create companyEvent for " +
+            "company [%s] with null payload";
 
     private final CompanyEventRepository companyEventRepository;
     private final CompanyRepository companyRepository;
@@ -45,7 +43,7 @@ public class CompanyEventService {
 
     public List<CompanyEventDto> findAll() {
         List<CompanyEvent> entities = companyEventRepository.findAll();
-        return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
     public Page<CompanyEventDto> findPaginated(int page, int size) {
@@ -57,7 +55,7 @@ public class CompanyEventService {
     public List<CompanyEventDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
         List<CompanyEvent> entities = Lists.newArrayList(companyEventRepository.findAll(sortInfo));
-        return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
     private Page<CompanyEventDto> validateAndGetPages(int page, Page<CompanyEvent> resultPage) {
@@ -71,7 +69,7 @@ public class CompanyEventService {
     public List<CompanyEventDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
-        return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
     private Company searchForCompany(UUID companyId) {
@@ -79,7 +77,7 @@ public class CompanyEventService {
     }
 
     public void create(UUID companyId, CompanyEventDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to create companyEvent for company [%s] with null payload", companyId));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD, companyId)) ;
         Company companyEntity = searchForCompany(companyId);
         CompanyEvent entity = CompanyEventConverter.toEntityModel(resource, new CompanyEvent());
         entity.setCompany(companyEntity);
@@ -89,7 +87,7 @@ public class CompanyEventService {
 
 
     public void create(UUID companyId, List<CompanyEventDto> resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to create companyEvent for company [%s] with null payload", companyId));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD, companyId));
         Company company = searchForCompany(companyId);
         List<CompanyEvent> entities = new ArrayList<>();
         resource.stream().filter(Objects::nonNull).forEach(companyEventDto -> {
@@ -129,11 +127,11 @@ public class CompanyEventService {
     }
 
     public void update(UUID companyId, UUID eventId, CompanyEventDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format("Failed to create companyEvent for company [%s] with null payload", companyId));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD, companyId));
         searchForCompany(companyId);
         CompanyEvent entity = searchForCompanyEvent(eventId);
         save(CompanyEventConverter.toEntityModel(resource, entity));
-        log.info(() -> String.format("companyEvent for Company[%s] successfully created", companyId));
+        log.info(() -> String.format("companyEvent for Company[%s] successfully updated", companyId));
     }
 
 
