@@ -34,6 +34,11 @@ public class CompanyHolidayController {
         return service.downloadHolidaysAsPdf(companyId);
     }
 
+    @GetMapping("/company/{location}/holidays")
+    public List<CompanyHolidayDto> holidayByLocation(@PathVariable("location") final String location){
+        return service.getHolidayByLoc(location);
+    }
+
     @PostMapping(value = "/company/{companyId}/holiday")
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable("companyId") final UUID companyId,

@@ -149,4 +149,9 @@ public class CompanyHolidayService {
         return documentService.generatePdf(thymeleafDocumentDto);
     }
 
+    public List<CompanyHolidayDto> getHolidayByLoc(String location) {
+
+       List<CompanyHoliday> entities= repository.findByLocation(location);
+       return entities.stream().map(CompanyHolidayConverter::toTransportModel).toList();
+    }
 }
