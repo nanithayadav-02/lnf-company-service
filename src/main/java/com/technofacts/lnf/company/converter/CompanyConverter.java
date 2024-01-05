@@ -14,7 +14,7 @@ public class CompanyConverter {
         if (entity == null) {
             return null;
         }
-        CompanyDto dto = CompanyDto.builder().id(entity.getId()).code(entity.getCode()).name(entity.getName()).status(entity.getStatus()).email(entity.getEmail()).telephone(entity.getTelephone()).mobile(entity.getMobile()).website(entity.getWebsite()).businessCategory(entity.getBusinessCategory()).businessDescription(entity.getBusinessDescription()).pan(entity.getPan()).arn(entity.getArn()).arnIssueDate(entity.getArnIssueDate()).sacCode(entity.getSacCode()).address(new ArrayList<>()).gst(new ArrayList<>()).account(new ArrayList<>()).theme(new ArrayList<>()).notes(new ArrayList<>()).companyEvent(new ArrayList<>()).build();
+        CompanyDto dto = CompanyDto.builder().id(entity.getId()).code(entity.getCode()).name(entity.getName()).status(entity.getStatus()).email(entity.getEmail()).telephone(entity.getTelephone()).mobile(entity.getMobile()).website(entity.getWebsite()).businessCategory(entity.getBusinessCategory()).businessDescription(entity.getBusinessDescription()).pan(entity.getPan()).arn(entity.getArn()).arnIssueDate(entity.getArnIssueDate()).sacCode(entity.getSacCode()).address(new ArrayList<>()).gst(new ArrayList<>()).account(new ArrayList<>()).theme(new ArrayList<>()).notes(new ArrayList<>()).companyEvent(new ArrayList<>()).companyHoliday(new ArrayList<>()).build();
 
         dto.getAddress().addAll(entity.getAddress().stream().map(AddressConverter::toTransportModel).filter(Objects::nonNull).toList());
         dto.getGst().addAll(entity.getGst().stream().map(GstConverter::toTransportModel).filter(Objects::nonNull).toList());
@@ -23,6 +23,7 @@ public class CompanyConverter {
         dto.getNotes().addAll(entity.getCompanyNotes().stream().map(CompanyNotesConverter::toTransportModel).filter(Objects::nonNull).toList());
         dto.getCompanyEvent().addAll(entity.getCompanyEvent().stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList());
         dto.getPayrollComponentConfiguration().addAll(entity.getPayrollComponentConfiguration().stream().map(PayrollComponentConfigurationConverter::toTransportModel).filter(Objects::nonNull).toList());
+        dto.getCompanyHoliday().addAll(entity.getCompanyHoliday().stream().map(CompanyHolidayConverter::toTransportModel).filter(Objects::isNull).toList());
         return dto;
     }
 
@@ -36,7 +37,7 @@ public class CompanyConverter {
         addNotesToEntityModel(transport, entity);
         addCompanyEventToEntityModel(transport, entity);
         addPayrollComponentConfigurationToEntityModel(transport,entity);
-
+        addCompanyHolidayToEntityModel(transport, entity);
         return entity;
     }
 
@@ -111,6 +112,16 @@ public class CompanyConverter {
             notesList.add(entity);
         });
         company.getCompanyNotes().addAll(notesList);
+    }
+
+    private static void addCompanyHolidayToEntityModel(CompanyDto transport, Company company) {
+        List<CompanyHoliday> companyEventList = new ArrayList<>();
+        transport.getCompanyHoliday().stream().filter(Objects::nonNull).forEach(dto -> {
+            CompanyHoliday entity = CompanyHolidayConverter.toEntityModel(dto, new CompanyHoliday());
+            entity.setCompany(company);
+            companyEventList.add(entity);
+        });
+        company.getCompanyHoliday().addAll(companyEventList);
     }
 
     private static void addCompanyEventToEntityModel(CompanyDto transport, Company company) {
