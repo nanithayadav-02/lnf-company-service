@@ -23,9 +23,10 @@ public class CompanyHolidayController {
         return service.getAllHolidays();
     }
 
-    @GetMapping("/company/{holidayId}/holiday")
-    public CompanyHolidayDto holiday(@PathVariable("holidayId") final UUID holidayId){
-        return service.getHoliday(holidayId);
+    @GetMapping("/company/{companyId}/{holidayId}/holiday")
+    public CompanyHolidayDto holiday(@PathVariable("holidayId") final UUID holidayId,
+                                     @PathVariable("companyId") final UUID companyId){
+        return service.getHoliday(holidayId,companyId);
     }
 
     @GetMapping("/company/{companyId}/holidays/pdf")
@@ -34,9 +35,10 @@ public class CompanyHolidayController {
         return service.downloadHolidaysAsPdf(companyId);
     }
 
-    @GetMapping("/company/{location}/holidays")
-    public List<CompanyHolidayDto> holidayByLocation(@PathVariable("location") final String location){
-        return service.getHolidayByLoc(location);
+    @GetMapping("/company/{year}/{location}/holidays")
+    public List<CompanyHolidayDto> holidayByLocation(@PathVariable("location") final String location,
+                                                     @PathVariable("year") final long year){
+        return service.getHolidayByLoc(location,year);
     }
 
     @PostMapping(value = "/company/{companyId}/holiday")

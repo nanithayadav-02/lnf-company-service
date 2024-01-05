@@ -13,6 +13,11 @@ public interface CompanyHolidayRepository extends JpaRepository<CompanyHoliday, 
     @Query("SELECT ad FROM CompanyHoliday ad WHERE ad.company.id = :id")
     List<CompanyHoliday> findByCompanyId(@Param("id") UUID id);
 
-    @Query(value = "SELECT * from company_holiday where location = :location",nativeQuery = true)
-    List<CompanyHoliday> findByLocation(String location);
+    @Query(value = "SELECT * FROM company_holiday ch " +
+            "WHERE ch.location = :location AND EXTRACT(YEAR FROM ch.date) = :year", nativeQuery = true)
+    List<CompanyHoliday> findByLocationAndYear(String location,long year);
+
+    @Query(value = "SELECT * FROM company_holiday ch " +
+            "WHERE ch.id = :holidayId AND ch.company_id = :companyId", nativeQuery = true)
+    CompanyHoliday findByCompanyIdAndHolidayId(UUID holidayId, UUID companyId);
 }

@@ -118,9 +118,10 @@ public class CompanyHolidayService {
         }
     }
 
-    public CompanyHolidayDto getHoliday(UUID holidayId) {
+    public CompanyHolidayDto getHoliday(UUID holidayId, UUID companyId) {
 
-        return CompanyHolidayConverter.toTransportModel(repository.findById(holidayId).get());
+        CompanyHoliday entity = repository.findByCompanyIdAndHolidayId(holidayId, companyId);
+        return CompanyHolidayConverter.toTransportModel(entity);
 
     }
 
@@ -149,9 +150,9 @@ public class CompanyHolidayService {
         return documentService.generatePdf(thymeleafDocumentDto);
     }
 
-    public List<CompanyHolidayDto> getHolidayByLoc(String location) {
+    public List<CompanyHolidayDto> getHolidayByLoc(String location, long year) {
 
-       List<CompanyHoliday> entities= repository.findByLocation(location);
+       List<CompanyHoliday> entities= repository.findByLocationAndYear(location,year);
        return entities.stream().map(CompanyHolidayConverter::toTransportModel).toList();
     }
 }
