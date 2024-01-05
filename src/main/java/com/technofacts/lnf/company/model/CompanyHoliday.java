@@ -13,7 +13,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "company_holiday")
+@Table(name = "company_holiday", uniqueConstraints = @UniqueConstraint(columnNames = {"location", "date", "description"}))
 public class CompanyHoliday extends AuditableEntity {
 
     @Column(name = "location", nullable = false)
