@@ -34,11 +34,12 @@ public class EmailClientImpl implements ThymeleafDocumentService, ThymeleafEmail
 
     @Override
     public void sendEmail(ThymeleafEmailDto resource) {
+        // To be implemented
 
     }
 
     @Override
     public void sendEmailWithPdf(ThymeleafEmailDto resource) {
-
+        // To be implemented
     }
 }

@@ -1,10 +1,11 @@
 package com.technofacts.lnf.company.controller;
 
 import com.technofacts.lnf.company.service.CompanyHolidayService;
-import com.technofacts.lnf.dto.company.AddressDto;
 import com.technofacts.lnf.dto.company.CompanyHolidayDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,60 +14,70 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lnf")
+@RequestMapping("/lnf/company")
 public class CompanyHolidayController {
 
-    private final CompanyHolidayService service;
+    private static final String COMPANY_HOLIDAYS_PDF_FILE = "company-holidays.pdf";
 
-    @GetMapping("/company/holidays")
-    public List<CompanyHolidayDto> holidaysList(){
-        return service.getAllHolidays();
-    }
+    private final CompanyHolidayService holidayService;
 
-    @GetMapping("/company/{companyId}/{holidayId}/holiday")
-    public CompanyHolidayDto holiday(@PathVariable("holidayId") final UUID holidayId,
-                                     @PathVariable("companyId") final UUID companyId){
-        return service.getHoliday(holidayId,companyId);
-    }
-
-    @GetMapping("/company/{companyId}/holidays/pdf")
+    @GetMapping("/{companyId}/holidays/{holidayId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<byte[]> downloadAsPdf(@PathVariable("companyId") final UUID companyId) {
-        return service.downloadHolidaysAsPdf(companyId);
+    public CompanyHolidayDto findHoliday(@PathVariable("companyId") final UUID companyId,
+                                        @PathVariable("holidayId") final UUID holidayId) {
+        return holidayService.findHolidayById(companyId, holidayId);
     }
 
-    @GetMapping("/company/{year}/{location}/holidays")
-    public List<CompanyHolidayDto> holidayByLocation(@PathVariable("location") final String location,
-                                                     @PathVariable("year") final long year){
-        return service.getHolidayByLoc(location,year);
+    @GetMapping("/holidays")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CompanyHolidayDto> findAllHolidays() {
+        return holidayService.findAll();
     }
 
-    @PostMapping(value = "/company/{companyId}/holiday")
+    @GetMapping("/{companyId}/holidays/{year}/{location}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CompanyHolidayDto> findHolidaysByYearAndLocation(@PathVariable("companyId") final UUID companyId,
+                                                                 @PathVariable("year") final long year,
+                                                                 @PathVariable("location") final String location) {
+        return holidayService.findHolidaysByYearAndLocation(companyId, year, location);
+    }
+
+    @GetMapping("/{companyId}/holidays/pdf")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<byte[]> getCompanyHolidaysAsPdf(@PathVariable("companyId") final UUID companyId) {
+        byte[] pdfContent = holidayService.getCompanyHolidaysAsPdf(companyId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+ COMPANY_HOLIDAYS_PDF_FILE)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfContent);
+    }
+
+    @PostMapping("/{companyId}/holidays")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final UUID companyId,
-                       @RequestBody final List<CompanyHolidayDto> resource) {
-        service.create(companyId, resource);
+    public void createHolidays(@PathVariable("companyId") final UUID companyId,
+                               @RequestBody final List<CompanyHolidayDto> holidays) {
+        holidayService.create(companyId, holidays);
     }
 
-    @PutMapping(value = "/company/{companyId}/holiday/{holidayId}")
+    @PutMapping("/{companyId}/holidays/{holidayId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId,
-                       @PathVariable("holidayId") final UUID holidayId, @RequestBody final CompanyHolidayDto resource) {
-        service.update(companyId, holidayId, resource);
+    public void updateHoliday(@PathVariable("companyId") final UUID companyId,
+                              @PathVariable("holidayId") final UUID holidayId,
+                              @RequestBody final CompanyHolidayDto updatedHoliday) {
+        holidayService.update(companyId, holidayId, updatedHoliday);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/holiday")
+    @DeleteMapping("/{companyId}/holidays")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId) {
-        service.deleteByCompanyId(companyId);
+    public void deleteAllHolidaysByCompanyId(@PathVariable("companyId") final UUID companyId) {
+        holidayService.deleteAll(companyId);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/holiday/{holidayId}")
+    @DeleteMapping("/{companyId}/holidays/{holidayId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId,
-                       @PathVariable("holidayId") final UUID holidayId) {
-        service.deleteById(companyId, holidayId);
+    public void deleteHolidayByIdAndCompanyId(@PathVariable("companyId") final UUID companyId,
+                                              @PathVariable("holidayId") final UUID holidayId) {
+        holidayService.deleteById(companyId, holidayId);
     }
-
 
 }

@@ -27,7 +27,7 @@ public class FileClientImpl implements FileUploadService {
 
     private final WebClient webClient;
 
-    public FileClientImpl(@Qualifier("FileService") WebClient webClient) {
+    public FileClientImpl(@Qualifier("fileService") WebClient webClient) {
         this.webClient = webClient;
     }
 
@@ -86,4 +86,5 @@ public class FileClientImpl implements FileUploadService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 }
