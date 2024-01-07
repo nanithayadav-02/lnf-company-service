@@ -1,8 +1,5 @@
 package com.technofacts.lnf.company.controller;
 
-import java.io.IOException;
-import java.util.UUID;
-
 import com.technofacts.lnf.company.service.ImageService;
 import com.technofacts.lnf.dto.company.ImageDto;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
 
 
 @RestController
@@ -20,7 +19,7 @@ public class ImageController {
     private final ImageService service;
 
     @GetMapping(value = "/company/{companyId}/image")
-    public ImageDto findByCompanyId(@PathVariable("companyId") final UUID companyId) throws IOException {
+    public ImageDto findByCompanyId(@PathVariable("companyId") final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
@@ -39,7 +38,7 @@ public class ImageController {
     @PutMapping(value = "/company/{companyId}/image/{imageId}")
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("imageId") final UUID imageId,
-                       @RequestParam MultipartFile image) throws IOException {
+                       @RequestParam MultipartFile image) {
         service.update(companyId, imageId, image);
     }
 

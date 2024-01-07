@@ -36,6 +36,10 @@ file:
   service:
     url: "http://localhost:8081/api/v1"
 
+email:
+  service:
+    url: "http://localhost:8081/api/v1"
+
 # Metrics Configuration
 management:
   metrics:

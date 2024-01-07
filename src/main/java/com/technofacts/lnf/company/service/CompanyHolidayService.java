@@ -1,0 +1,143 @@
+package com.technofacts.lnf.company.service;
+
+import com.technofacts.lnf.company.converter.CompanyHolidayConverter;
+import com.technofacts.lnf.company.exception.LnFBadRequestException;
+import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
+import com.technofacts.lnf.company.exception.LnFException;
+import com.technofacts.lnf.company.model.Company;
+import com.technofacts.lnf.company.model.CompanyHoliday;
+import com.technofacts.lnf.company.repository.CompanyHolidayRepository;
+import com.technofacts.lnf.company.repository.CompanyRepository;
+import com.technofacts.lnf.dto.company.CompanyHolidayDto;
+import com.technofacts.lnf.dto.email.ThymeleafDocumentDto;
+import com.technofacts.lnf.service.email.ThymeleafDocumentService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
+public class CompanyHolidayService {
+
+    private final ThymeleafDocumentService documentService;
+    private final CompanyHolidayRepository repository;
+    private final CompanyRepository companyRepository;
+
+    public CompanyHolidayDto findHolidayById(UUID companyId, UUID holidayId) {
+        CompanyHoliday entity = repository.findByHolidayId(companyId, holidayId);
+        return CompanyHolidayConverter.toTransportModel(entity);
+    }
+
+    public List<CompanyHolidayDto> findAll() {
+        List<CompanyHoliday> holidays = repository.findAll();
+        return holidays.stream().map(CompanyHolidayConverter::toTransportModel).toList();
+    }
+
+    public List<CompanyHolidayDto> findHolidaysByYearAndLocation(UUID companyId, long year, String location) {
+        List<CompanyHoliday> entities = repository.findByYearAndLocation(companyId, year, location);
+        return entities.stream().map(CompanyHolidayConverter::toTransportModel).toList();
+    }
+
+    public byte[] getCompanyHolidaysAsPdf(UUID companyId) {
+        List<CompanyHoliday> entities = repository.findByCompanyId(companyId);
+        List<CompanyHolidayDto> holidays = entities.stream().map(CompanyHolidayConverter::toTransportModel).toList();
+        return generateCompanyHolidayPdf(holidays);
+    }
+
+    private byte[] generateCompanyHolidayPdf(List<CompanyHolidayDto> holidays) {
+        Map<String, Object> dynamicData = new HashMap<>();
+        dynamicData.put("listObjects", holidays);
+
+        ThymeleafDocumentDto thymeleafDocumentDto = new ThymeleafDocumentDto();
+        thymeleafDocumentDto.setTemplateName("company-holidays");
+        thymeleafDocumentDto.setFileName("company-holidays.pdf");
+        thymeleafDocumentDto.setDynamicData(dynamicData);
+
+        return documentService.generatePdf(thymeleafDocumentDto);
+    }
+
+    public void create(UUID companyId, List<CompanyHolidayDto> resource) {
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
+                String.format("Failed to create Holidays for company [%s] with null payload", companyId));
+        Company company = searchForCompany(companyId);
+        List<CompanyHoliday> entities = new ArrayList<>();
+        resource.stream().filter(Objects::nonNull).forEach(companyHolidayDto -> {
+            CompanyHoliday entity = CompanyHolidayConverter.toEntityModel(companyHolidayDto, new CompanyHoliday());
+            entity.setCompany(company);
+            entities.add(entity);
+        });
+        save(entities);
+        log.info("Holidays for the company {} is successfully created", companyId);
+    }
+
+    private void save(List<CompanyHoliday> entities) {
+        try {
+            repository.saveAll(entities);
+        } catch (RuntimeException e) {
+            String errorMessage = String.format("Failed to save holiday for company [%s]",
+                    entities.get(0).getCompany().getCode());
+            throw new LnFException(errorMessage);
+        }
+    }
+
+    public void update(UUID companyId, UUID holidayId, CompanyHolidayDto resource) {
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
+                String.format("Failed to create holiday for company [%s] with null payload", companyId));
+        searchForCompany(companyId);
+        CompanyHoliday entity = searchForHoliday(holidayId);
+        save(CompanyHolidayConverter.toEntityModel(resource, entity));
+        log.info("Holiday for Company {} successfully created", companyId);
+    }
+
+    public void deleteAll(UUID companyId) {
+        searchForCompany(companyId);
+        List<CompanyHoliday> entities = repository.findByCompanyId(companyId);
+        try {
+            repository.deleteAll(entities);
+            log.info("Company {} all holiday are successfully deleted", companyId);
+        } catch (RuntimeException e) {
+            String errorMessage = String.format("Failed to delete Holiday for company [%s]", companyId);
+            throw new LnFException(errorMessage);
+        }
+    }
+
+    public void deleteById(UUID companyId, UUID holidayId) {
+        searchForCompany(companyId);
+        CompanyHoliday entity = searchForHoliday(holidayId);
+        try {
+            repository.delete(entity);
+            log.info("Company {} holiday {} is successfully deleted", holidayId, companyId);
+        } catch (RuntimeException e) {
+            String errorMessage = String.format("Failed to delete Holiday[[%s] for company [%s]", holidayId, companyId);
+            throw new LnFException(errorMessage);
+        }
+    }
+
+    private Company searchForCompany(UUID companyId) {
+        return companyRepository.findByCompanyId(companyId).
+                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist",
+                        companyId)));
+    }
+
+    private CompanyHoliday searchForHoliday(UUID holidayId) {
+        return repository.findById(holidayId).
+                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Holiday with id [%s] does not exist",
+                        holidayId)));
+    }
+
+    private void save(CompanyHoliday entity) {
+        try {
+            repository.save(entity);
+        } catch (RuntimeException e) {
+            String errorMessage = String.format("Failed to save holiday for company [%s]",
+                    entity.getCompany().getCode());
+            throw new LnFException(errorMessage);
+        }
+    }
+
+}

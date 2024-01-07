@@ -21,6 +21,9 @@ public class WebClientConfiguration {
     @Value("${file.service.url}")
     private String fileServiceUrl;
 
+    @Value("${email.service.url}")
+    private String emailServiceUrl;
+
     @Value("${application.maxInMemorySize}")
     private int maxInMemorySize;
 
@@ -28,9 +31,14 @@ public class WebClientConfiguration {
     private int timeOut;
 
     @Bean
-    @Qualifier("FileService")
-    public WebClient fileWebClient() {
+    @Qualifier("emailService")
+    public WebClient emailWebClient() {
+        return createWebClient(emailServiceUrl);
+    }
 
+    @Bean
+    @Qualifier("fileService")
+    public WebClient fileWebClient() {
         ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(maxInMemorySize))
                 .build();
@@ -47,5 +55,18 @@ public class WebClientConfiguration {
                 .exchangeStrategies(exchangeStrategies)
                 .build();
     }
-}
 
+        private WebClient createWebClient(String baseUrl) {
+        HttpClient httpClient = HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeOut)
+                .responseTimeout(Duration.ofMillis(timeOut))
+                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(timeOut, TimeUnit.MILLISECONDS))
+                        .addHandlerLast(new WriteTimeoutHandler(timeOut, TimeUnit.MILLISECONDS)));
+
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+    }
+
+}
