@@ -41,7 +41,6 @@ public class CompanyConverter {
                 .theme(safeConvert(entity.getTheme(), ThemeConverter::toTransportModel))
                 .notes(safeConvert(entity.getCompanyNotes(), CompanyNotesConverter::toTransportModel))
                 .companyEvent(safeConvert(entity.getCompanyEvent(), CompanyEventConverter::toTransportModel))
-                .payrollComponentConfiguration(safeConvert(entity.getPayrollComponentConfiguration(), PayrollComponentConfigurationConverter::toTransportModel))
                 .companyHoliday(safeConvert(entity.getCompanyHoliday(), CompanyHolidayConverter::toTransportModel))
                 .build();
     }
@@ -60,7 +59,6 @@ public class CompanyConverter {
         addThemeToEntityModel(transport, entity);
         addNotesToEntityModel(transport, entity);
         addCompanyEventToEntityModel(transport, entity);
-        addPayrollComponentConfigurationToEntityModel(transport,entity);
         addCompanyHolidayToEntityModel(transport, entity);
         return entity;
     }
@@ -85,7 +83,6 @@ public class CompanyConverter {
         entity.setArnIssueDate(transport.getArnIssueDate());
         entity.setSacCode(transport.getSacCode());
     }
-
 
     private static void addAddressToEntityModel(CompanyDto transport, Company company) {
         if(transport.getAddress() != null) {
@@ -171,15 +168,4 @@ public class CompanyConverter {
     }
     }
 
-    private static void addPayrollComponentConfigurationToEntityModel(CompanyDto transport, Company company) {
-         if(transport.getPayrollComponentConfiguration() != null) {
-        List<PayrollComponentConfiguration> payrollComponentConfigurationList = new ArrayList<>();
-        transport.getPayrollComponentConfiguration().stream().filter(Objects::nonNull).forEach(dto -> {
-            PayrollComponentConfiguration entity = PayrollComponentConfigurationConverter.toEntityModel(dto, new PayrollComponentConfiguration());
-            entity.setCompany(company);
-            payrollComponentConfigurationList.add(entity);
-        });
-        company.getPayrollComponentConfiguration().addAll(payrollComponentConfigurationList);
-    }
-    }
 }
