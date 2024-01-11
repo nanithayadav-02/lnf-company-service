@@ -1,10 +1,13 @@
 package com.technofacts.lnf.company.controller;
 
 import com.technofacts.lnf.company.service.CompanyService;
+import com.technofacts.lnf.dto.common.PageRequestDto;
 import com.technofacts.lnf.dto.company.CompanyDto;
-import com.technofacts.lnf.util.QueryConstants;
+import com.technofacts.lnf.service.common.page.PageableAsQueryParam;
+import com.technofacts.lnf.service.common.page.PaginationAndSortingHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,30 +20,11 @@ import java.util.UUID;
 public class CompanyController {
 
     private final CompanyService service;
-
-    @GetMapping(value = "/company", params = {QueryConstants.PAGE, QueryConstants.SIZE, QueryConstants.SORT_BY})
-    public List<CompanyDto> findAllPaginatedAndSorted(@RequestParam(value = QueryConstants.PAGE) final int page,
-                                                      @RequestParam(value = QueryConstants.SIZE) final int size,
-                                                      @RequestParam(value = QueryConstants.SORT_BY) final String sortBy,
-                                                      @RequestParam(value = QueryConstants.SORT_ORDER) final String sortOrder) {
-        return service.findPaginatedAndSorted(page, size, sortBy, sortOrder);
-    }
-
-    @GetMapping(value = "/company", params = {QueryConstants.PAGE, QueryConstants.SIZE})
-    public List<CompanyDto> findAllPaginated(@RequestParam(value = QueryConstants.PAGE) final int page,
-                                             @RequestParam(value = QueryConstants.SIZE) final int size) {
-        return service.findPaginated(page, size);
-    }
-
-    @GetMapping(value = "/company", params = {QueryConstants.SORT_BY})
-    public List<CompanyDto> findAllSorted(@RequestParam(value = QueryConstants.SORT_BY) final String sortBy,
-                                          @RequestParam(value = QueryConstants.SORT_ORDER) final String sortOrder) {
-        return service.findAllSorted(sortBy, sortOrder);
-    }
+    private final PaginationAndSortingHandler paginationAndSortingHandler;
 
     @GetMapping(value = "/company")
-    public List<CompanyDto> findAll() {
-        return service.findAll();
+    public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest) {
+        return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
     }
 
     @GetMapping(value = "/company", params = {"search"})
