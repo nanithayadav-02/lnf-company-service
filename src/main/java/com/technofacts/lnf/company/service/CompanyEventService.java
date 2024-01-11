@@ -10,6 +10,7 @@ import com.technofacts.lnf.company.model.CompanyEvent;
 import com.technofacts.lnf.company.repository.CompanyEventRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.dto.company.CompanyEventDto;
+import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -28,30 +29,33 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 @Log
-public class CompanyEventService {
+public class CompanyEventService implements PaginatedAndSortedService<CompanyEventDto> {
     private static final String FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD = "Failed to create companyEvent for " +
             "company [%s] with null payload";
 
     private final CompanyEventRepository companyEventRepository;
     private final CompanyRepository companyRepository;
 
+    @Override
     public Page<CompanyEventDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
         Page<CompanyEvent> resultPage = companyEventRepository.findAll(PageRequest.of(page, size, sortInfo));
         return validateAndGetPages(page, resultPage);
     }
 
+    @Override
     public List<CompanyEventDto> findAll() {
         List<CompanyEvent> entities = companyEventRepository.findAll();
         return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
+    @Override
     public Page<CompanyEventDto> findPaginated(int page, int size) {
         Page<CompanyEvent> resultPage = companyEventRepository.findAll(PageRequest.of(page, size));
         return validateAndGetPages(page, resultPage);
     }
 
-
+    @Override
     public List<CompanyEventDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
         List<CompanyEvent> entities = Lists.newArrayList(companyEventRepository.findAll(sortInfo));
@@ -64,7 +68,6 @@ public class CompanyEventService {
         }
         return resultPage.map(CompanyEventConverter::toTransportModel);
     }
-
 
     public List<CompanyEventDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);

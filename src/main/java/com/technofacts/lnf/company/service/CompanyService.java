@@ -8,6 +8,7 @@ import com.technofacts.lnf.company.exception.LnFException;
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.dto.company.CompanyDto;
+import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.service.specification.GenericSpecificationBuilder;
 import com.technofacts.lnf.util.RestUtil;
 import com.technofacts.lnf.util.specification.SpecificationUtil;
@@ -29,27 +30,31 @@ import java.util.function.Function;
 @Transactional
 @RequiredArgsConstructor
 @Log
-public class CompanyService {
+public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     private final CompanyRepository repository;
 
-    public List<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
+    @Override
+    public Page<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
         Page<Company> resultPage = repository.findAll(PageRequest.of(page, size, sortInfo));
         return validateAndGetPages(page, resultPage);
     }
 
-    public List<CompanyDto> findPaginated(int page, int size) {
+    @Override
+    public Page<CompanyDto> findPaginated(int page, int size) {
         Page<Company> resultPage = repository.findAll(PageRequest.of(page, size));
         return validateAndGetPages(page, resultPage);
     }
 
+    @Override
     public List<CompanyDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
         List<Company> entities = Lists.newArrayList(repository.findAll(sortInfo));
         return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
+    @Override
     public List<CompanyDto> findAll() {
         List<Company> entities = repository.findAll();
         return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).toList();
@@ -111,15 +116,12 @@ public class CompanyService {
         }
     }
 
-    private List<CompanyDto> validateAndGetPages(int page, Page<Company> resultPage) {
+    private Page<CompanyDto> validateAndGetPages(int page, Page<Company> resultPage) {
         if (page > resultPage.getTotalPages()) {
             throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " +
                     "requested page [%d] does not exist", resultPage.getTotalPages(), page));
         }
-        List<Company> entities = Lists.newArrayList(resultPage.getContent());
-        return entities.stream().map(CompanyConverter::toTransportModel)
-                .filter(Objects::nonNull)
-                .toList();
+        return resultPage.map(CompanyConverter::toTransportModel);
     }
 
     private void saveEntity(Company entity) {

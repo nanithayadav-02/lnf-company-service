@@ -9,7 +9,9 @@ import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.CompanyNotes;
 import com.technofacts.lnf.company.repository.CompanyNotesRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
+import com.technofacts.lnf.dto.company.CompanyEventDto;
 import com.technofacts.lnf.dto.company.NotesDto;
+import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -29,9 +31,39 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 @Log
-public class CompanyNotesService {
+public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> {
     private final CompanyRepository companyRepository;
     private final CompanyNotesRepository companyNotesRepository;
+
+    @Override
+    public Page<NotesDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
+        final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
+        Page<CompanyNotes> resultPage = companyNotesRepository.findAll(PageRequest.of(page, size, sortInfo));
+        return validateAndGetPages(page, resultPage);
+    }
+
+    @Override
+    public Page<NotesDto> findPaginated(int page, int size) {
+        Page<CompanyNotes> resultPage = companyNotesRepository.findAll(PageRequest.of(page, size));
+        return validateAndGetPages(page, resultPage);
+    }
+
+    @Override
+    public List<NotesDto> findAllSorted(String sortBy, String sortOrder) {
+        final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
+        List<CompanyNotes> entities = Lists.newArrayList(companyNotesRepository.findAll(sortInfo));
+        return entities.stream().map(CompanyNotesConverter::toTransportModel)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    @Override
+    public List<NotesDto> findAll() {
+        return companyNotesRepository.findAll().stream().
+                map(CompanyNotesConverter::toTransportModel)
+                .filter(Objects::nonNull)
+                .toList();
+    }
 
     public void create(UUID companyId, List<NotesDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
@@ -129,29 +161,6 @@ public void update(UUID companyId, UUID notesId, NotesDto resource) {
         return CompanyNotesConverter.toTransportModel(searchForNotes(notesId));
     }
 
-    public List<NotesDto> findAllNotes() {
-        return companyNotesRepository.findAll().stream().map(CompanyNotesConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList());
-    }
-
-    public Page<NotesDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
-        final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
-        Page<CompanyNotes> resultPage = companyNotesRepository.findAll(PageRequest.of(page, size, sortInfo));
-        return validateAndGetPages(page, resultPage);
-    }
-
-    public Page<NotesDto> findPaginated(int page, int size) {
-        Page<CompanyNotes> resultPage = companyNotesRepository.findAll(PageRequest.of(page, size));
-        return validateAndGetPages(page, resultPage);
-    }
-
-    public List<NotesDto> findAllSorted(String sortBy, String sortOrder) {
-        final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
-        List<CompanyNotes> entities = Lists.newArrayList(companyNotesRepository.findAll(sortInfo));
-        return entities.stream().map(CompanyNotesConverter::toTransportModel)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
     private Page<NotesDto> validateAndGetPages(int page, Page<CompanyNotes> resultPage) {
         if (page > resultPage.getTotalPages()) {
             throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " +
