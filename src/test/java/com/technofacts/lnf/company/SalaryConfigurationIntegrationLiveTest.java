@@ -11,7 +11,7 @@ public class SalaryConfigurationIntegrationLiveTest {
 
     @BeforeClass
     public void setup() {
-        RestAssured.baseURI = "http://localhost:8081/api/v1";
+        RestAssured.baseURI = "http://localhost:8081/api/v2";
     }
 
     @Test
