@@ -13,13 +13,6 @@ aws:
       enabled: true
       service: "/lnf/file"
       folderName: "company"
-      financialYear: "2023-24"
-      companyCode: "TF"
-      salaryConfigFile: "SalaryConfigurations.json"
-      investment:
-        declaration:
-          file: "investment_declaration.json"
-
 
 application:
   maxInMemorySize: 10485760

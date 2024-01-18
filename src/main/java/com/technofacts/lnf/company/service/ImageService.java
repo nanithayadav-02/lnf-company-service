@@ -92,7 +92,6 @@ public class ImageService {
 
     public void create(UUID companyId, MultipartFile file) {
         Company company = searchForCompany(companyId);
-        Image image = repository.findByCompanyId(companyId);
         try {
             LnFBadRequestException.throwOnCondition(Objects::isNull, file,
                     String.format("Failed to create Image for company [%s] with null payload", companyId));

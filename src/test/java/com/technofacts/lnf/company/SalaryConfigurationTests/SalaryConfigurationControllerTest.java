@@ -3,8 +3,6 @@ package com.technofacts.lnf.company.SalaryConfigurationTests;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.technofacts.lnf.company.controller.SalaryConfigurationController;
-import com.technofacts.lnf.company.service.SalaryConfigurationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

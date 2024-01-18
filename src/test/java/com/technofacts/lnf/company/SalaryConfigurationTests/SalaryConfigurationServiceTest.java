@@ -2,7 +2,6 @@ package com.technofacts.lnf.company.SalaryConfigurationTests;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.technofacts.lnf.company.service.SalaryConfigurationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
