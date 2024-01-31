@@ -24,4 +24,5 @@ public class DisableSecurityConfig {
                 .permitAll();
         return http.build();
     }
+
 }

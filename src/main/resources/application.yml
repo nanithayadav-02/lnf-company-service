@@ -35,10 +35,6 @@ email:
 
 # Metrics Configuration
 management:
-  metrics:
-    export:
-      prometheus:
-        enabled: true
   endpoint:
     prometheus:
       enabled: true
@@ -51,6 +47,10 @@ management:
       exposure:
         exclude:
         include: "*"
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 logging:
   level:
     org:
@@ -99,8 +99,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
-          jwk-set-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf/protocol/openid-connect/certs
+          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
+          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf/protocol/openid-connect/certs
       client:
         registration:
           company-service:
@@ -111,7 +111,7 @@ spring:
             provider: keycloak
         provider:
           keycloak:
-            issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
+            issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
 
 printStackTrace: true
 
@@ -150,8 +150,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
-          jwk-set-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf/protocol/openid-connect/certs
+          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
+          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf/protocol/openid-connect/certs
       client:
         registration:
           company-service:
@@ -162,7 +162,7 @@ spring:
             provider: keycloak
         provider:
           keycloak:
-            issuer-uri: http://${KEYCLOAK_HOST}/auth/realms/lnf
+            issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
 printStackTrace: true
 ---
 spring:
@@ -194,6 +194,23 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
+          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf/protocol/openid-connect/certs
+      client:
+        registration:
+          company-service:
+            client-id: lnf-company-api
+            client-secret: ${client-secret:lnf-company-api-secret}
+            scope: openid,profile,roles
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
 
   autoconfigure:
     exclude:
