@@ -163,7 +163,9 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
+
 printStackTrace: true
+
 ---
 spring:
   config:
@@ -194,23 +196,6 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
-          jwk-set-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf/protocol/openid-connect/certs
-      client:
-        registration:
-          company-service:
-            client-id: lnf-company-api
-            client-secret: ${client-secret:lnf-company-api-secret}
-            scope: openid,profile,roles
-            authorization-grant-type: client_credentials
-            provider: keycloak
-        provider:
-          keycloak:
-            issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
 
   autoconfigure:
     exclude:
