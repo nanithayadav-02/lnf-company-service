@@ -5,8 +5,6 @@ spring:
   application:
     name: lnf-company-service
 
-KEYCLOAK_HOST: "keycloak:8080"
-
 aws:
   s3:
     bucket:

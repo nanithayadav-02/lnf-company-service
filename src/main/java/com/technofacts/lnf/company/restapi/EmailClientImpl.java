@@ -7,15 +7,13 @@ import com.technofacts.lnf.service.email.ThymeleafEmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @Slf4j
-public class EmailClientImpl implements ThymeleafDocumentService, ThymeleafEmailService {
+public class EmailClientImpl extends BaseWebClientService implements ThymeleafDocumentService, ThymeleafEmailService {
 
     private final WebClient webClient;
 
@@ -26,12 +24,13 @@ public class EmailClientImpl implements ThymeleafDocumentService, ThymeleafEmail
 
     @Override
     public byte[] generatePdf(ThymeleafDocumentDto resource) {
-        Jwt jwt = getJwtToken();
-        return webClient.post()
+        WebClient.RequestHeadersSpec<?> spec = webClient.post()
                 .uri("/lnf/pdf")
-                .headers(header -> header.setBearerAuth(jwt.getTokenValue()))
-                .body(BodyInserters.fromValue(resource))
-                .retrieve()
+                .body(BodyInserters.fromValue(resource));
+
+        addJwtToken(spec);
+
+        return spec.retrieve()
                 .bodyToMono(byte[].class)
                 .block();
     }
@@ -45,10 +44,6 @@ public class EmailClientImpl implements ThymeleafDocumentService, ThymeleafEmail
     @Override
     public void sendEmailWithPdf(ThymeleafEmailDto resource) {
         // To be implemented
-    }
-
-    private Jwt getJwtToken() {
-        return (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }
