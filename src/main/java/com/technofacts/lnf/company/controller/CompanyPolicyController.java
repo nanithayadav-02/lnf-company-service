@@ -20,7 +20,7 @@ public class CompanyPolicyController {
     private final CompanyPolicyService service;
 
     @GetMapping(value = "/company/{companyId}/policies")
-    public List<CompanyPolicyDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) throws IOException {
+    public List<CompanyPolicyDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
@@ -38,7 +38,7 @@ public class CompanyPolicyController {
     @PutMapping(value = "/company/{companyId}/policies/{policyId}")
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("policyId") final UUID policyId,
-                       @RequestParam MultipartFile policy) throws IOException {
+                       @RequestParam MultipartFile policy) {
         service.update(companyId, policyId, policy);
     }
 
