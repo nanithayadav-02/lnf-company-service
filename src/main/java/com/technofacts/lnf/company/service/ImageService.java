@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -49,7 +48,7 @@ public class ImageService {
     public List<ImageDto> findAll() {
         List<Image> entities = repository.findAll();
         return entities.stream().map(ImageConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
     }
 
     public ImageDto findByCompanyId(UUID companyId) {
@@ -84,6 +83,16 @@ public class ImageService {
     public ResponseEntity<byte[]> findById(UUID companyId, UUID imageId) {
         searchForCompany(companyId);
         Image file = searchForImage(imageId);
+        String fileName = file.getName();
+        if(awsS3BucketEnabled) {
+            ResponseEntity<byte[]> s3Response =  fileUploadService.findFile(folderName + "/" + companyId + "/" + fileName);
+            if (s3Response.getStatusCode() == HttpStatus.OK) {
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                        .contentType(MediaType.valueOf(file.getContentType()))
+                        .body(s3Response.getBody());
+            }
+        }
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
                 .contentType(MediaType.valueOf(file.getContentType()))
@@ -106,7 +115,6 @@ public class ImageService {
                 log.info(() -> String.format("Image [%s] for Company[%s] successfully created",
                         file.getOriginalFilename(), companyId));
             }
-
         } catch (RuntimeException | IOException e) {
 
             String errorMessage = String.format("Failed to create image[%s] for company [%s]", companyId,
@@ -124,9 +132,9 @@ public class ImageService {
             if (awsS3BucketEnabled) {
                 String folder = folderName + "/" + companyId + "/";
                 String filePath = uploadFile(folder, file);
-                log.info("file uploaded successfully" + filePath);
+                log.info("File uploaded successfully to S3 bucket: " + filePath);
             } else {
-                Image updatedEntity = ImageConverter.toEntityModel(file, entity, awsS3BucketEnabled);
+                Image updatedEntity = ImageConverter.toEntityModel(file, entity, false);
                 save(updatedEntity);
                 log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
             }
@@ -158,12 +166,20 @@ public class ImageService {
     public void deleteById(UUID companyId, UUID fileId) {
         searchForCompany(companyId);
         Image entity = searchForImage(fileId);
-        try {
-            repository.delete(entity);
-            log.info(() -> String.format("Image[%s] for company [%s] successfully deleted", fileId, companyId));
-        } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
-            throw new LnFException(errorMessage);
+        if (awsS3BucketEnabled) {
+            String fileName = entity.getName();
+            String s3ObjectKey = folderName + "/" + companyId + "/" + fileName;
+            List<String> filePaths = Collections.singletonList(s3ObjectKey);
+            fileUploadService.delete(filePaths);
+            log.info("S3 object deleted for company");
+        } else {
+            try {
+                repository.delete(entity);
+                log.info(() -> String.format("Image[%s] for company [%s] successfully deleted", fileId, companyId));
+            } catch (RuntimeException e) {
+                String errorMessage = String.format("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
+                throw new LnFException(errorMessage);
+            }
         }
     }
 
