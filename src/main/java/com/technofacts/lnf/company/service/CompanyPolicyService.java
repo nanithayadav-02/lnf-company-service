@@ -9,9 +9,10 @@ import com.technofacts.lnf.dto.company.CompanyPolicyDto;
 import com.technofacts.lnf.exception.LnFBadRequestException;
 import com.technofacts.lnf.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.exception.LnFException;
-import com.technofacts.lnf.service.File.FileUploadService;
+import com.technofacts.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,10 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -44,7 +42,7 @@ public class CompanyPolicyService {
 
     private final CompanyPolicyRepository repository;
 
-    private final FileUploadService fileUploadService;
+    private final FileService fileService;
 
     public List<CompanyPolicyDto> findAll() {
         List<CompanyPolicy> entities = repository.findAll();
@@ -54,6 +52,22 @@ public class CompanyPolicyService {
     }
 
     public List<CompanyPolicyDto> findByCompanyId(UUID companyId) {
+        if(awsS3BucketEnabled) {
+            String filePath = folderName + "/" + companyId + "/policies/";
+            List<String> files = fileService.findFilesInFolder(filePath);
+            List<CompanyPolicyDto> companyPolicyDtos = new ArrayList<>();
+            files.forEach(file -> {
+                String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/lnf/file")
+                        .queryParam("filePath", file)
+                        .toUriString();
+                CompanyPolicyDto companyPolicyDto = new CompanyPolicyDto();
+                companyPolicyDto.setName(StringUtils.substringAfterLast(file, "/"));
+                companyPolicyDto.setUrl(downloadURL);
+                companyPolicyDtos.add(companyPolicyDto);
+            });
+            return companyPolicyDtos;
+        }
         searchForCompany(companyId);
         List<CompanyPolicy> entities = repository.findByCompanyId(companyId);
             List<CompanyPolicyDto> companyPolicyDtos = entities.stream()
@@ -70,19 +84,19 @@ public class CompanyPolicyService {
             return companyPolicyDtos;
     }
 
-    public ResponseEntity<byte[]> findById(UUID companyId, UUID policyId) {
-        searchForCompany(companyId);
-        CompanyPolicy companyPolicy = searchForPolicy(policyId);
-        String fileName = companyPolicy.getName();
-        if(awsS3BucketEnabled) {
-            ResponseEntity<byte[]> s3Response =  fileUploadService.findFile(folderName + "/" + companyId +  "/policies/" + fileName);
+    public ResponseEntity<byte[]> findById(UUID companyId, Optional<UUID> policyId, String fileName) {
+        if (awsS3BucketEnabled) {
+            String filePath = folderName + "/" + companyId +  "/policies/" + fileName;
+            ResponseEntity<byte[]> s3Response =  fileService.findFile(filePath);
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + companyPolicy.getName() + "\"")
-                        .contentType(MediaType.valueOf(companyPolicy.getContentType()))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +
+                                StringUtils.substringAfterLast(filePath, "/") + "\"")
                         .body(s3Response.getBody());
             }
         }
+        searchForCompany(companyId);
+        CompanyPolicy companyPolicy = searchForPolicy(policyId.get());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
                         + companyPolicy.getName() + "\"")
@@ -137,32 +151,31 @@ public class CompanyPolicyService {
     }
 
     public void deleteByCompanyId(UUID companyId) {
-        searchForCompany(companyId);
-        List<CompanyPolicy> entities = repository.findByCompanyId(companyId);
+        searchForCompany (companyId);
+        List<CompanyPolicy> entities = repository.findByCompanyId (companyId);
         try {
             repository.deleteAll(entities);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete policies for company [%s]", companyId);
-            throw new LnFException(errorMessage, e);
+            String errorMessage = String.format ("Failed to delete policies for company [%s]", companyId);
+            throw new LnFException (errorMessage, e);
         }
     }
 
-    public void deleteById(UUID companyId, UUID fileId) {
-        searchForCompany(companyId);
-        CompanyPolicy entity = searchForPolicy(fileId);
+    public void deleteById(UUID companyId, Optional<UUID> fileId , String fileName) {
         if (awsS3BucketEnabled) {
-            String fileName = entity.getName();
             String s3ObjectKey = folderName + "/" + companyId +  "/policies/"  + fileName;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
-            fileUploadService.delete( filePaths);
-            log.info("S3 object deleted for employee");
+            fileService.delete(filePaths);
+            log.info("S3 object deleted for company");
         } else {
+            searchForCompany (companyId);
+            CompanyPolicy entity = searchForPolicy (fileId.get ());
             try {
-                repository.delete(entity);
-                log.info(() -> String.format("Policy[%s] for company [%s] successfully deleted", fileId, companyId));
+                repository.delete (entity);
+                log.info (() -> String.format ("Policy[%s] for company [%s] successfully deleted", fileId, companyId));
             } catch (RuntimeException e) {
-                String errorMessage = String.format("Failed to delete Policy[[%s] for company [%s]", fileId, companyId);
-                throw new LnFException(errorMessage);
+                String errorMessage = String.format ("Failed to delete Policy[[%s] for company [%s]", fileId, companyId);
+                throw new LnFException (errorMessage);
             }
         }
     }
@@ -189,6 +202,7 @@ public class CompanyPolicyService {
     }
 
     private String uploadFile(String folder, MultipartFile file) {
-        return fileUploadService.uploadFile(folder,file);
+        return fileService.uploadFile(folder,file);
     }
+
 }

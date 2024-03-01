@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -23,10 +24,10 @@ public class ImageController {
         return service.findByCompanyId(companyId);
     }
 
-    @GetMapping(value = "/company/{companyId}/image/{imageId}")
+    @GetMapping(value = "/company/{companyId}/image/{fileName}")
     public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId,
-                                           @PathVariable("imageId") final UUID imageId) {
-        return service.findById(companyId, imageId);
+                                           @RequestParam("imageId") final Optional<UUID> imageId, @PathVariable("fileName") String fileName) {
+        return service.findById(companyId, imageId, fileName);
     }
 
     @PostMapping(value = "/company/{companyId}/image")
@@ -44,8 +45,8 @@ public class ImageController {
 
     @DeleteMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId) {
-        service.deleteByCompanyId(companyId);
+    public void delete(@PathVariable("companyId") final UUID companyId, @RequestParam String fileName) {
+        service.deleteByCompanyId(companyId, fileName);
     }
 
     @DeleteMapping(value = "/company/{companyId}/image/{imageId}")

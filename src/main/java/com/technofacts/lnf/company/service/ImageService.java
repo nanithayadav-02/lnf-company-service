@@ -8,10 +8,12 @@ import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.Image;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.ImageRepository;
+import com.technofacts.lnf.dto.company.CompanyPolicyDto;
 import com.technofacts.lnf.dto.company.ImageDto;
-import com.technofacts.lnf.service.File.FileUploadService;
+import com.technofacts.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,10 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -36,8 +37,7 @@ public class ImageService {
 
     private final CompanyRepository companyRepository;
     private final ImageRepository repository;
-
-    private final FileUploadService fileUploadService;
+    private final FileService fileService;
 
     @Value("${aws.s3.bucket.enabled}")
     private boolean awsS3BucketEnabled;
@@ -52,47 +52,53 @@ public class ImageService {
     }
 
     public ImageDto findByCompanyId(UUID companyId) {
+        if (awsS3BucketEnabled) {
+            String filePath = folderName + "/" + companyId + "/";
+            List<String> filePaths = fileService.findFilesInFolder (filePath);
+
+            String url = filePaths.stream()
+                    .map(file -> ServletUriComponentsBuilder.fromCurrentContextPath()
+                            .path("/lnf/file")
+                            .queryParam("filePath", file)
+                            .toUriString())
+                    .collect(Collectors.joining(", "));
+
+            ImageDto imageDto = new ImageDto();
+            String fileName = Paths.get(filePaths.get(0)).getFileName().toString();
+            imageDto.setName(fileName);
+            imageDto.setUrl(url);
+
+            return imageDto;
+        }
         searchForCompany(companyId);
         Image entity = repository.findByCompanyId(companyId);
         if (entity == null) {
             throw new LnFEntityNotFoundException(String.format("Image for company [%s] does not exist", companyId));
         }
-        if (awsS3BucketEnabled) {
-            ImageDto imageDto = new ImageDto();
-            String fileName = entity.getName();
-            ResponseEntity<byte[]> s3Response = fileUploadService.findFile(folderName + "/" + companyId + "/" + fileName);
-            if (s3Response.getStatusCode() == HttpStatus.OK) {
-                String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/lnf/file")
-                        .queryParam("filePath", folderName + "/" + companyId + "/" + fileName)
-                        .toUriString();
-                imageDto.setUrl(downloadURL);
-                return imageDto;
-            }
-        }
-            ImageDto imageDto = ImageConverter.toTransportModel(entity);
-            String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(String.format("/lnf/company/%s/image/", companyId))
-                    .path(imageDto.getId().toString())
-                    .toUriString();
-            imageDto.setUrl(downloadURL);
 
-            return imageDto;
+        ImageDto imageDto = ImageConverter.toTransportModel(entity);
+        String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(String.format("/lnf/company/%s/image/", companyId))
+                .path(imageDto.getId().toString())
+                .toUriString();
+        imageDto.setUrl(downloadURL);
+
+        return imageDto;
     }
 
-    public ResponseEntity<byte[]> findById(UUID companyId, UUID imageId) {
-        searchForCompany(companyId);
-        Image file = searchForImage(imageId);
-        String fileName = file.getName();
-        if(awsS3BucketEnabled) {
-            ResponseEntity<byte[]> s3Response =  fileUploadService.findFile(folderName + "/" + companyId + "/" + fileName);
+    public ResponseEntity<byte[]> findById(UUID companyId, Optional<UUID> imageId, String fileName) {
+        if (awsS3BucketEnabled) {
+            String filePath = folderName + "/" + companyId + "/" + fileName;
+            ResponseEntity<byte[]> s3Response =  fileService.findFile(filePath);
             if (s3Response.getStatusCode() == HttpStatus.OK) {
                 return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
-                        .contentType(MediaType.valueOf(file.getContentType()))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +
+                                StringUtils.substringAfterLast(filePath, "/") + "\"")
                         .body(s3Response.getBody());
             }
         }
+        searchForCompany(companyId);
+        Image file = searchForImage(imageId.get());
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
                 .contentType(MediaType.valueOf(file.getContentType()))
@@ -144,16 +150,15 @@ public class ImageService {
         }
     }
 
-    public void deleteByCompanyId(UUID companyId) {
-        searchForCompany(companyId);
-        Image entity = repository.findByCompanyId(companyId);
+    public void deleteByCompanyId(UUID companyId, String fileName) {
         if (awsS3BucketEnabled) {
-            String fileName = entity.getName();
             String s3ObjectKey = folderName + "/" + companyId + "/" + fileName;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
-            fileUploadService.delete(filePaths);
+            fileService.delete(filePaths);
             log.info("S3 object deleted for company");
         } else {
+            searchForCompany(companyId);
+            Image entity = repository.findByCompanyId(companyId);
             try {
                 repository.delete(entity);
             } catch (RuntimeException e) {
@@ -166,20 +171,12 @@ public class ImageService {
     public void deleteById(UUID companyId, UUID fileId) {
         searchForCompany(companyId);
         Image entity = searchForImage(fileId);
-        if (awsS3BucketEnabled) {
-            String fileName = entity.getName();
-            String s3ObjectKey = folderName + "/" + companyId + "/" + fileName;
-            List<String> filePaths = Collections.singletonList(s3ObjectKey);
-            fileUploadService.delete(filePaths);
-            log.info("S3 object deleted for company");
-        } else {
-            try {
-                repository.delete(entity);
-                log.info(() -> String.format("Image[%s] for company [%s] successfully deleted", fileId, companyId));
-            } catch (RuntimeException e) {
-                String errorMessage = String.format("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
-                throw new LnFException(errorMessage);
-            }
+        try {
+            repository.delete(entity);
+            log.info(() -> String.format("Image[%s] for company [%s] successfully deleted", fileId, companyId));
+        } catch (RuntimeException e) {
+            String errorMessage = String.format("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
+            throw new LnFException(errorMessage);
         }
     }
 
@@ -206,6 +203,6 @@ public class ImageService {
     }
 
     private String uploadFile(String folder, MultipartFile file) {
-        return fileUploadService.uploadFile(folder, file);
+        return fileService.uploadFile(folder, file);
     }
 }
