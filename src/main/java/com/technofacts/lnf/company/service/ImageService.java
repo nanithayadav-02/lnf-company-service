@@ -8,7 +8,6 @@ import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.Image;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.ImageRepository;
-import com.technofacts.lnf.dto.company.CompanyPolicyDto;
 import com.technofacts.lnf.dto.company.ImageDto;
 import com.technofacts.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,7 +88,7 @@ public class ImageService {
         return imageDto;
     }
 
-    public ResponseEntity<byte[]> findById(UUID companyId, Optional<UUID> imageId, String fileName) {
+    public ResponseEntity<byte[]> findById(UUID companyId, UUID imageId, String fileName) {
         if (awsS3BucketEnabled) {
             String filePath = folderName + "/" + companyId + "/" + fileName;
             ResponseEntity<byte[]> s3Response =  fileService.findFile(filePath);
@@ -98,7 +100,7 @@ public class ImageService {
             }
         }
         searchForCompany(companyId);
-        Image file = searchForImage(imageId.get());
+        Image file = searchForImage(imageId);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
                 .contentType(MediaType.valueOf(file.getContentType()))
@@ -106,7 +108,6 @@ public class ImageService {
     }
 
     public void create(UUID companyId, MultipartFile file) {
-        Company company = searchForCompany(companyId);
         try {
             LnFBadRequestException.throwOnCondition(Objects::isNull, file,
                     String.format("Failed to create Image for company [%s] with null payload", companyId));
@@ -115,6 +116,7 @@ public class ImageService {
                 String filePath = uploadFile(folder, file);
                 log.info("File uploaded successfully to S3 bucket: " + filePath);
             } else {
+                Company company = searchForCompany(companyId);
                 Image entity = ImageConverter.toEntityModel(file, false);
                 entity.setCompany(company);
                 save(entity);
@@ -132,14 +134,14 @@ public class ImageService {
     public void update(UUID companyId, UUID fileId, MultipartFile file) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, file,
                 String.format("Failed to update file for company [%s] with null payload", companyId));
-        searchForCompany(companyId);
-        Image entity = searchForImage(fileId);
         try {
             if (awsS3BucketEnabled) {
                 String folder = folderName + "/" + companyId + "/";
                 String filePath = uploadFile(folder, file);
                 log.info("File uploaded successfully to S3 bucket: " + filePath);
             } else {
+                searchForCompany(companyId);
+                Image entity = searchForImage(fileId);
                 Image updatedEntity = ImageConverter.toEntityModel(file, entity, false);
                 save(updatedEntity);
                 log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));

@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -26,7 +25,7 @@ public class ImageController {
 
     @GetMapping(value = "/company/{companyId}/image/{fileName}")
     public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId,
-                                           @RequestParam("imageId") final Optional<UUID> imageId, @PathVariable("fileName") String fileName) {
+                                           @RequestParam(value = "imageId", required = false) final UUID imageId, @PathVariable("fileName") String fileName) {
         return service.findById(companyId, imageId, fileName);
     }
 
