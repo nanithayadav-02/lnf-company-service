@@ -35,9 +35,9 @@ public class CompanyPolicyController {
         service.create(companyId, policies);
     }
 
-    @PutMapping(value = "/company/{companyId}/policies/{policyId}")
+    @PutMapping(value = "/company/{companyId}/policies")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("policyId") final UUID policyId,
+    public void update(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
                        @RequestParam MultipartFile policy) {
         service.update(companyId, policyId, policy);
     }
@@ -51,7 +51,7 @@ public class CompanyPolicyController {
     @DeleteMapping(value = "/company/{companyId}/policies/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
-                       @PathVariable("fileName") String fileName) {
+                       @PathVariable("fileName") final String fileName) {
         service.deleteById(companyId, policyId, fileName);
     }
 
