@@ -35,23 +35,23 @@ public class ImageController {
         service.create(companyId, image);
     }
 
-    @PutMapping(value = "/company/{companyId}/image/{imageId}")
+    @PutMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("imageId") final UUID imageId,
+    public void update(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "imageId", required = false) final UUID imageId,
                        @RequestParam MultipartFile image) {
         service.update(companyId, imageId, image);
     }
 
     @DeleteMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId, @RequestParam String fileName) {
-        service.deleteByCompanyId(companyId, fileName);
+    public void delete(@PathVariable("companyId") final UUID companyId) {
+        service.deleteByCompanyId(companyId);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/image/{imageId}")
+    @DeleteMapping(value = "/company/{companyId}/image/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("companyId") final UUID companyId,
-                       @PathVariable("imageId") final UUID imageId) {
-        service.deleteById(companyId, imageId);
+                       @RequestParam(value = "imageId", required = false) final UUID imageId, @PathVariable("fileName") String fileName) {
+        service.deleteById(companyId, imageId, fileName);
     }
 }
