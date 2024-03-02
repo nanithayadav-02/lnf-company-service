@@ -1,18 +1,15 @@
 package com.technofacts.lnf.company.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.technofacts.lnf.company.service.CompanyPolicyService;
 import com.technofacts.lnf.dto.company.CompanyPolicyDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +24,7 @@ public class CompanyPolicyController {
     }
 
     @GetMapping(value = "/company/{companyId}/policies/{fileName}")
-    public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId, @RequestParam("policyId") final Optional<UUID> policyId,
+    public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
                                            @PathVariable("fileName") String fileName) {
         return service.findById(companyId, policyId, fileName);
     }
@@ -53,7 +50,7 @@ public class CompanyPolicyController {
 
     @DeleteMapping(value = "/company/{companyId}/policies/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId, @RequestParam("policyId") final Optional<UUID> policyId,
+    public void delete(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
                        @PathVariable("fileName") String fileName) {
         service.deleteById(companyId, policyId, fileName);
     }

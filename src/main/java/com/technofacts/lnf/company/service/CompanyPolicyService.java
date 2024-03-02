@@ -84,7 +84,7 @@ public class CompanyPolicyService {
             return companyPolicyDtos;
     }
 
-    public ResponseEntity<byte[]> findById(UUID companyId, Optional<UUID> policyId, String fileName) {
+    public ResponseEntity<byte[]> findById(UUID companyId, UUID policyId, String fileName) {
         if (awsS3BucketEnabled) {
             String filePath = folderName + "/" + companyId +  "/policies/" + fileName;
             ResponseEntity<byte[]> s3Response =  fileService.findFile(filePath);
@@ -96,7 +96,7 @@ public class CompanyPolicyService {
             }
         }
         searchForCompany(companyId);
-        CompanyPolicy companyPolicy = searchForPolicy(policyId.get());
+        CompanyPolicy companyPolicy = searchForPolicy(policyId);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
                         + companyPolicy.getName() + "\"")
@@ -132,13 +132,13 @@ public class CompanyPolicyService {
     public void update(UUID companyId, UUID fileId, MultipartFile policy) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, policy,
                 String.format("Failed to update policy for company [%s] with null payload", companyId));
-        searchForCompany(companyId);
         try {
             if (awsS3BucketEnabled) {
                 String folder = folderName + "/" + companyId + "/policies/";
                 String filePath = uploadFile(folder, policy);
                 log.info("File uploaded successfully to S3 bucket: " + filePath);
             } else {
+                searchForCompany(companyId);
                 CompanyPolicy entity = searchForPolicy(fileId);
                 CompanyPolicy updatedEntity = CompanyPolicyConverter.toEntityModel(policy, entity, awsS3BucketEnabled);
                 save(updatedEntity);
@@ -161,7 +161,7 @@ public class CompanyPolicyService {
         }
     }
 
-    public void deleteById(UUID companyId, Optional<UUID> fileId , String fileName) {
+    public void deleteById(UUID companyId, UUID fileId , String fileName) {
         if (awsS3BucketEnabled) {
             String s3ObjectKey = folderName + "/" + companyId +  "/policies/"  + fileName;
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
@@ -169,7 +169,7 @@ public class CompanyPolicyService {
             log.info("S3 object deleted for company");
         } else {
             searchForCompany (companyId);
-            CompanyPolicy entity = searchForPolicy (fileId.get ());
+            CompanyPolicy entity = searchForPolicy (fileId);
             try {
                 repository.delete (entity);
                 log.info (() -> String.format ("Policy[%s] for company [%s] successfully deleted", fileId, companyId));
