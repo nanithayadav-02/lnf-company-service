@@ -15,7 +15,6 @@ import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -67,41 +66,42 @@ public class CompanyPolicyService {
                 companyPolicyDtos.add(companyPolicyDto);
             });
             return companyPolicyDtos;
-        }
-        searchForCompany(companyId);
-        List<CompanyPolicy> entities = repository.findByCompanyId(companyId);
-            List<CompanyPolicyDto> companyPolicyDtos = entities.stream()
-                    .map(CompanyPolicyConverter::toTransportModel)
-                    .filter(Objects::nonNull)
-                    .toList();
-            companyPolicyDtos.forEach(f -> {
-                String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path(String.format("/lnf/company/%s/policies/", companyId))
-                        .path(f.getId().toString())
-                        .toUriString();
-                f.setUrl(downloadURL);
+        } else {
+            searchForCompany (companyId);
+            List<CompanyPolicy> entities = repository.findByCompanyId (companyId);
+            List<CompanyPolicyDto> companyPolicyDtos = entities.stream ()
+                    .map (CompanyPolicyConverter::toTransportModel)
+                    .filter (Objects::nonNull)
+                    .toList ();
+            companyPolicyDtos.forEach (f -> {
+                String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath ()
+                        .path (String.format ("/lnf/company/%s/policies/", companyId))
+                        .path (f.getId ().toString ())
+                        .toUriString ();
+                f.setUrl (downloadURL);
             });
             return companyPolicyDtos;
+        }
     }
 
     public ResponseEntity<byte[]> findById(UUID companyId, UUID policyId, String fileName) {
-        if (awsS3BucketEnabled) {
-            String filePath = folderName + "/" + companyId +  "/policies/" + fileName;
-            ResponseEntity<byte[]> s3Response =  fileService.findFile(filePath);
-            if (s3Response.getStatusCode() == HttpStatus.OK) {
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +
-                                StringUtils.substringAfterLast(filePath, "/") + "\"")
-                        .body(s3Response.getBody());
+        try {
+            if (awsS3BucketEnabled) {
+                String filePath = folderName + "/" + companyId + "/policies/" + fileName;
+                return fileService.findFileContent (filePath);
+            } else {
+                searchForCompany (companyId);
+                CompanyPolicy companyPolicy = searchForPolicy (policyId);
+                return ResponseEntity.ok ()
+                        .header (HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
+                                + companyPolicy.getName () + "\"")
+                        .contentType (MediaType.valueOf (companyPolicy.getContentType ()))
+                        .body (companyPolicy.getContent ());
             }
+        } catch (RuntimeException e ) {
+            String errorMessage = String.format ("file not found for Company[%s]", companyId);
+            throw new LnFException (errorMessage, e);
         }
-        searchForCompany(companyId);
-        CompanyPolicy companyPolicy = searchForPolicy(policyId);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""
-                        + companyPolicy.getName() + "\"")
-                .contentType(MediaType.valueOf(companyPolicy.getContentType()))
-                .body(companyPolicy.getContent());
     }
 
     public void create(UUID companyId, MultipartFile[] policies) {

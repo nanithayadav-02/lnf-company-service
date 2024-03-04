@@ -12,10 +12,8 @@ import com.technofacts.lnf.dto.company.ImageDto;
 import com.technofacts.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -58,57 +56,58 @@ public class ImageService {
             String filePath = folderName + "/" + companyId + "/";
             List<String> filePaths = fileService.findFilesInFolder (filePath);
 
-            if (!filePaths.isEmpty()) {
-                String url = filePaths.stream()
-                        .map(file -> ServletUriComponentsBuilder.fromCurrentContextPath()
-                                .path("/lnf/file")
-                                .queryParam("filePath", file)
-                                .toUriString())
-                        .collect(Collectors.joining(", "));
+            if (!filePaths.isEmpty ()) {
+                String url = filePaths.stream ()
+                        .map (file -> ServletUriComponentsBuilder.fromCurrentContextPath ()
+                                .path ("/lnf/file")
+                                .queryParam ("filePath", file)
+                                .toUriString ())
+                        .collect (Collectors.joining (", "));
 
-                ImageDto imageDto = new ImageDto();
-                String fileName = Paths.get(filePaths.get(0)).getFileName().toString();
-                imageDto.setName(fileName);
-                imageDto.setUrl(url);
+                ImageDto imageDto = new ImageDto ();
+                String fileName = Paths.get (filePaths.get (0)).getFileName ().toString ();
+                imageDto.setName (fileName);
+                imageDto.setUrl (url);
 
                 return imageDto;
             } else {
                 throw new LnFException ("No files found for companyId: " + companyId);
             }
-        }
-        searchForCompany (companyId);
-        Image entity = repository.findByCompanyId (companyId);
-        if (entity == null) {
-            throw new LnFEntityNotFoundException (String.format ("Image for company [%s] does not exist", companyId));
-        }
+        } else {
+            searchForCompany (companyId);
+            Image entity = repository.findByCompanyId (companyId);
+            if (entity == null) {
+                throw new LnFEntityNotFoundException (String.format ("Image for company [%s] does not exist", companyId));
+            }
 
-        ImageDto imageDto = ImageConverter.toTransportModel (entity);
-        String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath ()
-                .path (String.format ("/lnf/company/%s/image/", companyId))
-                .path (imageDto.getId ().toString ())
-                .toUriString ();
-        imageDto.setUrl (downloadURL);
+            ImageDto imageDto = ImageConverter.toTransportModel (entity);
+            String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath ()
+                    .path (String.format ("/lnf/company/%s/image/", companyId))
+                    .path (imageDto.getId ().toString ())
+                    .toUriString ();
+            imageDto.setUrl (downloadURL);
 
-        return imageDto;
+            return imageDto;
+        }
     }
 
     public ResponseEntity<byte[]> findById (UUID companyId, UUID imageId, String fileName) {
-        if (awsS3BucketEnabled) {
-            String filePath = folderName + "/" + companyId + "/" + fileName;
-            ResponseEntity<byte[]> s3Response = fileService.findFile (filePath);
-            if (s3Response.getStatusCode () == HttpStatus.OK) {
+        try {
+            if (awsS3BucketEnabled) {
+                String filePath = folderName + "/" + companyId + "/" + fileName;
+                return fileService.findFileContent (filePath);
+            } else {
+                searchForCompany (companyId);
+                Image file = searchForImage (imageId);
                 return ResponseEntity.ok ()
-                        .header (HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +
-                                StringUtils.substringAfterLast (filePath, "/") + "\"")
-                        .body (s3Response.getBody ());
+                        .header (HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName () + "\"")
+                        .contentType (MediaType.valueOf (file.getContentType ()))
+                        .body (file.getContent ());
             }
+        } catch (RuntimeException e ) {
+            String errorMessage = String.format ("file not found for Company[%s]", companyId);
+            throw new LnFException (errorMessage, e);
         }
-        searchForCompany (companyId);
-        Image file = searchForImage (imageId);
-        return ResponseEntity.ok ()
-                .header (HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName () + "\"")
-                .contentType (MediaType.valueOf (file.getContentType ()))
-                .body (file.getContent ());
     }
 
     public void create (UUID companyId, MultipartFile file) {
