@@ -1,6 +1,5 @@
 package com.technofacts.lnf.company.restapi;
 
-import com.technofacts.lnf.dto.client.ClientDto;
 import com.technofacts.lnf.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.exception.LnFException;
 import com.technofacts.lnf.service.file.FileService;
@@ -22,8 +21,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 
 
 @Service
@@ -69,6 +68,11 @@ public class FileClientImpl extends BaseWebClientService implements FileService 
             log.error("Unexpected error occurred during file upload", e);
             throw new LnFException("File Upload for employee failed" + e);
         }
+    }
+
+    @Override
+    public List<String> uploadFiles (String folder, List<MultipartFile> files) {
+        return Collections.emptyList ();
     }
 
     @Override
@@ -122,6 +126,24 @@ public class FileClientImpl extends BaseWebClientService implements FileService 
             log.info("file is retrieved");
             return response;
         } catch (Exception ex) {
+            log.error("File is not retrieved {}", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @Override
+    public ResponseEntity<byte[]> findFileContent (String filePath) {
+        try {
+            WebClient.RequestHeadersSpec<?> spec = webClient.get ()
+                    .uri (s3Service + "/content" + "?filePath={filePath}", filePath);
+            addJwtToken(spec);
+            ResponseEntity<byte[]> response = spec
+                    .retrieve()
+                    .toEntity(byte[].class)
+                    .block();
+            log.info("file is retrieved");
+            return response;
+        }  catch (Exception ex) {
             log.error("File is not retrieved {}", ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
