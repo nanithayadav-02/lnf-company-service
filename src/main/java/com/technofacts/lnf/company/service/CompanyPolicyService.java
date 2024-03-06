@@ -56,12 +56,12 @@ public class CompanyPolicyService {
             List<String> files = fileService.findFilesInFolder(filePath);
             List<CompanyPolicyDto> companyPolicyDtos = new ArrayList<>();
             files.forEach(file -> {
+                String fileName = StringUtils.substringAfterLast(file, "/");
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/lnf/file")
-                        .queryParam("filePath", file)
+                        .path (String.format ("/lnf/company/%s/policies/%s", companyId,fileName))
                         .toUriString();
                 CompanyPolicyDto companyPolicyDto = new CompanyPolicyDto();
-                companyPolicyDto.setName(StringUtils.substringAfterLast(file, "/"));
+                companyPolicyDto.setName(fileName);
                 companyPolicyDto.setUrl(downloadURL);
                 companyPolicyDtos.add(companyPolicyDto);
             });
