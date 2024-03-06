@@ -53,21 +53,20 @@ public class ImageService {
 
     public ImageDto findByCompanyId (UUID companyId) {
         if (awsS3BucketEnabled) {
-            String filePath = folderName + "/" + companyId + "/";
+            String filePath = folderName + "/" + companyId + "/image/";
             List<String> filePaths = fileService.findFilesInFolder (filePath);
 
             if (!filePaths.isEmpty ()) {
+                String fileName = Paths.get(filePaths.get(0)).getFileName().toString();
                 String url = filePaths.stream ()
-                        .map (file -> ServletUriComponentsBuilder.fromCurrentContextPath ()
-                                .path ("/lnf/file")
-                                .queryParam ("filePath", file)
-                                .toUriString ())
-                        .collect (Collectors.joining (", "));
+                        .map(file -> ServletUriComponentsBuilder.fromCurrentContextPath ()
+                                .path(String.format("/lnf/company/%s/image/%s", companyId, fileName))
+                                .toUriString())
+                        .collect(Collectors.joining(", "));
 
                 ImageDto imageDto = new ImageDto ();
-                String fileName = Paths.get (filePaths.get (0)).getFileName ().toString ();
-                imageDto.setName (fileName);
-                imageDto.setUrl (url);
+                imageDto.setName(fileName);
+                imageDto.setUrl(url);
 
                 return imageDto;
             } else {
@@ -94,7 +93,7 @@ public class ImageService {
     public ResponseEntity<byte[]> findById (UUID companyId, UUID imageId, String fileName) {
         try {
             if (awsS3BucketEnabled) {
-                String filePath = folderName + "/" + companyId + "/" + fileName;
+                String filePath = folderName + "/" + companyId + "/image/" + fileName;
                 return fileService.findFileContent (filePath);
             } else {
                 searchForCompany (companyId);
@@ -115,7 +114,7 @@ public class ImageService {
             LnFBadRequestException.throwOnCondition (Objects::isNull, file,
                     String.format ("Failed to create Image for company [%s] with null payload", companyId));
             if (awsS3BucketEnabled) {
-                String folder = folderName + "/" + companyId + "/";
+                String folder = folderName + "/" + companyId + "/image/";
                 String filePath = uploadFile (folder, file);
                 log.info ("File uploaded successfully to S3 bucket: " + filePath);
             } else {
@@ -139,7 +138,7 @@ public class ImageService {
                 String.format ("Failed to update file for company [%s] with null payload", companyId));
         try {
             if (awsS3BucketEnabled) {
-                String folder = folderName + "/" + companyId + "/";
+                String folder = folderName + "/" + companyId + "/image/";
                 String filePath = uploadFile (folder, file);
                 log.info ("File uploaded successfully to S3 bucket: " + filePath);
             } else {
@@ -169,7 +168,7 @@ public class ImageService {
 
     public void deleteById (UUID companyId, UUID fileId, String fileName) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + "/" + companyId + "/" + fileName;
+            String s3ObjectKey = folderName + "/" + companyId + "/image/" + fileName;
             List<String> filePaths = Collections.singletonList (s3ObjectKey);
             fileService.delete (filePaths);
             log.info ("S3 object deleted for company");

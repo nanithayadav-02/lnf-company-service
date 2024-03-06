@@ -127,7 +127,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService 
             return response;
         } catch (Exception ex) {
             log.error("File is not retrieved {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new byte[0]);
         }
     }
 
@@ -145,7 +145,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService 
             return response;
         }  catch (Exception ex) {
             log.error("File is not retrieved {}", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new byte[0]);
         }
     }
 
