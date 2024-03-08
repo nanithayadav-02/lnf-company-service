@@ -25,6 +25,7 @@ public class CompanyHolidayConverter {
             return null;
         }
 
+        entity.setId(transport.getId());
         entity.setDate(transport.getDate());
         entity.setDeleted(transport.isDeleted());
         entity.setDescription(transport.getDescription());
