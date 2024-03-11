@@ -39,34 +39,26 @@ public class WebClientConfiguration {
     @Bean
     @Qualifier("fileService")
     public WebClient fileWebClient() {
-        ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(maxInMemorySize))
-                .build();
-
-        HttpClient httpClient = HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeOut)
-                .responseTimeout(Duration.ofMillis(timeOut))
-                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(timeOut, TimeUnit.MILLISECONDS))
-                        .addHandlerLast(new WriteTimeoutHandler(timeOut, TimeUnit.MILLISECONDS)));
-
-        return WebClient.builder()
-                .baseUrl(fileServiceUrl)
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .exchangeStrategies(exchangeStrategies)
-                .build();
+        return createWebClient(fileServiceUrl);
     }
 
-        private WebClient createWebClient(String baseUrl) {
-        HttpClient httpClient = HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeOut)
-                .responseTimeout(Duration.ofMillis(timeOut))
-                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(timeOut, TimeUnit.MILLISECONDS))
-                        .addHandlerLast(new WriteTimeoutHandler(timeOut, TimeUnit.MILLISECONDS)));
+    private WebClient createWebClient(String baseUrl) {
 
-        return WebClient.builder()
-                .baseUrl(baseUrl)
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .build();
-    }
+    ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
+            .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(maxInMemorySize))
+            .build();
+
+    HttpClient httpClient = HttpClient.create()
+            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeOut)
+            .responseTimeout(Duration.ofMillis(timeOut))
+            .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(timeOut, TimeUnit.MILLISECONDS))
+                    .addHandlerLast(new WriteTimeoutHandler(timeOut, TimeUnit.MILLISECONDS)));
+
+    return WebClient.builder()
+            .baseUrl(baseUrl)
+            .clientConnector(new ReactorClientHttpConnector(httpClient))
+            .exchangeStrategies(exchangeStrategies)
+            .build();
+   }
 
 }

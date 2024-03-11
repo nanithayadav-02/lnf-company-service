@@ -53,7 +53,7 @@ public class ImageService {
 
     public ImageDto findByCompanyId (UUID companyId) {
         if (awsS3BucketEnabled) {
-            String filePath = folderName + "/" + companyId + "/image/";
+            String filePath = String.format ("%s/%s/%s/", folderName, companyId, "image");
             List<String> filePaths = fileService.findFilesInFolder (filePath);
 
             if (!filePaths.isEmpty ()) {
@@ -93,7 +93,7 @@ public class ImageService {
     public ResponseEntity<byte[]> findById (UUID companyId, UUID imageId, String fileName) {
         try {
             if (awsS3BucketEnabled) {
-                String filePath = folderName + "/" + companyId + "/image/" + fileName;
+                String filePath = String.format ("%s/%s/%s/%s",folderName, companyId, "image", fileName);
                 return fileService.findFileContent (filePath);
             } else {
                 searchForCompany (companyId);
@@ -114,7 +114,7 @@ public class ImageService {
             LnFBadRequestException.throwOnCondition (Objects::isNull, file,
                     String.format ("Failed to create Image for company [%s] with null payload", companyId));
             if (awsS3BucketEnabled) {
-                String folder = folderName + "/" + companyId + "/image/";
+                String folder = String.format ("%s/%s/%s/", folderName, companyId, "image");
                 String filePath = uploadFile (folder, file);
                 log.info ("File uploaded successfully to S3 bucket: " + filePath);
             } else {
@@ -138,7 +138,7 @@ public class ImageService {
                 String.format ("Failed to update file for company [%s] with null payload", companyId));
         try {
             if (awsS3BucketEnabled) {
-                String folder = folderName + "/" + companyId + "/image/";
+                String folder = String.format ("%s/%s/%s/", folderName, companyId, "image");
                 String filePath = uploadFile (folder, file);
                 log.info ("File uploaded successfully to S3 bucket: " + filePath);
             } else {
@@ -168,7 +168,7 @@ public class ImageService {
 
     public void deleteById (UUID companyId, UUID fileId, String fileName) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + "/" + companyId + "/image/" + fileName;
+            String s3ObjectKey = String.format ("%s/%s/%s/%s", folderName, companyId, "image", fileName);
             List<String> filePaths = Collections.singletonList (s3ObjectKey);
             fileService.delete (filePaths);
             log.info ("S3 object deleted for company");
