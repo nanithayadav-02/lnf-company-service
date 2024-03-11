@@ -16,7 +16,7 @@ application:
   maxInMemorySize: 10485760
 
 connection:
-  timeout: 2000
+  timeout: 10000
 
 server:
   port: 8081
