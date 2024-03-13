@@ -52,13 +52,13 @@ public class CompanyPolicyService {
 
     public List<CompanyPolicyDto> findByCompanyId(UUID companyId) {
         if(awsS3BucketEnabled) {
-            String filePath = folderName + "/" + companyId + "/policies/";
+            String filePath = String.format("%s/%s/%s/", folderName, companyId, "policies");
             List<String> files = fileService.findFilesInFolder(filePath);
             List<CompanyPolicyDto> companyPolicyDtos = new ArrayList<>();
             files.forEach(file -> {
                 String fileName = StringUtils.substringAfterLast(file, "/");
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path (String.format ("/lnf/company/%s/policies/%s", companyId,fileName))
+                        .path (String.format ("/lnf/company/%s/policies/%s", companyId, fileName))
                         .toUriString();
                 CompanyPolicyDto companyPolicyDto = new CompanyPolicyDto();
                 companyPolicyDto.setName(fileName);
@@ -87,7 +87,7 @@ public class CompanyPolicyService {
     public ResponseEntity<byte[]> findById(UUID companyId, UUID policyId, String fileName) {
         try {
             if (awsS3BucketEnabled) {
-                String filePath = folderName + "/" + companyId + "/policies/" + fileName;
+                String filePath = String.format("%s/%s/%s/%s", folderName, companyId, "policies", fileName);
                 return fileService.findFileContent (filePath);
             } else {
                 searchForCompany (companyId);
@@ -111,7 +111,7 @@ public class CompanyPolicyService {
                 LnFBadRequestException.throwOnCondition(Objects::isNull, policy,
                         String.format("Failed to create Policy for company [%s] with null payload", companyId));
                 if (awsS3BucketEnabled) {
-                    String folder = folderName + "/" + companyId + "/policies/";
+                    String folder = String.format("%s/%s/%s/", folderName, companyId, "policies");
                     String filePath = uploadFile(folder, policy);
                     log.info("File uploaded successfully to S3 bucket: " + filePath);
                 } else {
@@ -134,7 +134,7 @@ public class CompanyPolicyService {
                 String.format("Failed to update policy for company [%s] with null payload", companyId));
         try {
             if (awsS3BucketEnabled) {
-                String folder = folderName + "/" + companyId + "/policies/";
+                String folder = String.format("%s/%s/%s/", folderName, companyId, "policies");
                 String filePath = uploadFile(folder, policy);
                 log.info("File uploaded successfully to S3 bucket: " + filePath);
             } else {
@@ -163,7 +163,7 @@ public class CompanyPolicyService {
 
     public void deleteById(UUID companyId, UUID fileId , String fileName) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = folderName + "/" + companyId +  "/policies/"  + fileName;
+            String s3ObjectKey = String.format("%s/%s/%s/%s", folderName, companyId, "policies", fileName);
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileService.delete(filePaths);
             log.info("S3 object deleted for company");

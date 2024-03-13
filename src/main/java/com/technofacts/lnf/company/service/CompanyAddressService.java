@@ -1,11 +1,5 @@
 package com.technofacts.lnf.company.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import com.technofacts.lnf.company.converter.AddressConverter;
 import com.technofacts.lnf.company.exception.LnFBadRequestException;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
@@ -20,6 +14,11 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -32,14 +31,14 @@ public class CompanyAddressService {
     public List<AddressDto> findAll() {
         List<CompanyAddress> entities = repository.findAll();
         return entities.stream().map(AddressConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
     }
 
     public List<AddressDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyAddress> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(AddressConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
     }
 
     public AddressDto findById(UUID companyId, UUID addressId) {

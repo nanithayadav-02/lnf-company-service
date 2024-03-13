@@ -40,10 +40,8 @@ class TaskControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private TaskService service;
-
     private UUID taskId;
 
     @BeforeAll
@@ -205,4 +203,5 @@ class TaskControllerTest {
         dto.setRemindMe(LocalDate.parse(remindMe));
         return dto;
     }
+
 }

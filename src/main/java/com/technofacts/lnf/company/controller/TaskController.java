@@ -15,36 +15,36 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lnf/company")
+@RequestMapping("/lnf")
 public class TaskController {
 
     private final TaskService service;
     private final PaginationAndSortingHandler paginationAndSortingHandler;
 
-    @GetMapping(value = "/tasks")
+    @GetMapping(value = "/company/tasks")
     public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest) {
         return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
     }
 
-    @GetMapping(value = "/task/{taskId}")
+    @GetMapping(value = "/company/task/{taskId}")
     public TaskDto findById(@PathVariable("taskId") final UUID taskId) {
         return service.findByTaskId(taskId);
     }
 
-    @PostMapping(value = "/tasks")
+    @PostMapping(value = "/company/tasks")
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody final List<TaskDto> resource) {
         service.create(resource);
     }
 
-    @PutMapping(value = "/task/{taskId}")
+    @PutMapping(value = "/company/task/{taskId}")
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable("taskId") final UUID taskId,
                        @RequestBody final TaskDto resource) {
         service.update(taskId, resource);
     }
 
-    @DeleteMapping(value = "/task/{taskId}")
+    @DeleteMapping(value = "/company/task/{taskId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete( @PathVariable("taskId") final UUID taskId) {
         service.deleteById(taskId);

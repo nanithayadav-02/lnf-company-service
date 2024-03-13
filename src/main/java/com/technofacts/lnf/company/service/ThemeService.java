@@ -1,11 +1,5 @@
 package com.technofacts.lnf.company.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import com.technofacts.lnf.company.converter.ThemeConverter;
 import com.technofacts.lnf.company.exception.LnFBadRequestException;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
@@ -20,6 +14,11 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -33,19 +32,19 @@ public class ThemeService {
         List<Theme> entities = repository.findAll();
         return entities.stream().map(ThemeConverter::toTransportModel)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<ThemeDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<Theme> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(ThemeConverter::toTransportModel).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public ThemeDto findById(UUID companyId, UUID gstId) {
+    public ThemeDto findById(UUID companyId, UUID themeId) {
         searchForCompany(companyId);
-        return ThemeConverter.toTransportModel(searchForGst(gstId));
+        return ThemeConverter.toTransportModel(searchForTheme (themeId));
     }
 
     public void create(UUID companyId, List<ThemeDto> resource) {
@@ -72,25 +71,25 @@ public class ThemeService {
         log.info(() -> String.format("Theme for company[%s] successfully created", companyId));
     }
 
-    public void update(UUID companyId, UUID gstId, ThemeDto resource) {
+    public void update(UUID companyId, UUID themeId, ThemeDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, 
                 String.format("Failed to theme company[%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
-        searchForGst(gstId);
+        searchForTheme (themeId);
         Theme updatedEntity = ThemeConverter.toEntityModel(resource);
         updatedEntity.setCompany(companyEntity);
         save(updatedEntity);
         log.info(() -> String.format("Theme for company[%s] successfully updated", companyId));
     }
 
-    public void deleteById(UUID companyId, UUID gstId) {
+    public void deleteById(UUID companyId, UUID themeId) {
         searchForCompany(companyId);
-        Theme entity = searchForGst(gstId);
+        Theme entity = searchForTheme (themeId);
         try {
             repository.delete(entity);
-            log.info(() -> String.format("Theme[%s] for company[%s] successfully deleted", gstId, companyId));
+            log.info(() -> String.format("Theme[%s] for company[%s] successfully deleted", themeId, companyId));
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete theme[%s] for company [%s]", gstId, companyId);
+            String errorMessage = String.format("Failed to delete theme[%s] for company [%s]", themeId, companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -130,9 +129,9 @@ public class ThemeService {
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
     }
 
-    private Theme searchForGst(UUID gstId) {
-        return repository.findById(gstId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Theme with id [%s] does not exist", gstId)));
+    private Theme searchForTheme (UUID themeId) {
+        return repository.findById(themeId).
+                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Theme with id [%s] does not exist", themeId)));
     }
 
 }

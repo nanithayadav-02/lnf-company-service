@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -24,32 +23,32 @@ public class CompanyEventSchedulerService {
 
     public List<CompanyEventDto> findEventsByTypeAndDate(EventType eventType, LocalDate dateAndTime) {
         List<CompanyEvent> entities = companyEventRepository.getEventsByDate(eventType, dateAndTime);
-        return entities.stream().map(entity -> CompanyEventConverter.toTransportModel(entity)).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
     public List<CompanyEventDto> findEventsByEventTypeAndDateRange(EventType eventType, LocalDate startDate, LocalDate endDate) {
         List<CompanyEvent> entities = companyEventRepository.getEventsByEventTypeAndDateRange(eventType, startDate, endDate);
-        return entities.stream().map(entity -> CompanyEventConverter.toTransportModel(entity)).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
     public List<CompanyEventDto> findEventsByWeek(EventType eventType, int week) {
         List<CompanyEvent> entities = companyEventRepository.getEventsByWeek(eventType, week);
-        return entities.stream().map(entity -> CompanyEventConverter.toTransportModel(entity)).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
     public List<CompanyEventDto> findEventsByMonth(EventType eventType, int month) {
         List<CompanyEvent> entities = companyEventRepository.getEventsByMonth(eventType, month);
-        return entities.stream().map(entity -> CompanyEventConverter.toTransportModel(entity)).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
     public List<CompanyEventDto> findEventsByYear(EventType eventType, int year) {
         List<CompanyEvent> entities = companyEventRepository.getEventsByYear(eventType, year);
-        return entities.stream().map(entity -> CompanyEventConverter.toTransportModel(entity)).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
     public List<CompanyEventDto> findEventsByMonthAndYear(EventType eventType, int month, int year) {
         List<CompanyEvent> entities = companyEventRepository.getEventsByMonthAndYear(eventType, month, year);
-        return entities.stream().map(entity -> CompanyEventConverter.toTransportModel(entity)).collect(Collectors.toList());
+        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
-}
 
+}

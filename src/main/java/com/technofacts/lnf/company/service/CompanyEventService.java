@@ -76,7 +76,8 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
     }
 
     private Company searchForCompany(UUID companyId) {
-        return companyRepository.findByCompanyId(companyId).orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
+        return companyRepository.findByCompanyId(companyId)
+                .orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
     }
 
     public void create(UUID companyId, CompanyEventDto resource) {
@@ -161,7 +162,5 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
             throw new LnFException(errorMessage);
         }
     }
+
 }
-
-
-

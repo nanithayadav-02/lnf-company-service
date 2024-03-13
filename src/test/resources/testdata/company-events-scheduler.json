@@ -1,0 +1,18 @@
+[
+  {
+    "id": "019d9f96-8f91-4725-9056-ed022b4cb65f",
+    "eventType": "Birthday",
+    "dateAndTime": "2024-04-02",
+    "assignTo": "Pritham k Shende",
+    "eventDescription": "25th birthday",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "9060225c-f356-45b4-a89a-ef91ea859e60",
+    "eventType": "Birthday",
+    "dateAndTime": "2024-04-02",
+    "assignTo": "Kushbu Sharma",
+    "eventDescription": "28th birthday",
+    "status": "ACTIVE"
+  }
+]

@@ -1,11 +1,5 @@
 package com.technofacts.lnf.company.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import com.technofacts.lnf.company.converter.GstConverter;
 import com.technofacts.lnf.company.exception.LnFBadRequestException;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
@@ -20,6 +14,11 @@ import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -33,14 +32,14 @@ public class CompanyGstService {
         List<CompanyGst> entities = repository.findAll();
         return entities.stream().map(GstConverter::toTransportModel)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<GstDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyGst> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(GstConverter::toTransportModel).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public GstDto findById(UUID companyId, UUID gstId) {
@@ -134,4 +133,5 @@ public class CompanyGstService {
         return repository.findById(gstId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Gst with id [%s] does not exist", gstId)));
     }
+
 }

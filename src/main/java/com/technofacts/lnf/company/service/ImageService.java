@@ -45,12 +45,6 @@ public class ImageService {
     @Value("${aws.s3.bucket.folderName}")
     private String folderName;
 
-    public List<ImageDto> findAll () {
-        List<Image> entities = repository.findAll ();
-        return entities.stream ().map (ImageConverter::toTransportModel)
-                .filter (Objects::nonNull).toList ();
-    }
-
     public ImageDto findByCompanyId (UUID companyId) {
         if (awsS3BucketEnabled) {
             String filePath = String.format ("%s/%s/%s/", folderName, companyId, "image");
@@ -210,4 +204,5 @@ public class ImageService {
     private String uploadFile (String folder, MultipartFile file) {
         return fileService.uploadFile (folder, file);
     }
+
 }

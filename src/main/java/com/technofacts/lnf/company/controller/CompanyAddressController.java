@@ -53,4 +53,5 @@ public class CompanyAddressController {
                        @PathVariable("addressId") final UUID addressId) {
         service.deleteById(companyId, addressId);
     }
+
 }

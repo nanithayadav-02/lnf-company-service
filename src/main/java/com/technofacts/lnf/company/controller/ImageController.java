@@ -54,4 +54,5 @@ public class ImageController {
                        @RequestParam(value = "imageId", required = false) final UUID imageId, @PathVariable("fileName") String fileName) {
         service.deleteById(companyId, imageId, fileName);
     }
+
 }

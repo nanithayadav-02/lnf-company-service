@@ -19,6 +19,6 @@ public class JpaAuditingConfig {
 
           SecurityContextHolder.getContext().getAuthentication().getName()
          */
-        return () -> Optional.ofNullable("SYSTEM");
+        return () -> Optional.of ("SYSTEM");
     }
 }

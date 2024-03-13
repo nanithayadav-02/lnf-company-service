@@ -32,7 +32,6 @@ public class CompanyController {
         return service.findAll(search);
     }
 
-
     @GetMapping(value = "/company/{companyCode}")
     public CompanyDto findCompany(@PathVariable("companyCode") final String companyCode) {
         return service.findByCompanyCode(companyCode);
@@ -55,4 +54,5 @@ public class CompanyController {
     public void delete(@PathVariable("companyId") final UUID companyId) {
         service.delete(companyId);
     }
+
 }

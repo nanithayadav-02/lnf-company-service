@@ -27,6 +27,12 @@ public class AccountController {
         return service.findById(companyId, accountId);
     }
 
+    @PostMapping(value = "/company/{companyId}/accounts")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@PathVariable("companyId") final UUID companyId, @RequestBody final List<AccountDto> resource) {
+        service.create(companyId, resource);
+    }
+
     @PostMapping(value = "/company/{companyId}/account")
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable("companyId") final UUID companyId, @RequestBody final AccountDto resource) {
