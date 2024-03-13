@@ -14,41 +14,39 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lnf/companyEvent")
+@RequestMapping("/lnf")
 public class CompanyEventSchedulerController {
 
     private final CompanyEventSchedulerService companyEventSchedulerService;
 
-    @GetMapping("/eventType/date")
+    @GetMapping("/companyEvent/eventType/date")
     public List<CompanyEventDto> findEventsByDate(@RequestParam("eventType") EventType eventType, @RequestParam("date") LocalDate date) {
         return companyEventSchedulerService.findEventsByTypeAndDate(eventType, date);
     }
 
-    @GetMapping("/eventType/startDate/endDate")
+    @GetMapping("/companyEvent/eventType/startDate/endDate")
     public List<CompanyEventDto> findEventsByEventTypeAndDateRange(@RequestParam("eventType") EventType eventType, @RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
         return companyEventSchedulerService.findEventsByEventTypeAndDateRange(eventType, startDate, endDate);
     }
 
-    @GetMapping("/eventType/week")
+    @GetMapping("/companyEvent/eventType/week")
     public List<CompanyEventDto> findEventsByWeek(@RequestParam("eventType") EventType eventType, @RequestParam("week") int week) {
         return companyEventSchedulerService.findEventsByWeek(eventType, week);
     }
 
-    @GetMapping("/eventType/month")
+    @GetMapping("/companyEvent/eventType/month")
     public List<CompanyEventDto> findEventsByMonth(@RequestParam("eventType") EventType eventType, @RequestParam("month") int month) {
         return companyEventSchedulerService.findEventsByMonth(eventType, month);
     }
 
-    @GetMapping("/eventType/year")
+    @GetMapping("/companyEvent/eventType/year")
     public List<CompanyEventDto> findEventsByYear(@RequestParam("eventType") EventType eventType, @RequestParam("year") int year) {
         return companyEventSchedulerService.findEventsByYear(eventType, year);
     }
 
-    @GetMapping("/eventType/month/year")
+    @GetMapping("/companyEvent/eventType/month/year")
     public List<CompanyEventDto> findEventsByMonthAndYear(@RequestParam("eventType") EventType eventType, @RequestParam("month") int month, @RequestParam("year") int year) {
         return companyEventSchedulerService.findEventsByMonthAndYear(eventType, month, year);
     }
+
 }
-
-
-

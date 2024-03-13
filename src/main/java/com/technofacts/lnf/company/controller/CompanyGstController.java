@@ -26,6 +26,12 @@ public class CompanyGstController {
         return service.findById(companyId, gstId);
     }
 
+    @PostMapping(value = "/company/{companyId}/gsts")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@PathVariable("companyId") final UUID companyId, @RequestBody final List<GstDto> resource) {
+        service.create(companyId, resource);
+    }
+
     @PostMapping(value = "/company/{companyId}/gst")
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@PathVariable("companyId") final UUID companyId, @RequestBody final GstDto resource) {

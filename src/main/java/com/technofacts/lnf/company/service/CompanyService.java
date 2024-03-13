@@ -144,5 +144,5 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
     private LnFEntityNotFoundException entityNotFoundException(Object companyIdentifier) {
         return new LnFEntityNotFoundException(String.format("Company with id/code [%s] does not exist", companyIdentifier));
     }
-}
 
+}

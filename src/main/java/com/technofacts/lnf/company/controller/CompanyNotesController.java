@@ -48,11 +48,11 @@ public class CompanyNotesController {
         service.create(companyId, resource);
     }
 
-    @PutMapping(value = "/company/{companyId}/notes/{notesID}")
+    @PutMapping(value = "/company/{companyId}/notes/{notesId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("notesID") final UUID notesID,
+    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("notesId") final UUID notesId,
                        @RequestBody final NotesDto resource) {
-        service.update(companyId, notesID, resource);
+        service.update(companyId, notesId, resource);
     }
 
     @DeleteMapping(value = "/company/{companyId}/notes")
@@ -61,9 +61,9 @@ public class CompanyNotesController {
         service.deleteByCompanyId(companyId);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/notes/{notesID}")
+    @DeleteMapping(value = "/company/{companyId}/notes/{notesId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId, @PathVariable("notesID") final UUID notesID) {
-        service.deleteById(companyId, notesID);
+    public void delete(@PathVariable("companyId") final UUID companyId, @PathVariable("notesId") final UUID notesId) {
+        service.deleteById(companyId, notesId);
     }
 }

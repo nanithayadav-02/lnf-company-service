@@ -9,7 +9,6 @@ import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.model.CompanyNotes;
 import com.technofacts.lnf.company.repository.CompanyNotesRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
-import com.technofacts.lnf.dto.company.CompanyEventDto;
 import com.technofacts.lnf.dto.company.NotesDto;
 import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.util.RestUtil;
@@ -32,6 +31,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log
 public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> {
+
     private final CompanyRepository companyRepository;
     private final CompanyNotesRepository companyNotesRepository;
 
@@ -113,7 +113,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
 
 public void update(UUID companyId, UUID notesId, NotesDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, "Failed to update Notes with null payload");
-        searchForNotes(notesId);
+        searchForCompany(companyId);
         CompanyNotes entity = searchForNotes(notesId);
         entity.setNotes(resource.getNotes());
         save(CompanyNotesConverter.toEntityModel(resource, entity));
@@ -168,4 +168,5 @@ public void update(UUID companyId, UUID notesId, NotesDto resource) {
         }
         return resultPage.map(CompanyNotesConverter::toTransportModel);
     }
+
 }

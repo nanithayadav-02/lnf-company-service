@@ -1,0 +1,24 @@
+[
+  {
+    "id": "d8e3c50a-6adc-486a-a8de-126fb77cee41",
+    "addressLine1": "123 Main Street",
+    "addressLine2": "Apt 4B",
+    "town": "Smallville",
+    "city": "Metropolis",
+    "state": "TG",
+    "postCode": "12345",
+    "country": "India",
+    "type": "Primary"
+  },
+  {
+    "id": "2c3d8b47-83d7-4e6c-9fb7-9845cfb2f157",
+    "addressLine1": "Main Street",
+    "addressLine2": "Apt 5B",
+    "town": "kukatphally",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "postCode": "500085",
+    "country": "Usa",
+    "type": "Secondary"
+  }
+]
