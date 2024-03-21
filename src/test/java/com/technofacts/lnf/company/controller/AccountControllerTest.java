@@ -78,7 +78,7 @@ class AccountControllerTest {
     }
 
     @Test
-    void findByCompanyIdAndId () throws Exception {
+    void  TestFindByCompanyIdAndId() throws Exception {
         UUID id = UUID.fromString("d8e3c50a-6adc-486a-a8de-126fb77cee41");
         AccountDto expectedDto = mockAccount1();
 
