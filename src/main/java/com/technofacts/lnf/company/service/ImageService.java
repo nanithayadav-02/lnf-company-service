@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 @Log
 public class ImageService {
 
+    public static final String S_S_S = "%s/%s/%s/";
+    public static final String IMAGE = "image";
     private final CompanyRepository companyRepository;
     private final ImageRepository repository;
     private final FileService fileService;
@@ -45,164 +47,161 @@ public class ImageService {
     @Value("${aws.s3.bucket.folderName}")
     private String folderName;
 
-    public ImageDto findByCompanyId (UUID companyId) {
+    public ImageDto findByCompanyId(UUID companyId) {
         if (awsS3BucketEnabled) {
-            String filePath = String.format ("%s/%s/%s/", folderName, companyId, "image");
-            List<String> filePaths = fileService.findFilesInFolder (filePath);
-
-            if (!filePaths.isEmpty ()) {
-                String fileName = Paths.get(filePaths.get(0)).getFileName().toString();
-                String url = filePaths.stream ()
-                        .map(file -> ServletUriComponentsBuilder.fromCurrentContextPath ()
-                                .path(String.format("/lnf/company/%s/image/%s", companyId, fileName))
-                                .toUriString())
-                        .collect(Collectors.joining(", "));
-
-                ImageDto imageDto = new ImageDto ();
-                imageDto.setName(fileName);
-                imageDto.setUrl(url);
-
-                return imageDto;
-            } else {
-                throw new LnFException ("No files found for companyId: " + companyId);
+            String filePath = String.format(S_S_S, folderName, companyId, IMAGE);
+            List<String> filePaths = fileService.findFilesInFolder(filePath);
+            if(filePaths == null || filePaths.isEmpty()) {
+                log.info(String.format("Image not found for company[%s]", companyId));
+                return null;
             }
+            String fileName = Paths.get(filePaths.get(0)).getFileName().toString();
+            String url = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path(String.format("/lnf/company/%s/image/%s", companyId, fileName))
+                    .toUriString();
+
+            ImageDto imageDto = new ImageDto();
+            imageDto.setName(fileName);
+            imageDto.setUrl(url);
+
+            return imageDto;
         } else {
-            searchForCompany (companyId);
-            Image entity = repository.findByCompanyId (companyId);
+            searchForCompany(companyId);
+            Image entity = repository.findByCompanyId(companyId);
             if (entity == null) {
-                throw new LnFEntityNotFoundException (String.format ("Image for company [%s] does not exist", companyId));
+                throw new LnFEntityNotFoundException(String.format("Image for company [%s] does not exist", companyId));
             }
 
-            ImageDto imageDto = ImageConverter.toTransportModel (entity);
-            String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath ()
-                    .path (String.format ("/lnf/company/%s/image/", companyId))
-                    .path (imageDto.getId ().toString ())
-                    .toUriString ();
-            imageDto.setUrl (downloadURL);
+            ImageDto imageDto = ImageConverter.toTransportModel(entity);
+            String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path(String.format("/lnf/company/%s/image/", companyId))
+                    .path(imageDto.getId().toString())
+                    .toUriString();
+            imageDto.setUrl(downloadURL);
 
             return imageDto;
         }
     }
 
-    public ResponseEntity<byte[]> findById (UUID companyId, UUID imageId, String fileName) {
+    public ResponseEntity<byte[]> findById(UUID companyId, UUID imageId, String fileName) {
         try {
             if (awsS3BucketEnabled) {
-                String filePath = String.format ("%s/%s/%s/%s",folderName, companyId, "image", fileName);
-                return fileService.findFileContent (filePath);
+                String filePath = String.format("%s/%s/%s/%s", folderName, companyId, IMAGE, fileName);
+                return fileService.findFileContent(filePath);
             } else {
-                searchForCompany (companyId);
-                Image file = searchForImage (imageId);
-                return ResponseEntity.ok ()
-                        .header (HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName () + "\"")
-                        .contentType (MediaType.valueOf (file.getContentType ()))
-                        .body (file.getContent ());
+                searchForCompany(companyId);
+                Image file = searchForImage(imageId);
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                        .contentType(MediaType.valueOf(file.getContentType()))
+                        .body(file.getContent());
             }
-        } catch (RuntimeException e ) {
-            String errorMessage = String.format ("file not found for Company[%s]", companyId);
-            throw new LnFException (errorMessage, e);
-        }
-    }
-
-    public void create (UUID companyId, MultipartFile file) {
-        try {
-            LnFBadRequestException.throwOnCondition (Objects::isNull, file,
-                    String.format ("Failed to create Image for company [%s] with null payload", companyId));
-            if (awsS3BucketEnabled) {
-                String folder = String.format ("%s/%s/%s/", folderName, companyId, "image");
-                String filePath = uploadFile (folder, file);
-                log.info ("File uploaded successfully to S3 bucket: " + filePath);
-            } else {
-                Company company = searchForCompany (companyId);
-                Image entity = ImageConverter.toEntityModel (file, false);
-                entity.setCompany (company);
-                save (entity);
-                log.info (() -> String.format ("Image [%s] for Company[%s] successfully created",
-                        file.getOriginalFilename (), companyId));
-            }
-        } catch (RuntimeException | IOException e) {
-
-            String errorMessage = String.format ("Failed to create image[%s] for company [%s]", companyId,
-                    file.getOriginalFilename ());
-            throw new LnFException (errorMessage, e);
-        }
-    }
-
-    public void update (UUID companyId, UUID fileId, MultipartFile file) {
-        LnFBadRequestException.throwOnCondition (Objects::isNull, file,
-                String.format ("Failed to update file for company [%s] with null payload", companyId));
-        try {
-            if (awsS3BucketEnabled) {
-                String folder = String.format ("%s/%s/%s/", folderName, companyId, "image");
-                String filePath = uploadFile (folder, file);
-                log.info ("File uploaded successfully to S3 bucket: " + filePath);
-            } else {
-                searchForCompany (companyId);
-                Image entity = searchForImage (fileId);
-                Image updatedEntity = ImageConverter.toEntityModel (file, entity, false);
-                save (updatedEntity);
-                log.info (() -> String.format ("Image [%s] for Company[%s] successfully updated", fileId, companyId));
-            }
-        } catch (RuntimeException | IOException e) {
-            String errorMessage = String.format ("Failed to update file[%s] for company [%s]", fileId, companyId);
-            throw new LnFException (errorMessage, e);
-        }
-    }
-
-    public void deleteByCompanyId (UUID companyId) {
-        searchForCompany (companyId);
-        Image entity = repository.findByCompanyId (companyId);
-        try {
-            repository.delete (entity);
         } catch (RuntimeException e) {
-            String errorMessage = String.format ("Failed to delete image for company [%s]", companyId);
-            throw new LnFException (errorMessage, e);
+            String errorMessage = String.format("file not found for Company[%s]", companyId);
+            throw new LnFException(errorMessage, e);
+        }
+    }
+
+    public void create(UUID companyId, MultipartFile file) {
+        try {
+            LnFBadRequestException.throwOnCondition(Objects::isNull, file,
+                    String.format("Failed to create Image for company [%s] with null payload", companyId));
+            if (awsS3BucketEnabled) {
+                String folder = String.format(S_S_S, folderName, companyId, IMAGE);
+                String filePath = uploadFile(folder, file);
+                log.info("File uploaded successfully to S3 bucket: " + filePath);
+            } else {
+                Company company = searchForCompany(companyId);
+                Image entity = ImageConverter.toEntityModel(file, false);
+                entity.setCompany(company);
+                save(entity);
+                log.info(() -> String.format("Image [%s] for Company[%s] successfully created",
+                        file.getOriginalFilename(), companyId));
+            }
+        } catch (RuntimeException | IOException e) {
+
+            String errorMessage = String.format("Failed to create image[%s] for company [%s]", companyId,
+                    file.getOriginalFilename());
+            throw new LnFException(errorMessage, e);
+        }
+    }
+
+    public void update(UUID companyId, UUID fileId, MultipartFile file) {
+        LnFBadRequestException.throwOnCondition(Objects::isNull, file,
+                String.format("Failed to update file for company [%s] with null payload", companyId));
+        try {
+            if (awsS3BucketEnabled) {
+                String folder = String.format(S_S_S, folderName, companyId, IMAGE);
+                String filePath = uploadFile(folder, file);
+                log.info("File uploaded successfully to S3 bucket: " + filePath);
+            } else {
+                searchForCompany(companyId);
+                Image entity = searchForImage(fileId);
+                Image updatedEntity = ImageConverter.toEntityModel(file, entity, false);
+                save(updatedEntity);
+                log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
+            }
+        } catch (RuntimeException | IOException e) {
+            String errorMessage = String.format("Failed to update file[%s] for company [%s]", fileId, companyId);
+            throw new LnFException(errorMessage, e);
+        }
+    }
+
+    public void deleteByCompanyId(UUID companyId) {
+        searchForCompany(companyId);
+        Image entity = repository.findByCompanyId(companyId);
+        try {
+            repository.delete(entity);
+        } catch (RuntimeException e) {
+            String errorMessage = String.format("Failed to delete image for company [%s]", companyId);
+            throw new LnFException(errorMessage, e);
         }
 
     }
 
-    public void deleteById (UUID companyId, UUID fileId, String fileName) {
+    public void deleteById(UUID companyId, UUID fileId, String fileName) {
         if (awsS3BucketEnabled) {
-            String s3ObjectKey = String.format ("%s/%s/%s/%s", folderName, companyId, "image", fileName);
-            List<String> filePaths = Collections.singletonList (s3ObjectKey);
-            fileService.delete (filePaths);
-            log.info ("S3 object deleted for company");
+            String s3ObjectKey = String.format("%s/%s/%s/%s", folderName, companyId, IMAGE, fileName);
+            List<String> filePaths = Collections.singletonList(s3ObjectKey);
+            fileService.delete(filePaths);
+            log.info("S3 object deleted for company");
         } else {
-            searchForCompany (companyId);
-            Image entity = searchForImage (fileId);
+            searchForCompany(companyId);
+            Image entity = searchForImage(fileId);
             try {
-                repository.delete (entity);
-                log.info (() -> String.format ("Image[%s] for company [%s] successfully deleted", fileId, companyId));
+                repository.delete(entity);
+                log.info(() -> String.format("Image[%s] for company [%s] successfully deleted", fileId, companyId));
             } catch (RuntimeException e) {
-                String errorMessage = String.format ("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
-                throw new LnFException (errorMessage);
+                String errorMessage = String.format("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
+                throw new LnFException(errorMessage);
             }
         }
     }
 
-    private void save (Image entity) {
+    private void save(Image entity) {
         try {
-            repository.save (entity);
+            repository.save(entity);
         } catch (RuntimeException e) {
-            String errorMessage = String.format ("Failed to save Image for company [%s]",
-                    entity.getCompany ().getCode ());
-            throw new LnFException (errorMessage);
+            String errorMessage = String.format("Failed to save Image for company [%s]",
+                    entity.getCompany().getCode());
+            throw new LnFException(errorMessage);
         }
     }
 
-    private Company searchForCompany (UUID companyId) {
-        return companyRepository.findByCompanyId (companyId).
-                orElseThrow (() -> new LnFEntityNotFoundException (String.format ("Company with id [%s] does not exist",
+    private Company searchForCompany(UUID companyId) {
+        return companyRepository.findByCompanyId(companyId).
+                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist",
                         companyId)));
     }
 
-    private Image searchForImage (UUID fileId) {
-        return repository.findById (fileId).
-                orElseThrow (() -> new LnFEntityNotFoundException (String.format ("Image with id [%s] does not exist",
+    private Image searchForImage(UUID fileId) {
+        return repository.findById(fileId).
+                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Image with id [%s] does not exist",
                         fileId)));
     }
 
-    private String uploadFile (String folder, MultipartFile file) {
-        return fileService.uploadFile (folder, file);
+    private String uploadFile(String folder, MultipartFile file) {
+        return fileService.uploadFile(folder, file);
     }
 
 }
