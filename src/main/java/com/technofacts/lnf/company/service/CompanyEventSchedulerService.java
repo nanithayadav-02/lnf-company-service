@@ -26,6 +26,11 @@ public class CompanyEventSchedulerService {
         return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
+    public List<CompanyEventDto> findEventsByCurrentDate() {
+        List<CompanyEvent> entities = companyEventRepository.findEventsByCurrentDate();
+        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
+    }
+
     public List<CompanyEventDto> findEventsByEventTypeAndDateRange(EventType eventType, LocalDate startDate, LocalDate endDate) {
         List<CompanyEvent> entities = companyEventRepository.getEventsByEventTypeAndDateRange(eventType, startDate, endDate);
         return entities.stream().map(CompanyEventConverter::toTransportModel).toList();

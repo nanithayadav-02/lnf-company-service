@@ -24,6 +24,11 @@ public class CompanyEventSchedulerController {
         return companyEventSchedulerService.findEventsByTypeAndDate(eventType, date);
     }
 
+    @GetMapping("/companyEvent/eventType/currentDate")
+    public List<CompanyEventDto> findEventsByCurrentDate() {
+        return companyEventSchedulerService.findEventsByCurrentDate();
+    }
+
     @GetMapping("/companyEvent/eventType/startDate/endDate")
     public List<CompanyEventDto> findEventsByEventTypeAndDateRange(@RequestParam("eventType") EventType eventType, @RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
         return companyEventSchedulerService.findEventsByEventTypeAndDateRange(eventType, startDate, endDate);
