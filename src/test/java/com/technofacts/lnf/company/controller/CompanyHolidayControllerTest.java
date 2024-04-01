@@ -4,22 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.technofacts.lnf.company.BaseTestClass;
 import com.technofacts.lnf.company.service.CompanyHolidayService;
+import com.technofacts.lnf.dto.common.PageRequestDto;
 import com.technofacts.lnf.dto.company.CompanyHolidayDto;
+import com.technofacts.lnf.service.common.page.PaginationAndSortingHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +43,8 @@ class CompanyHolidayControllerTest extends BaseTestClass {
 
     @Autowired
     private CompanyHolidayService holidayService;
+    @Autowired
+    private PaginationAndSortingHandler paginationAndSortingHandler;
 
     private UUID companyId;
 
@@ -69,24 +72,36 @@ class CompanyHolidayControllerTest extends BaseTestClass {
     }
 
     @Test
-    void findAllHolidays_ReturnsCompanyHolidays() throws Exception {
-        List<CompanyHolidayDto> holidayDtoList = Arrays.asList(mockHoliday1(),
-                mockHoliday2(), mockHoliday3());
+    void findAllHolidays_ReturnsCompanyHolidays() {
+        Page<CompanyHolidayDto> mockedPage = mock(Page.class);
+        PageRequestDto pageRequest = new PageRequestDto(0, 10, "description", "asc");
 
-        when(holidayService.findAll()).thenReturn(holidayDtoList);
+        List<CompanyHolidayDto> mockedList = List.of(mockHoliday1(), mockHoliday2());
+        when(holidayService.findPaginatedAndSorted(0, 10, "description", "asc")).thenReturn(mockedPage);
+        when(holidayService.findPaginated(0, 10)).thenReturn(mockedPage);
+        when(holidayService.findAllSorted("description", "asc")).thenReturn(mockedList);
+        when(holidayService.findAll()).thenReturn(mockedList);
 
-        String url = "/lnf/company/holidays";
+        CompanyHolidayController controller = new CompanyHolidayController(holidayService, paginationAndSortingHandler);
+        // Test for paginated and sorted request
+        ResponseEntity<?> response = controller.findAll(pageRequest);
+        assertEquals(ResponseEntity.ok(mockedPage), response);
 
-        String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-holidays.json")
-                        .toURI())));
+        // Pagination with  sortBy and sortOrder
+        pageRequest = new PageRequestDto(0, 10,null,null);
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, holidayService);
+        assertEquals(ResponseEntity.ok(mockedPage), response);
 
-        mockMvc.perform(get(url)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(resultContent));
+        // Pagination with sortBy and sortOrder
+        pageRequest = new PageRequestDto(null, null, "description", "asc");
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, holidayService);
+        assertEquals(ResponseEntity.ok(mockedList), response);
 
-        verify(holidayService, times(1)).findAll();
+        //find All
+        pageRequest = new PageRequestDto();
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, holidayService);
+        assertEquals(ResponseEntity.ok(mockedList), response);
+
     }
 
     @Test
