@@ -5,7 +5,6 @@ import com.technofacts.lnf.company.model.enums.EventType;
 import com.technofacts.lnf.company.service.CompanyEventSchedulerService;
 import com.technofacts.lnf.dto.common.PageRequestDto;
 import com.technofacts.lnf.dto.company.CompanyEventDto;
-import com.technofacts.lnf.dto.company.NotesDto;
 import com.technofacts.lnf.service.common.page.PaginationAndSortingHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
