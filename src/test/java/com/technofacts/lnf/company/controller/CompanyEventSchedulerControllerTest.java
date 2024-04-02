@@ -3,12 +3,16 @@ package com.technofacts.lnf.company.controller;
 import com.technofacts.lnf.company.BaseTestClass;
 import com.technofacts.lnf.company.model.enums.EventType;
 import com.technofacts.lnf.company.service.CompanyEventSchedulerService;
+import com.technofacts.lnf.dto.common.PageRequestDto;
 import com.technofacts.lnf.dto.company.CompanyEventDto;
+import com.technofacts.lnf.service.common.page.PaginationAndSortingHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Files;
@@ -17,9 +21,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +34,8 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     private MockMvc mockMvc;
     @Autowired
     private CompanyEventSchedulerService service;
+    @Autowired
+    private PaginationAndSortingHandler paginationAndSortingHandler;
 
     @BeforeAll
     void beforeAll() {
@@ -38,6 +44,38 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
     @BeforeEach
     void setUp() {
+    }
+
+    @Test
+    void findAll() {
+        Page<CompanyEventDto> mockedPage = mock(Page.class);
+        PageRequestDto pageRequest = new PageRequestDto(0, 10, "eventType", "asc");
+
+        List<CompanyEventDto> mockedList = List.of(mockEvent1(), mockEvent2());
+        when(service.findPaginatedAndSorted(0, 10, "eventType", "asc")).thenReturn(mockedPage);
+        when(service.findPaginated(0, 10)).thenReturn(mockedPage);
+        when(service.findAllSorted("eventType", "asc")).thenReturn(mockedList);
+        when(service.findAll()).thenReturn(mockedList);
+
+        CompanyEventSchedulerController controller = new CompanyEventSchedulerController(service, paginationAndSortingHandler);
+        // Test for paginated and sorted request
+        ResponseEntity<?> response = controller.findAll(pageRequest);
+        assertEquals(ResponseEntity.ok(mockedPage), response);
+
+        // Pagination with  sortBy and sortOrder
+        pageRequest = new PageRequestDto(0, 10,null,null);
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedPage), response);
+
+        // Pagination with sortBy and sortOrder
+        pageRequest = new PageRequestDto(null, null, "eventType", "asc");
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedList), response);
+
+        //find All
+        pageRequest = new PageRequestDto();
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedList), response);
     }
 
     @Test
@@ -65,6 +103,28 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
         verify(service, times(1)).findEventsByTypeAndDate(eventType, date);
 
+    }
+
+    @Test
+    void findEventsByCurrentDate() throws Exception {
+
+        String url = "/lnf/companyEvent/eventType/currentDate";
+        CompanyEventDto event1 = mockEvent1();
+        CompanyEventDto event2 = mockEvent2();
+        List<CompanyEventDto> events = List.of(event1, event2);
+
+        given(service.findEventsByCurrentDate()).willReturn(events);
+
+        String resultContent = new String(Files
+                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
+                        .toURI())));
+
+        mockMvc.perform(get(url)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(resultContent));
+
+        verify(service, times(1)).findEventsByCurrentDate();
     }
 
     @Test

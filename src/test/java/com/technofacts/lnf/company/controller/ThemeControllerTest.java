@@ -40,7 +40,6 @@ class ThemeControllerTest extends BaseTestClass  {
     private ThemeService service;
     private UUID companyId;
 
-
     @BeforeAll
     void beforeAll() {
         companyId = UUID.fromString("eaae6ae2-f6da-4e4d-9ad9-8808b98965c5");

@@ -4,14 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.technofacts.lnf.company.BaseTestClass;
 import com.technofacts.lnf.company.service.TaskService;
+import com.technofacts.lnf.dto.common.PageRequestDto;
 import com.technofacts.lnf.dto.company.TaskDto;
+import com.technofacts.lnf.service.common.page.PaginationAndSortingHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -35,6 +39,8 @@ class TaskControllerTest extends BaseTestClass  {
     private MockMvc mockMvc;
     @Autowired
     private TaskService service;
+    @Autowired
+    private PaginationAndSortingHandler paginationAndSortingHandler;
     private UUID taskId;
 
     @BeforeAll
@@ -45,6 +51,38 @@ class TaskControllerTest extends BaseTestClass  {
     @BeforeEach
     void setUp() {
         // Common setup code if necessary
+    }
+
+    @Test
+    void findAll() {
+        Page<TaskDto> mockedPage = mock(Page.class);
+        PageRequestDto pageRequest = new PageRequestDto(0, 10, "description", "asc");
+
+        List<TaskDto> mockedList = List.of(mockTask1(), mockTask2());
+        when(service.findPaginatedAndSorted(0, 10, "description", "asc")).thenReturn(mockedPage);
+        when(service.findPaginated(0, 10)).thenReturn(mockedPage);
+        when(service.findAllSorted("description", "asc")).thenReturn(mockedList);
+        when(service.findAll()).thenReturn(mockedList);
+
+        TaskController controller = new TaskController(service, paginationAndSortingHandler);
+        // Test for paginated and sorted request
+        ResponseEntity<?> response = controller.findAll(pageRequest);
+        assertEquals(ResponseEntity.ok(mockedPage), response);
+
+        // Pagination with  sortBy and sortOrder
+        pageRequest = new PageRequestDto(0, 10,null,null);
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedPage), response);
+
+        // Pagination with sortBy and sortOrder
+        pageRequest = new PageRequestDto(null, null, "description", "asc");
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedList), response);
+
+        //find All
+        pageRequest = new PageRequestDto();
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedList), response);
     }
 
     @Test

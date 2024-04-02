@@ -4,14 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.technofacts.lnf.company.BaseTestClass;
 import com.technofacts.lnf.company.service.CompanyEventService;
+import com.technofacts.lnf.dto.common.PageRequestDto;
 import com.technofacts.lnf.dto.company.CompanyEventDto;
+import com.technofacts.lnf.service.common.page.PaginationAndSortingHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -39,6 +43,8 @@ class CompanyEventControllerTest extends BaseTestClass  {
     private MockMvc mockMvc;
     @Autowired
     private CompanyEventService service;
+    @Autowired
+    private PaginationAndSortingHandler paginationAndSortingHandler;
     private UUID companyId;
 
     @BeforeAll
@@ -48,6 +54,38 @@ class CompanyEventControllerTest extends BaseTestClass  {
 
     @BeforeEach
     void setUp() {
+    }
+
+    @Test
+    void findAll() {
+        Page<CompanyEventDto> mockedPage = mock(Page.class);
+        PageRequestDto pageRequest = new PageRequestDto(0, 10, "eventType", "asc");
+
+        List<CompanyEventDto> mockedList = List.of(mockEvent1(), mockEvent2());
+        when(service.findPaginatedAndSorted(0, 10, "eventType", "asc")).thenReturn(mockedPage);
+        when(service.findPaginated(0, 10)).thenReturn(mockedPage);
+        when(service.findAllSorted("eventType", "asc")).thenReturn(mockedList);
+        when(service.findAll()).thenReturn(mockedList);
+
+        CompanyEventController controller = new CompanyEventController(service, paginationAndSortingHandler);
+        // Test for paginated and sorted request
+        ResponseEntity<?> response = controller.findAll(pageRequest);
+        assertEquals(ResponseEntity.ok(mockedPage), response);
+
+        // Pagination with  sortBy and sortOrder
+        pageRequest = new PageRequestDto(0, 10,null,null);
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedPage), response);
+
+        // Pagination with sortBy and sortOrder
+        pageRequest = new PageRequestDto(null, null, "eventType", "asc");
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedList), response);
+
+        //find All
+        pageRequest = new PageRequestDto();
+        response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        assertEquals(ResponseEntity.ok(mockedList), response);
     }
 
     @Test
