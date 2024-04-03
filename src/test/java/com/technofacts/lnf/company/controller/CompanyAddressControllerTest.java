@@ -59,7 +59,7 @@ class CompanyAddressControllerTest extends BaseTestClass {
         String url = "/lnf/company/" + companyId + "/address";
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testData/company-addresses.json")
+                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-addresses.json")
                         .toURI())));
 
         mockMvc.perform(get(url)
