@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,14 +31,14 @@ public class CompanyAddressService {
     public List<AddressDto> findAll() {
         List<CompanyAddress> entities = repository.findAll();
         return entities.stream().map(AddressConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
     }
 
     public List<AddressDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyAddress> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(AddressConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
     }
 
     public AddressDto findById(UUID companyId, UUID addressId) {

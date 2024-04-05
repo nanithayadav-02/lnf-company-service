@@ -1,9 +1,10 @@
+
 package com.technofacts.lnf.company.model;
 
+import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import java.io.Serializable;
 
 @ToString
 @Entity
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "company_image")
-public class Image extends AuditableEntity {
+public class Image extends AuditableEntity implements Serializable {
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -24,13 +25,11 @@ public class Image extends AuditableEntity {
     @Column(name = "content_type", nullable = false)
     private String contentType;
 
-    @Type(type="org.hibernate.type.BinaryType")
     @Column(name = "content", nullable = false)
     private byte[] content;
 
-    @ToString.Exclude
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "company_id", referencedColumnName="id", nullable = false)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
     private Company company;
 
 }

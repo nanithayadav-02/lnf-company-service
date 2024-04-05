@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,13 +19,14 @@ public class CompanyPolicyController {
     private final CompanyPolicyService service;
 
     @GetMapping(value = "/company/{companyId}/policies")
-    public List<CompanyPolicyDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) throws IOException {
+    public List<CompanyPolicyDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
-    @GetMapping(value = "/company/{companyId}/policies/{policyId}")
-    public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId, @PathVariable("policyId") final UUID policyId) {
-        return service.findById(companyId, policyId);
+    @GetMapping(value = "/company/{companyId}/policies/{fileName}")
+    public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
+                                           @PathVariable("fileName") String fileName) {
+        return service.findById(companyId, policyId, fileName);
     }
 
     @PostMapping(value = "/company/{companyId}/policies")
@@ -35,10 +35,10 @@ public class CompanyPolicyController {
         service.create(companyId, policies);
     }
 
-    @PutMapping(value = "/company/{companyId}/policies/{policyId}")
+    @PutMapping(value = "/company/{companyId}/policies")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("policyId") final UUID policyId,
-                       @RequestParam MultipartFile policy) throws IOException {
+    public void update(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
+                       @RequestParam MultipartFile policy) {
         service.update(companyId, policyId, policy);
     }
 
@@ -48,10 +48,11 @@ public class CompanyPolicyController {
         service.deleteByCompanyId(companyId);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/policies/{policyId}")
+    @DeleteMapping(value = "/company/{companyId}/policies/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId, @PathVariable("policyId") final UUID policyId) {
-        service.deleteById(companyId, policyId);
+    public void delete(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
+                       @PathVariable("fileName") final String fileName) {
+        service.deleteById(companyId, policyId, fileName);
     }
 
 }

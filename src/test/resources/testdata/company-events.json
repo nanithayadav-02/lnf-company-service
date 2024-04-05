@@ -1,0 +1,18 @@
+[
+  {
+    "id": "cfe94b9f-c86f-4733-be96-a9b619f7bca7",
+    "eventType": "Birthday",
+    "dateAndTime": "2024-04-30",
+    "assignTo": "Vikranth Thakur",
+    "eventDescription": "31st birthday",
+    "status": "InProgress"
+  },
+  {
+    "id": "019d9f96-8f91-4725-9056-ed022b4cb65f",
+    "eventType": "Release",
+    "dateAndTime": "2024-04-02",
+    "assignTo": "Pritham k Shende",
+    "eventDescription": "Product is Launching",
+    "status": "Release"
+  }
+]

@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.UUID;
 
 
@@ -20,15 +19,14 @@ public class ImageController {
     private final ImageService service;
 
     @GetMapping(value = "/company/{companyId}/image")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ImageDto findByCompanyId(@PathVariable("companyId") final UUID companyId) throws IOException {
+    public ImageDto findByCompanyId(@PathVariable("companyId") final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
-    @GetMapping(value = "/company/{companyId}/image/{imageId}")
+    @GetMapping(value = "/company/{companyId}/image/{fileName}")
     public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId,
-                                           @PathVariable("imageId") final UUID imageId) {
-        return service.findById(companyId, imageId);
+                                           @RequestParam(value = "imageId", required = false) final UUID imageId, @PathVariable("fileName") String fileName) {
+        return service.findById(companyId, imageId, fileName);
     }
 
     @PostMapping(value = "/company/{companyId}/image")
@@ -37,10 +35,10 @@ public class ImageController {
         service.create(companyId, image);
     }
 
-    @PutMapping(value = "/company/{companyId}/image/{imageId}")
+    @PutMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("imageId") final UUID imageId,
-                       @RequestParam MultipartFile image) throws IOException {
+    public void update(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "imageId", required = false) final UUID imageId,
+                       @RequestParam MultipartFile image) {
         service.update(companyId, imageId, image);
     }
 
@@ -50,11 +48,11 @@ public class ImageController {
         service.deleteByCompanyId(companyId);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/image/{imageId}")
+    @DeleteMapping(value = "/company/{companyId}/image/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("companyId") final UUID companyId,
-                       @PathVariable("imageId") final UUID imageId) {
-        service.deleteById(companyId, imageId);
+                       @RequestParam(value = "imageId", required = false) final UUID imageId, @PathVariable("fileName") String fileName) {
+        service.deleteById(companyId, imageId, fileName);
     }
 
 }

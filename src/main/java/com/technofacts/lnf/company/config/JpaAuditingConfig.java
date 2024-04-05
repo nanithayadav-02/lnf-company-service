@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
-public class JpaAuditingConfiguration {
+public class JpaAuditingConfig {
 
     @Bean
     public AuditorAware<String> auditorProvider() {
@@ -19,6 +19,6 @@ public class JpaAuditingConfiguration {
 
           SecurityContextHolder.getContext().getAuthentication().getName()
          */
-        return () -> Optional.ofNullable("SYSTEM");
+        return () -> Optional.of ("SYSTEM");
     }
 }

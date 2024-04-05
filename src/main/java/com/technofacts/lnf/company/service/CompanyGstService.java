@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -33,14 +32,14 @@ public class CompanyGstService {
         List<CompanyGst> entities = repository.findAll();
         return entities.stream().map(GstConverter::toTransportModel)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<GstDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyGst> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(GstConverter::toTransportModel).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public GstDto findById(UUID companyId, UUID gstId) {
@@ -134,4 +133,5 @@ public class CompanyGstService {
         return repository.findById(gstId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Gst with id [%s] does not exist", gstId)));
     }
+
 }

@@ -6,16 +6,21 @@ import com.technofacts.lnf.dto.company.CompanyDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import static com.technofacts.lnf.util.CommonUtils.safeConvert;
 
 public class CompanyConverter {
 
-    public static CompanyDto toTransportModel(Company entity) {
+    private CompanyConverter() {
 
+    }
+
+    public static CompanyDto toTransportModel(Company entity) {
         if (entity == null) {
             return null;
         }
-        CompanyDto dto = CompanyDto.builder()
+
+        return CompanyDto.builder()
                 .id(entity.getId())
                 .code(entity.getCode())
                 .name(entity.getName())
@@ -30,44 +35,37 @@ public class CompanyConverter {
                 .arn(entity.getArn())
                 .arnIssueDate(entity.getArnIssueDate())
                 .sacCode(entity.getSacCode())
-                .address(new ArrayList<>())
-                .image(new ArrayList<>())
-                .gst(new ArrayList<>())
-                .account(new ArrayList<>())
-                .theme(new ArrayList<>())
+                .address(safeConvert(entity.getAddress(), AddressConverter::toTransportModel))
+                .gst(safeConvert(entity.getGst(), GstConverter::toTransportModel))
+                .account(safeConvert(entity.getAccount(), AccountConverter::toTransportModel))
+                .theme(safeConvert(entity.getTheme(), ThemeConverter::toTransportModel))
+                .notes(safeConvert(entity.getCompanyNotes(), CompanyNotesConverter::toTransportModel))
+                .companyEvent(safeConvert(entity.getCompanyEvent(), CompanyEventConverter::toTransportModel))
+                .companyHoliday(safeConvert(entity.getCompanyHoliday(), CompanyHolidayConverter::toTransportModel))
                 .build();
-
-        dto.getAddress().addAll(entity.getAddress().stream()
-                .map(AddressConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
-        dto.getImage().addAll(entity.getImage().stream()
-                .map(ImageConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
-        dto.getGst().addAll(entity.getGst().stream().map(GstConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
-        dto.getAccount().addAll(entity.getAccount().stream().map(AccountConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
-        dto.getTheme().addAll(entity.getTheme().stream().map(ThemeConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList()));
-
-        return dto;
     }
 
+
     public static Company toEntityModel(CompanyDto transport) {
-        Company entity = toEntityModel(transport, new Company());
+        if (transport == null) {
+            return null;
+        }
+        Company entity = new Company();
+        toEntityModel(transport, entity);
 
         addAddressToEntityModel(transport, entity);
-        imageToEntityModel(transport, entity);
         addGstToEntityModel(transport, entity);
         addAccountToEntityModel(transport, entity);
         addThemeToEntityModel(transport, entity);
-
+        addNotesToEntityModel(transport, entity);
+        addCompanyEventToEntityModel(transport, entity);
+        addCompanyHolidayToEntityModel(transport, entity);
         return entity;
     }
 
-    private static Company toEntityModel(CompanyDto transport, Company entity) {
+    private static void toEntityModel(CompanyDto transport, Company entity) {
         if (transport == null || entity == null) {
-            return null;
+            return;
         }
 
         entity.setId(transport.getId());
@@ -84,11 +82,10 @@ public class CompanyConverter {
         entity.setArn(transport.getArn());
         entity.setArnIssueDate(transport.getArnIssueDate());
         entity.setSacCode(transport.getSacCode());
-
-        return entity;
     }
 
     private static void addAddressToEntityModel(CompanyDto transport, Company company) {
+        if(transport.getAddress() != null) {
         List<CompanyAddress> entityList = new ArrayList<>();
         transport.getAddress().stream().filter(Objects::nonNull).forEach(dto -> {
             CompanyAddress entity = (CompanyAddress) AddressConverter.toEntityModel(dto, new CompanyAddress());
@@ -97,18 +94,10 @@ public class CompanyConverter {
         });
         company.getAddress().addAll(entityList);
     }
-
-    private static void imageToEntityModel(CompanyDto transport, Company company) {
-        List<Image> entityList = new ArrayList<>();
-        transport.getImage().stream().filter(Objects::nonNull).forEach(dto -> {
-            Image entity = ImageConverter.toEntityModel(dto, new Image());
-            entity.setCompany(company);
-            entityList.add(entity);
-        });
-        company.getImage().addAll(entityList);
     }
 
     private static void addGstToEntityModel(CompanyDto transport, Company company) {
+        if(transport.getGst() != null) {
         List<CompanyGst> gstList = new ArrayList<>();
         transport.getGst().stream().filter(Objects::nonNull).forEach(dto -> {
             CompanyGst entity = GstConverter.toEntityModel(dto);
@@ -117,8 +106,10 @@ public class CompanyConverter {
         });
         company.getGst().addAll(gstList);
     }
+    }
 
     private static void addAccountToEntityModel(CompanyDto transport, Company company) {
+         if(transport.getAccount() != null) {
         List<Account> accountList = new ArrayList<>();
         transport.getAccount().stream().filter(Objects::nonNull).forEach(dto -> {
             Account entity = AccountConverter.toEntityModel(dto);
@@ -127,8 +118,10 @@ public class CompanyConverter {
         });
         company.getAccount().addAll(accountList);
     }
+    }
 
     private static void addThemeToEntityModel(CompanyDto transport, Company company) {
+        if(transport.getTheme() != null) {
         List<Theme> themeList = new ArrayList<>();
         transport.getTheme().stream().filter(Objects::nonNull).forEach(dto -> {
             Theme entity = ThemeConverter.toEntityModel(dto);
@@ -136,6 +129,43 @@ public class CompanyConverter {
             themeList.add(entity);
         });
         company.getTheme().addAll(themeList);
+    }
+    }
+
+    private static void addNotesToEntityModel(CompanyDto transport, Company company) {
+        if(transport.getNotes() != null) {
+        List<CompanyNotes> notesList = new ArrayList<>();
+        transport.getNotes().stream().filter(Objects::nonNull).forEach(dto -> {
+            CompanyNotes entity = CompanyNotesConverter.toEntityModel(dto);
+            entity.setCompany(company);
+            notesList.add(entity);
+        });
+        company.getCompanyNotes().addAll(notesList);
+    }
+    }
+
+    private static void addCompanyHolidayToEntityModel(CompanyDto transport, Company company) {
+        if(transport.getCompanyHoliday() != null) {
+        List<CompanyHoliday> companyEventList = new ArrayList<>();
+        transport.getCompanyHoliday().stream().filter(Objects::nonNull).forEach(dto -> {
+            CompanyHoliday entity = CompanyHolidayConverter.toEntityModel(dto, new CompanyHoliday());
+            entity.setCompany(company);
+            companyEventList.add(entity);
+        });
+        company.getCompanyHoliday().addAll(companyEventList);
+    }
+    }
+
+    private static void addCompanyEventToEntityModel(CompanyDto transport, Company company) {
+        if(transport.getCompanyEvent() != null) {
+        List<CompanyEvent> companyEventList = new ArrayList<>();
+        transport.getCompanyEvent().stream().filter(Objects::nonNull).forEach(dto -> {
+            CompanyEvent entity = CompanyEventConverter.toEntityModel(dto, new CompanyEvent());
+            entity.setCompany(company);
+            companyEventList.add(entity);
+        });
+        company.getCompanyEvent().addAll(companyEventList);
+    }
     }
 
 }

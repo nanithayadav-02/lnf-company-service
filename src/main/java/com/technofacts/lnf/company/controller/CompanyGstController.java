@@ -1,13 +1,13 @@
 package com.technofacts.lnf.company.controller;
 
+import java.util.List;
+import java.util.UUID;
+
 import com.technofacts.lnf.company.service.CompanyGstService;
 import com.technofacts.lnf.dto.company.GstDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +24,12 @@ public class CompanyGstController {
     @GetMapping(value = "/company/{companyId}/gst/{gstId}")
     public GstDto findById(@PathVariable("companyId") final UUID companyId, @PathVariable("gstId") final UUID gstId) {
         return service.findById(companyId, gstId);
+    }
+
+    @PostMapping(value = "/company/{companyId}/gsts")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@PathVariable("companyId") final UUID companyId, @RequestBody final List<GstDto> resource) {
+        service.create(companyId, resource);
     }
 
     @PostMapping(value = "/company/{companyId}/gst")

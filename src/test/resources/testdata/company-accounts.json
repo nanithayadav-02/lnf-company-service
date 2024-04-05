@@ -1,0 +1,18 @@
+[
+  {
+    "id": "d8e3c50a-6adc-486a-a8de-126fb77cee41",
+    "number": "00461010055186",
+    "branch": "srinagar",
+    "ifscCode": "SBI562365",
+    "ibanNumber": "DE56501201000000484637",
+    "address": "Near metro pillar TG"
+  },
+  {
+    "id": "2c3d8b47-83d7-4e6c-9fb7-9845cfb2f157",
+    "number": "919652597554",
+    "branch": "kukatphally",
+    "ifscCode": "SBI123433",
+    "ibanNumber": "MT25501201000000484637",
+    "address": "Near aditya school TG"
+  }
+]

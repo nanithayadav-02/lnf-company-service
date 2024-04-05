@@ -1,13 +1,13 @@
 package com.technofacts.lnf.company.controller;
 
+import java.util.List;
+import java.util.UUID;
+
 import com.technofacts.lnf.company.service.AccountService;
 import com.technofacts.lnf.dto.company.AccountDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,6 +25,12 @@ public class AccountController {
     public AccountDto findById(@PathVariable("companyId") final UUID companyId,
                                @PathVariable("accountId") final UUID accountId) {
         return service.findById(companyId, accountId);
+    }
+
+    @PostMapping(value = "/company/{companyId}/accounts")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@PathVariable("companyId") final UUID companyId, @RequestBody final List<AccountDto> resource) {
+        service.create(companyId, resource);
     }
 
     @PostMapping(value = "/company/{companyId}/account")

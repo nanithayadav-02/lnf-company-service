@@ -1,0 +1,23 @@
+[
+  {
+    "id": "1bb2af60-5565-41f8-b60a-6d139cba5178",
+    "date": "2024-01-01",
+    "description": "New Year",
+    "deleted": false,
+    "location": "Hyderabad"
+  },
+  {
+    "id": "63c85f6b-8c71-4f46-b9ff-278eba7dad44",
+    "date": "2024-08-15",
+    "description": "Independence Day",
+    "deleted": false,
+    "location": "Hyderabad"
+  },
+  {
+    "id": "fc24295f-c28f-4046-b614-8f9dc4665d62",
+    "date": "2024-01-26",
+    "description": "Republic Day",
+    "deleted": false,
+    "location": "Bangalore"
+  }
+]

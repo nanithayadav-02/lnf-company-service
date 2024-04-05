@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -32,14 +31,14 @@ public class AccountService {
     public List<AccountDto> findAll() {
         List<Account> entities = repository.findAll();
         return entities.stream().map(AccountConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
     }
 
     public List<AccountDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<Account> entities = repository.findByCompanyId(companyId);
         return entities.stream().map(AccountConverter::toTransportModel)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+                .filter(Objects::nonNull).toList();
     }
 
     public AccountDto findById(UUID companyId, UUID accountId) {
@@ -71,25 +70,25 @@ public class AccountService {
         log.info(() -> String.format("Account for company[%s] successfully created", companyId));
     }
 
-    public void update(UUID companyId, UUID addressId, AccountDto resource) {
+    public void update(UUID companyId, UUID accountId, AccountDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to update the account for company [%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
-        searchForAccount(addressId);
+        searchForAccount(accountId);
         Account updatedEntity = AccountConverter.toEntityModel(resource);
         updatedEntity.setCompany(companyEntity);
         save(updatedEntity);
         log.info(() -> String.format("Account for company[%s] successfully created", companyId));
     }
 
-    public void deleteById(UUID companyId, UUID addressId) {
+    public void deleteById(UUID companyId, UUID accountId) {
         searchForCompany(companyId);
-        Account entity = searchForAccount(addressId);
+        Account entity = searchForAccount(accountId);
         try {
             repository.delete(entity);
-            log.info(() -> String.format("Account[%s] for company [%s] successfully deleted", addressId, companyId));
+            log.info(() -> String.format("Account[%s] for company [%s] successfully deleted", accountId, companyId));
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete account[[%s] for company [%s]", addressId, companyId);
+            String errorMessage = String.format("Failed to delete account[[%s] for company [%s]", accountId, companyId);
             throw new LnFException(errorMessage);
         }
     }

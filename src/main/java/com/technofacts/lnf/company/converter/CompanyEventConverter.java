@@ -1,0 +1,34 @@
+package com.technofacts.lnf.company.converter;
+
+
+import com.technofacts.lnf.company.model.CompanyEvent;
+import com.technofacts.lnf.company.model.enums.EventType;
+import com.technofacts.lnf.dto.company.CompanyEventDto;
+
+public class CompanyEventConverter {
+
+    public static CompanyEventDto toTransportModel(CompanyEvent entity) {
+        return CompanyEventDto.builder()
+                .id(entity.getId())
+                .eventType(entity.getEventType().name())
+                .dateAndTime(entity.getDateAndTime())
+                .assignTo(entity.getAssignTo())
+                .eventDescription(entity.getEventDescription())
+                .status(entity.getStatus()).build();
+
+    }
+
+    public static CompanyEvent toEntityModel(CompanyEventDto transport, CompanyEvent entity) {
+        if (transport == null || entity == null) {
+            return null;
+        }
+        entity.setId(entity.getId());
+        entity.setEventType(EventType.valueOf(transport.getEventType()));
+        entity.setEventDescription(transport.getEventDescription());
+        entity.setAssignTo(transport.getAssignTo());
+        entity.setDateAndTime(transport.getDateAndTime());
+        entity.setStatus(transport.getStatus());
+        return entity;
+    }
+
+}

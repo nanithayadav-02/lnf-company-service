@@ -1,3 +1,4 @@
+
 package com.technofacts.lnf.company.converter;
 
 import com.technofacts.lnf.company.model.Image;
@@ -22,35 +23,28 @@ public class ImageConverter {
         return dto;
     }
 
-    public static Image toEntityModel(MultipartFile transport) throws IOException {
+    public static Image toEntityModel(MultipartFile transport, boolean awsS3BucketEnabled) throws IOException {
         if (transport == null) {
             return null;
         }
         Image entity = new Image();
-        return toEntityModel(transport, entity);
+        entity.setName(transport.getOriginalFilename() != null ? transport.getOriginalFilename() : transport.getName());
+        entity.setContentType(transport.getContentType());
+        entity.setSize(transport.getSize());
+        entity.setContent(awsS3BucketEnabled ? new byte[0] : transport.getBytes());
 
+        return entity;
     }
 
-    public static Image toEntityModel(MultipartFile transport, Image entity) throws IOException {
+    public static Image toEntityModel(MultipartFile transport, Image entity,
+                                      boolean awsS3BucketEnabled) throws IOException {
         if (transport == null || entity == null) {
             return null;
         }
         entity.setName(transport.getOriginalFilename() != null ? transport.getOriginalFilename() : transport.getName());
         entity.setContentType(transport.getContentType());
         entity.setSize(transport.getSize());
-        entity.setContent(transport.getBytes());
-
-        return entity;
-    }
-
-    public static Image toEntityModel(ImageDto transport, Image entity) {
-        if (transport == null || entity == null) {
-            return null;
-        }
-        entity.setName(transport.getName());
-        entity.setContentType(transport.getContentType());
-        entity.setSize(transport.getSize());
-        entity.setContent(transport.getContent());
+        entity.setContent(awsS3BucketEnabled ? new byte[0] : transport.getBytes());
 
         return entity;
     }

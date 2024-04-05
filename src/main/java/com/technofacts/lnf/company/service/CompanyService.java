@@ -7,9 +7,11 @@ import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.exception.LnFException;
 import com.technofacts.lnf.company.model.Company;
 import com.technofacts.lnf.company.repository.CompanyRepository;
-import com.technofacts.lnf.company.repository.specification.company.CompanySpecificationBuilder;
-import com.technofacts.lnf.company.util.RestUtil;
 import com.technofacts.lnf.dto.company.CompanyDto;
+import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
+import com.technofacts.lnf.service.specification.GenericSpecificationBuilder;
+import com.technofacts.lnf.util.RestUtil;
+import com.technofacts.lnf.util.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
@@ -19,59 +21,64 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 @Log
-public class CompanyService {
-
-    private static final String SEARCH_REGEX_PATTERN = "([\\w+?\\-_]+)(:|<|>)([\\w+?\\-_.@\\s]+),";
+public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     private final CompanyRepository repository;
 
-    public List<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
+    @Override
+    public Page<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
         Page<Company> resultPage = repository.findAll(PageRequest.of(page, size, sortInfo));
         return validateAndGetPages(page, resultPage);
     }
 
-    public List<CompanyDto> findPaginated(int page, int size) {
+    @Override
+    public Page<CompanyDto> findPaginated(int page, int size) {
         Page<Company> resultPage = repository.findAll(PageRequest.of(page, size));
         return validateAndGetPages(page, resultPage);
     }
 
+    @Override
     public List<CompanyDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
         List<Company> entities = Lists.newArrayList(repository.findAll(sortInfo));
-        return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
+    @Override
     public List<CompanyDto> findAll() {
         List<Company> entities = repository.findAll();
-        return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).collect(Collectors.toList());
+        return entities.stream().map(CompanyConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
     public List<CompanyDto> findAll(String search) {
-        CompanySpecificationBuilder builder = new CompanySpecificationBuilder();
-        Pattern pattern = Pattern.compile(SEARCH_REGEX_PATTERN, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(URLDecoder.decode(search, StandardCharsets.UTF_8) + ",");
-        while (matcher.find()) {
-            builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
-        }
-        Specification<Company> specification = builder.build();
+        Specification<Company> specification = buildCompanySpecification(search);
         List<Company> entities = repository.findAll(specification);
-        return entities.stream().map(CompanyConverter::toTransportModel)
+        return convertToDtos(entities);
+    }
+    private List<CompanyDto> convertToDtos(List<Company> entities) {
+        return entities.stream()
+                .map(CompanyConverter::toTransportModel)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
+    }
+    private Specification<Company> buildCompanySpecification(String search) {
+        GenericSpecificationBuilder<Company> companySpecBuilder = new GenericSpecificationBuilder<>();
+        Function<String, Class<?>> fieldClassForCompany = this::getFieldClassFromCompany;
+        return SpecificationUtil.buildSpecification(search, companySpecBuilder, fieldClassForCompany);
+    }
+
+    private Class<?> getFieldClassFromCompany(String fieldName) {
+        return SpecificationUtil.getFieldClass(Company.class, fieldName);
     }
 
     public CompanyDto findByCompanyCode(String companyCode) {
@@ -109,20 +116,17 @@ public class CompanyService {
         }
     }
 
-    private List<CompanyDto> validateAndGetPages(int page, Page<Company> resultPage) {
+    private Page<CompanyDto> validateAndGetPages(int page, Page<Company> resultPage) {
         if (page > resultPage.getTotalPages()) {
             throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " +
                     "requested page [%d] does not exist", resultPage.getTotalPages(), page));
         }
-        List<Company> entities = Lists.newArrayList(resultPage.getContent());
-        return entities.stream().map(CompanyConverter::toTransportModel)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        return resultPage.map(CompanyConverter::toTransportModel);
     }
 
-    private Company saveEntity(Company entity) {
+    private void saveEntity(Company entity) {
         try {
-            return repository.save(entity);
+            repository.save(entity);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to save company [%s]", entity.getCode());
             throw new LnFException(errorMessage, e);
@@ -130,13 +134,15 @@ public class CompanyService {
     }
 
     private Company search(UUID companyId) {
-        return repository.findById(companyId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
+        return repository.findById(companyId).orElseThrow(() -> entityNotFoundException(companyId));
     }
 
     private Company search(String companyCode) {
-        return repository.findByCompanyCode(companyCode).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with code [%s] does not exist", companyCode)));
+        return repository.findByCompanyCode(companyCode).orElseThrow(() -> entityNotFoundException(companyCode));
     }
-}
 
+    private LnFEntityNotFoundException entityNotFoundException(Object companyIdentifier) {
+        return new LnFEntityNotFoundException(String.format("Company with id/code [%s] does not exist", companyIdentifier));
+    }
+
+}
