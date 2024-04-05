@@ -71,3 +71,19 @@ pipelines:
           - export IMAGE_NAME=levernfulcrum/lnf-company-service
           - chmod +x lnf-deployment-pipeline/scripts/build-n-push/ecr_image.sh
           - lnf-deployment-pipeline/scripts/build-n-push/ecr_image.sh "$AWS_DEFAULT_REGION" "$IMAGE_NAME"
+    - step:
+        name: Notify Slack
+        script:
+          # Start ssh-agent
+          - eval "$(ssh-agent -s)"
+
+          # Decode the Base64-encoded SSH private key, ensuring it's correctly formatted
+          # and adding it to the agent
+          - echo "$SSH_PRIVATE_KEY" | base64 --decode | tr -d '\r' | ssh-add -
+
+          # Clone the scripts repository
+          - git clone git@bitbucket.org:technofacts/lnf-deployment-pipeline.git
+          
+           # Send slack notification
+          - chmod +x lnf-deployment-pipeline/scripts/send_slack_notification.sh
+          - lnf-deployment-pipeline/scripts/send_slack_notification.sh "C05LZPH07DZ,C067QCG4VE0" "Build Successful :tada:"
