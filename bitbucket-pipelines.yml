@@ -86,4 +86,4 @@ pipelines:
           
            # Send slack notification
           - chmod +x lnf-deployment-pipeline/scripts/send_slack_notification.sh
-          - lnf-deployment-pipeline/scripts/send_slack_notification.sh "C05LZPH07DZ,C067QCG4VE0" "Build Successful :tada:"
+          - lnf-deployment-pipeline/scripts/send_slack_notification.sh "C05LZPH07DZ,C067QCG4VE0" "Build Successful for lnf-company-service :tada:"
