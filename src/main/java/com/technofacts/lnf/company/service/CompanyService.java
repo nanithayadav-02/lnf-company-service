@@ -33,6 +33,7 @@ import java.util.function.Function;
 public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     private final CompanyRepository repository;
+    private final ImageService imageService;
 
     @Override
     public Page<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -83,7 +84,15 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     public CompanyDto findByCompanyCode(String companyCode) {
         Company entity = search(companyCode);
-        return CompanyConverter.toTransportModel(entity);
+        return findCompanyWithImage(entity);
+    }
+
+    private CompanyDto findCompanyWithImage(Company entity) {
+        CompanyDto dto = CompanyConverter.toTransportModel(entity);
+        if(dto != null) {
+            dto.setImage(imageService.findByCompanyId(dto.getId()));
+        }
+        return dto;
     }
 
     public void create(CompanyDto resource) {
