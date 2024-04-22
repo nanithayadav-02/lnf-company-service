@@ -12,7 +12,6 @@ import static com.technofacts.lnf.util.CommonUtils.safeConvert;
 public class CompanyConverter {
 
     private CompanyConverter() {
-
     }
 
     public static CompanyDto toTransportModel(Company entity) {
@@ -37,7 +36,6 @@ public class CompanyConverter {
                 .sacCode(entity.getSacCode())
                 .address(safeConvert(entity.getAddress(), AddressConverter::toTransportModel))
                 .gst(safeConvert(entity.getGst(), GstConverter::toTransportModel))
-                .account(safeConvert(entity.getAccount(), AccountConverter::toTransportModel))
                 .theme(safeConvert(entity.getTheme(), ThemeConverter::toTransportModel))
                 .notes(safeConvert(entity.getCompanyNotes(), CompanyNotesConverter::toTransportModel))
                 .companyEvent(safeConvert(entity.getCompanyEvent(), CompanyEventConverter::toTransportModel))
@@ -55,7 +53,6 @@ public class CompanyConverter {
 
         addAddressToEntityModel(transport, entity);
         addGstToEntityModel(transport, entity);
-        addAccountToEntityModel(transport, entity);
         addThemeToEntityModel(transport, entity);
         addNotesToEntityModel(transport, entity);
         addCompanyEventToEntityModel(transport, entity);
@@ -85,87 +82,75 @@ public class CompanyConverter {
     }
 
     private static void addAddressToEntityModel(CompanyDto transport, Company company) {
-        if(transport.getAddress() != null) {
-        List<CompanyAddress> entityList = new ArrayList<>();
-        transport.getAddress().stream().filter(Objects::nonNull).forEach(dto -> {
-            CompanyAddress entity = (CompanyAddress) AddressConverter.toEntityModel(dto, new CompanyAddress());
-            entity.setCompany(company);
-            entityList.add(entity);
-        });
-        company.getAddress().addAll(entityList);
-    }
+        if (transport.getAddress() != null) {
+            List<CompanyAddress> entityList = new ArrayList<>();
+            transport.getAddress().stream().filter(Objects::nonNull).forEach(dto -> {
+                CompanyAddress entity = (CompanyAddress) AddressConverter.toEntityModel(dto, new CompanyAddress());
+                entity.setCompany(company);
+                entityList.add(entity);
+            });
+            company.getAddress().addAll(entityList);
+        }
     }
 
     private static void addGstToEntityModel(CompanyDto transport, Company company) {
-        if(transport.getGst() != null) {
-        List<CompanyGst> gstList = new ArrayList<>();
-        transport.getGst().stream().filter(Objects::nonNull).forEach(dto -> {
-            CompanyGst entity = GstConverter.toEntityModel(dto);
-            entity.setCompany(company);
-            gstList.add(entity);
-        });
-        company.getGst().addAll(gstList);
-    }
-    }
-
-    private static void addAccountToEntityModel(CompanyDto transport, Company company) {
-         if(transport.getAccount() != null) {
-        List<Account> accountList = new ArrayList<>();
-        transport.getAccount().stream().filter(Objects::nonNull).forEach(dto -> {
-            Account entity = AccountConverter.toEntityModel(dto);
-            entity.setCompany(company);
-            accountList.add(entity);
-        });
-        company.getAccount().addAll(accountList);
-    }
+        if (transport.getGst() != null) {
+            List<CompanyGst> gstList = new ArrayList<>();
+            transport.getGst().stream().filter(Objects::nonNull).forEach(dto -> {
+                CompanyGst entity = GstConverter.toEntityModel(dto);
+                entity.setCompany(company);
+                gstList.add(entity);
+            });
+            company.getGst().addAll(gstList);
+        }
     }
 
     private static void addThemeToEntityModel(CompanyDto transport, Company company) {
-        if(transport.getTheme() != null) {
-        List<Theme> themeList = new ArrayList<>();
-        transport.getTheme().stream().filter(Objects::nonNull).forEach(dto -> {
-            Theme entity = ThemeConverter.toEntityModel(dto);
-            entity.setCompany(company);
-            themeList.add(entity);
-        });
-        company.getTheme().addAll(themeList);
-    }
+        if (transport.getTheme() != null) {
+            List<Theme> themeList = new ArrayList<>();
+            transport.getTheme().stream().filter(Objects::nonNull).forEach(dto -> {
+                Theme entity = ThemeConverter.toEntityModel(dto);
+                entity.setCompany(company);
+                themeList.add(entity);
+            });
+            company.getTheme().addAll(themeList);
+        }
     }
 
     private static void addNotesToEntityModel(CompanyDto transport, Company company) {
-        if(transport.getNotes() != null) {
-        List<CompanyNotes> notesList = new ArrayList<>();
-        transport.getNotes().stream().filter(Objects::nonNull).forEach(dto -> {
-            CompanyNotes entity = CompanyNotesConverter.toEntityModel(dto);
-            entity.setCompany(company);
-            notesList.add(entity);
-        });
-        company.getCompanyNotes().addAll(notesList);
-    }
+        if (transport.getNotes() != null) {
+            List<CompanyNotes> notesList = new ArrayList<>();
+            transport.getNotes().stream().filter(Objects::nonNull).forEach(dto -> {
+                CompanyNotes entity = CompanyNotesConverter.toEntityModel(dto);
+                entity.setCompany(company);
+                notesList.add(entity);
+            });
+            company.getCompanyNotes().addAll(notesList);
+        }
     }
 
     private static void addCompanyHolidayToEntityModel(CompanyDto transport, Company company) {
-        if(transport.getCompanyHoliday() != null) {
-        List<CompanyHoliday> companyEventList = new ArrayList<>();
-        transport.getCompanyHoliday().stream().filter(Objects::nonNull).forEach(dto -> {
-            CompanyHoliday entity = CompanyHolidayConverter.toEntityModel(dto, new CompanyHoliday());
-            entity.setCompany(company);
-            companyEventList.add(entity);
-        });
-        company.getCompanyHoliday().addAll(companyEventList);
-    }
+        if (transport.getCompanyHoliday() != null) {
+            List<CompanyHoliday> companyEventList = new ArrayList<>();
+            transport.getCompanyHoliday().stream().filter(Objects::nonNull).forEach(dto -> {
+                CompanyHoliday entity = CompanyHolidayConverter.toEntityModel(dto, new CompanyHoliday());
+                entity.setCompany(company);
+                companyEventList.add(entity);
+            });
+            company.getCompanyHoliday().addAll(companyEventList);
+        }
     }
 
     private static void addCompanyEventToEntityModel(CompanyDto transport, Company company) {
-        if(transport.getCompanyEvent() != null) {
-        List<CompanyEvent> companyEventList = new ArrayList<>();
-        transport.getCompanyEvent().stream().filter(Objects::nonNull).forEach(dto -> {
-            CompanyEvent entity = CompanyEventConverter.toEntityModel(dto, new CompanyEvent());
-            entity.setCompany(company);
-            companyEventList.add(entity);
-        });
-        company.getCompanyEvent().addAll(companyEventList);
-    }
+        if (transport.getCompanyEvent() != null) {
+            List<CompanyEvent> companyEventList = new ArrayList<>();
+            transport.getCompanyEvent().stream().filter(Objects::nonNull).forEach(dto -> {
+                CompanyEvent entity = CompanyEventConverter.toEntityModel(dto, new CompanyEvent());
+                entity.setCompany(company);
+                companyEventList.add(entity);
+            });
+            company.getCompanyEvent().addAll(companyEventList);
+        }
     }
 
 }
