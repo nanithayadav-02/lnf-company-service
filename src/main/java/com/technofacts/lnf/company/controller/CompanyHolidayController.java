@@ -84,4 +84,10 @@ public class CompanyHolidayController {
         service.deleteById(companyId, holidayId);
     }
 
+
+    @GetMapping(value = "/company/holidays", params = {"search"})
+    public List<CompanyHolidayDto> search(@RequestParam(value = "search") String search) {
+        return service.findAll(search);
+    }
+
 }
