@@ -13,16 +13,20 @@ import com.technofacts.lnf.dto.company.CompanyHolidayDto;
 import com.technofacts.lnf.dto.email.ThymeleafDocumentDto;
 import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.service.email.ThymeleafDocumentService;
+import com.technofacts.lnf.service.specification.GenericSpecificationBuilder;
 import com.technofacts.lnf.util.RestUtil;
+import com.technofacts.lnf.util.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 
 @Service
 @Transactional
@@ -174,4 +178,26 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
         }
     }
 
+    public List<CompanyHolidayDto> findAll(String search) {
+        Specification<CompanyHoliday> specification = buildEmployeeSpecification(search);
+        List<CompanyHoliday> entities = repository.findAll(specification);
+        return convertToDtos(entities);
+    }
+
+    private Specification<CompanyHoliday> buildEmployeeSpecification(String search) {
+        GenericSpecificationBuilder<CompanyHoliday> employeeBuilder = new GenericSpecificationBuilder<>();
+        Function<String, Class<?>> fieldClassForEmployee = this::getFieldClassFromEmployee;
+        return SpecificationUtil.buildSpecification(search, employeeBuilder, fieldClassForEmployee);
+    }
+
+    private Class<?> getFieldClassFromEmployee(String fieldName) {
+        return SpecificationUtil.getFieldClass(CompanyHoliday.class, fieldName);
+    }
+
+    private List<CompanyHolidayDto> convertToDtos(List<CompanyHoliday> entities) {
+        return entities.stream()
+                .map(CompanyHolidayConverter::toTransportModel)
+                .filter(Objects::nonNull)
+                .toList();
+    }
 }
