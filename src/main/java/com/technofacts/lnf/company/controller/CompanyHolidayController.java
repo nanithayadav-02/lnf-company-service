@@ -46,6 +46,13 @@ public class CompanyHolidayController {
         return service.findHolidaysByYearAndLocation(companyId, year, location);
     }
 
+    @GetMapping("/company/{companyId}/holidays")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CompanyHolidayDto> findHolidaysByYear(@PathVariable("companyId") final UUID companyId,
+                                                                 @RequestParam("year") final long year) {
+        return service.findHolidaysByYear(companyId, year);
+    }
+
     @GetMapping("/company/{companyId}/holidays/pdf")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<byte[]> getCompanyHolidaysAsPdf(@PathVariable("companyId") final UUID companyId) {
