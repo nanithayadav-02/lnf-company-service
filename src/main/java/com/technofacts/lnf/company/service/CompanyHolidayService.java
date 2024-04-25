@@ -200,4 +200,10 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
                 .filter(Objects::nonNull)
                 .toList();
     }
+
+    public List<CompanyHolidayDto> findHolidaysByYear(UUID companyId, long year) {
+        List<CompanyHoliday> entities = repository.findByYear(companyId, year);
+        return entities.stream().map(CompanyHolidayConverter::toTransportModel).toList();
+
+    }
 }
