@@ -16,9 +16,6 @@ import org.springframework.test.context.ContextConfiguration;
 public abstract class BaseTestClass {
 
     @MockBean
-    public AccountService accountService;
-
-    @MockBean
     public CompanyAddressService companyAddressService;
 
     @MockBean
