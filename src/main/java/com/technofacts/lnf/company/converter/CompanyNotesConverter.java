@@ -9,6 +9,10 @@ public class CompanyNotesConverter {
     }
 
     public static NotesDto toTransportModel(CompanyNotes entity) {
+        if (entity == null) {
+            return null;
+        }
+
         NotesDto notesDto = new NotesDto();
         notesDto.setId(entity.getId());
         notesDto.setNotes(entity.getNotes());
