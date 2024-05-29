@@ -35,10 +35,16 @@ public class CompanyNotesConverter {
         }
         entity.setId(transport.getId());
         entity.setNotes(transport.getNotes());
-        entity.setCreatedBy(transport.getCreatedBy());
-        entity.setCreatedTime(transport.getCreatedTime());
+
+        if (transport.getCreatedBy() != null) {
+            entity.setCreatedBy(transport.getCreatedBy());
+        }
+        if (transport.getCreatedTime() != null) {
+            entity.setCreatedTime(transport.getCreatedTime());
+        }
         entity.setLastUpdatedBy(transport.getLastUpdatedBy());
         entity.setLastUpdatedTime(transport.getLastUpdatedTime());
+
         return entity;
     }
 
