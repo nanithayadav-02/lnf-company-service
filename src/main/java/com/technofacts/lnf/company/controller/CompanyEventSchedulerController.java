@@ -30,7 +30,8 @@ public class CompanyEventSchedulerController {
     }
 
     @GetMapping("/companyEvent/eventType/date")
-    public List<CompanyEventDto> findEventsByDate(@RequestParam("eventType") EventType eventType, @RequestParam("date") LocalDate date) {
+    public List<CompanyEventDto> findEventsByDate(@RequestParam("eventType") EventType eventType
+            , @RequestParam("date") LocalDate date) {
         return service.findEventsByTypeAndDate(eventType, date);
     }
 
@@ -40,27 +41,32 @@ public class CompanyEventSchedulerController {
     }
 
     @GetMapping("/companyEvent/eventType/startDate/endDate")
-    public List<CompanyEventDto> findEventsByEventTypeAndDateRange(@RequestParam("eventType") EventType eventType, @RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
+    public List<CompanyEventDto> findEventsByEventTypeAndDateRange(@RequestParam("eventType") EventType eventType
+            , @RequestParam("startDate") LocalDate startDate, @RequestParam("endDate") LocalDate endDate) {
         return service.findEventsByEventTypeAndDateRange(eventType, startDate, endDate);
     }
 
     @GetMapping("/companyEvent/eventType/week")
-    public List<CompanyEventDto> findEventsByWeek(@RequestParam("eventType") EventType eventType, @RequestParam("week") int week) {
+    public List<CompanyEventDto> findEventsByWeek(@RequestParam(value = "eventType",required = false) EventType eventType
+            , @RequestParam(value = "week",required = false) Integer week) {
         return service.findEventsByWeek(eventType, week);
     }
 
     @GetMapping("/companyEvent/eventType/month")
-    public List<CompanyEventDto> findEventsByMonth(@RequestParam("eventType") EventType eventType, @RequestParam("month") int month) {
+    public List<CompanyEventDto> findEventsByMonth(@RequestParam(value = "eventType",required = false) EventType eventType
+            , @RequestParam(value = "month",required = false) Integer month) {
         return service.findEventsByMonth(eventType, month);
     }
 
     @GetMapping("/companyEvent/eventType/year")
-    public List<CompanyEventDto> findEventsByYear(@RequestParam("eventType") EventType eventType, @RequestParam("year") int year) {
+    public List<CompanyEventDto> findEventsByYear(@RequestParam(value = "eventType",required = false) EventType eventType
+            , @RequestParam(value = "year",required = false) Integer year) {
         return service.findEventsByYear(eventType, year);
     }
 
     @GetMapping("/companyEvent/eventType/month/year")
-    public List<CompanyEventDto> findEventsByMonthAndYear(@RequestParam("eventType") EventType eventType, @RequestParam("month") int month, @RequestParam("year") int year) {
+    public List<CompanyEventDto> findEventsByMonthAndYear(@RequestParam("eventType") EventType eventType
+            , @RequestParam("month") int month, @RequestParam("year") int year) {
         return service.findEventsByMonthAndYear(eventType, month, year);
     }
 

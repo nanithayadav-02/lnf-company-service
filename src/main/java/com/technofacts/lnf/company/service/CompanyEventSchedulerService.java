@@ -77,18 +77,40 @@ public class CompanyEventSchedulerService implements PaginatedAndSortedService<C
         return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
-    public List<CompanyEventDto> findEventsByWeek(EventType eventType, int week) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByWeek(eventType, week);
+    public List<CompanyEventDto> findEventsByWeek(EventType eventType, Integer week) {
+        List<CompanyEvent> entities;
+        if ((week != null && eventType != null) || week != null && eventType == null) {
+            entities = companyEventRepository.getEventsByWeek(eventType, week);
+        } else if (week == null && eventType == null) {
+            entities = companyEventRepository.findAll();
+        } else {
+            entities = companyEventRepository.getEventsByType(eventType);
+        }
         return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
-    public List<CompanyEventDto> findEventsByMonth(EventType eventType, int month) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByMonth(eventType, month);
+    public List<CompanyEventDto> findEventsByMonth(EventType eventType, Integer month) {
+        List<CompanyEvent> entities;
+        if ((month != null && eventType != null) || month != null && eventType == null) {
+            entities = companyEventRepository.getEventsByMonth(eventType, month);
+        } else if (month == null && eventType == null) {
+            entities = companyEventRepository.findAll();
+        } else {
+            entities = companyEventRepository.getEventsByType(eventType);
+        }
+
         return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
-    public List<CompanyEventDto> findEventsByYear(EventType eventType, int year) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByYear(eventType, year);
+    public List<CompanyEventDto> findEventsByYear(EventType eventType, Integer year) {
+        List<CompanyEvent> entities;
+        if ((year != null && eventType != null) || year != null && eventType == null) {
+            entities = companyEventRepository.getEventsByYear(eventType, year);
+        } else if (year == null && eventType == null) {
+            entities = companyEventRepository.findAll();
+        } else {
+            entities = companyEventRepository.getEventsByType(eventType);
+        }
         return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
