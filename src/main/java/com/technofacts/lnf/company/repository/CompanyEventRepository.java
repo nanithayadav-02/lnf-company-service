@@ -35,7 +35,7 @@ public interface CompanyEventRepository extends JpaRepository<CompanyEvent, UUID
 
     @Query("SELECT e FROM CompanyEvent e WHERE " +
             "(:eventType IS NULL OR e.eventType = :eventType) AND " +
-            "(:week IS NULL OR EXTRACT(WEEK FROM e.dateAndTime) = :week)")
+            "(:week IS NULL OR FUNCTION('EXTRACT', 'WEEK', e.dateAndTime) = :week)")
     List<CompanyEvent> findEventsByWeek(@Param("eventType") EventType eventType, @Param("week") Integer week);
 
     @Query("SELECT e FROM CompanyEvent e WHERE " +
