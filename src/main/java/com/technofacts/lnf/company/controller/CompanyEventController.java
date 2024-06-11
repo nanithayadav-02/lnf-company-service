@@ -53,8 +53,7 @@ public class CompanyEventController {
 
     @PutMapping(value = "/company/{companyId}/event/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId,
-                       @PathVariable("eventId") final UUID eventId,
+    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("eventId") final UUID eventId,
                        @RequestBody final CompanyEventDto resource) {
         service.update(companyId, eventId, resource);
     }
