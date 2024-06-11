@@ -153,7 +153,7 @@ pipelines:
             - export IMAGE_NAME=levernfulcrum/lnf-company-service
             - chmod +x lnf-deployment-pipeline/scripts/build-n-push/docker_image.sh
             - lnf-deployment-pipeline/scripts/build-n-push/docker_image.sh "$DOCKER_HUB_USERNAME" "$DOCKER_HUB_PASSWORD" "$IMAGE_NAME"
-    "master/*":
+    "master":
       - step:
           name: Build and Test
           caches:
