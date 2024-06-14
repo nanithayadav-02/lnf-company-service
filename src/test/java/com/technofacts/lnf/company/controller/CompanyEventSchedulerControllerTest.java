@@ -32,8 +32,10 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private CompanyEventSchedulerService service;
+
     @Autowired
     private PaginationAndSortingHandler paginationAndSortingHandler;
 
@@ -79,7 +81,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     }
 
     @Test
-    void findEventsByDate () throws Exception {
+    void findEventsByDate() throws Exception {
 
         EventType eventType = EventType.Birthday;
         LocalDate date = LocalDate.of(2024, 4, 2);
@@ -87,7 +89,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         CompanyEventDto event2 = mockEvent2();
         List<CompanyEventDto> events = List.of(event1, event2);
 
-        String url = "/lnf/companyEvent/eventType/date";
+        String url = "/lnf/company/events/{eventType}/date/{date}";
 
         given(service.findEventsByTypeAndDate(eventType, date)).willReturn(events);
 
@@ -95,9 +97,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
                 .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
-        mockMvc.perform(get(url)
-                .param("eventType", String.valueOf(eventType))
-                .param("date", date.toString()))
+        mockMvc.perform(get(url, eventType, date))
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
@@ -108,12 +108,12 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     @Test
     void findEventsByCurrentDate() throws Exception {
 
-        String url = "/lnf/companyEvent/eventType/currentDate";
+        String url = "/lnf/company/events/currentDate";
         CompanyEventDto event1 = mockEvent1();
         CompanyEventDto event2 = mockEvent2();
         List<CompanyEventDto> events = List.of(event1, event2);
 
-        given(service.findEventsByCurrentDate()).willReturn(events);
+        given(service.findEventsByCurrentDate(null)).willReturn(events);
 
         String resultContent = new String(Files
                 .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
@@ -124,7 +124,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
-        verify(service, times(1)).findEventsByCurrentDate();
+        verify(service, times(1)).findEventsByCurrentDate(null);
     }
 
     @Test
@@ -136,7 +136,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         CompanyEventDto event2 = mockEvent2();
         List<CompanyEventDto> events = List.of(event1, event2);
 
-        String url = "/lnf/companyEvent/eventType/startDate/endDate";
+        String url = "/lnf/company/events/{eventType}/range/{startDate}/{endDate}";
 
         given(service.findEventsByEventTypeAndDateRange(eventType, startDate, endDate)).willReturn(events);
 
@@ -144,10 +144,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
                 .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
-        mockMvc.perform(get(url)
-                        .param("eventType", String.valueOf(eventType))
-                        .param("startDate", startDate.toString())
-                        .param("endDate",endDate.toString()))
+        mockMvc.perform(get(url, String.valueOf(eventType), startDate.toString(), endDate.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
@@ -162,7 +159,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         CompanyEventDto event2 = mockEvent2();
         List<CompanyEventDto> events = List.of(event1, event2);
 
-        String url = "/lnf/companyEvent/eventType/week";
+        String url = "/lnf/company/events/{eventType}/week/{week}";
 
         given(service.findEventsByWeek(eventType, week)).willReturn(events);
 
@@ -170,9 +167,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
                 .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
-        mockMvc.perform(get(url)
-                        .param("eventType", String.valueOf(eventType))
-                        .param("week", String.valueOf(week)))
+        mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(week)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
@@ -187,7 +182,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         CompanyEventDto event2 = mockEvent2();
         List<CompanyEventDto> events = List.of(event1, event2);
 
-        String url = "/lnf/companyEvent/eventType/month";
+        String url = "/lnf/company/events/{eventType}/month/{month}";
 
         given(service.findEventsByMonth(eventType, month)).willReturn(events);
 
@@ -195,9 +190,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
                 .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
-        mockMvc.perform(get(url)
-                        .param("eventType", String.valueOf(eventType))
-                        .param("month", String.valueOf(month)))
+        mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(month)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
@@ -212,7 +205,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         CompanyEventDto event2 = mockEvent2();
         List<CompanyEventDto> events = List.of(event1, event2);
 
-        String url = "/lnf/companyEvent/eventType/year";
+        String url = "/lnf/company/events/{eventType}/year/{year}";
 
         given(service.findEventsByYear(eventType, year)).willReturn(events);
 
@@ -220,9 +213,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
                 .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
-        mockMvc.perform(get(url)
-                        .param("eventType", String.valueOf(eventType))
-                        .param("year", String.valueOf(year)))
+        mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(year)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
@@ -238,7 +229,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         CompanyEventDto event2 = mockEvent2();
         List<CompanyEventDto> events = List.of(event1, event2);
 
-        String url = "/lnf/companyEvent/eventType/month/year";
+        String url = "/lnf/company/events/{eventType}/monthYear/{month}/{year}";
 
         given(service.findEventsByMonthAndYear(eventType, month, year)).willReturn(events);
 
@@ -246,10 +237,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
                 .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
-        mockMvc.perform(get(url)
-                        .param("eventType", String.valueOf(eventType))
-                        .param("month", String.valueOf(month))
-                        .param("year", String.valueOf(year)))
+        mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(month),  String.valueOf(year)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 

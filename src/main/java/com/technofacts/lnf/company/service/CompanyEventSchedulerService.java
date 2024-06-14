@@ -1,6 +1,5 @@
 package com.technofacts.lnf.company.service;
 
-import com.google.common.collect.Lists;
 import com.technofacts.lnf.company.converter.CompanyEventConverter;
 import com.technofacts.lnf.company.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.company.model.CompanyEvent;
@@ -9,8 +8,10 @@ import com.technofacts.lnf.company.repository.CompanyEventRepository;
 import com.technofacts.lnf.dto.company.CompanyEventDto;
 import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.util.RestUtil;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,26 +21,32 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CompanyEventSchedulerService implements PaginatedAndSortedService<CompanyEventDto> {
 
-    private final CompanyEventRepository companyEventRepository;
+    @Autowired
+    private CompanyEventRepository companyEventRepository;
 
-    @Override
-    public Page<CompanyEventDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
-        final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
-        Page<CompanyEvent> resultPage = companyEventRepository.findAll(PageRequest.of(page, size, sortInfo));
-        return validateAndGetPages(page, resultPage);
+    private BiFunction<EventType, Integer, List<CompanyEvent>> eventsByWeek;
+    private BiFunction<EventType, Integer, List<CompanyEvent>> eventsByMonth;
+    private BiFunction<EventType, Integer, List<CompanyEvent>> eventsByYear;
+
+    @PostConstruct
+    public void init() {
+        eventsByWeek = companyEventRepository::findEventsByWeek;
+        eventsByMonth = companyEventRepository::findEventsByMonth;
+        eventsByYear = companyEventRepository::findEventsByYear;
     }
 
     @Override
     public List<CompanyEventDto> findAll() {
-        List<CompanyEvent> entities = companyEventRepository.findAll();
-        return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList();
+        return convertAndFilter(companyEventRepository.findAll());
     }
 
     @Override
@@ -49,51 +56,86 @@ public class CompanyEventSchedulerService implements PaginatedAndSortedService<C
     }
 
     @Override
+    public Page<CompanyEventDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
+        final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
+        Page<CompanyEvent> resultPage = companyEventRepository.findAll(PageRequest.of(page, size, sortInfo));
+        return validateAndGetPages(page, resultPage);
+    }
+
+    @Override
     public List<CompanyEventDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
-        List<CompanyEvent> entities = Lists.newArrayList(companyEventRepository.findAll(sortInfo));
-        return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList();
+        return convertAndFilter(companyEventRepository.findAll(sortInfo));
+    }
+
+    public List<CompanyEventDto> findEventsByTypeAndDate(EventType eventType, LocalDate dateAndTime) {
+        return fetchAndTransform(() -> companyEventRepository.findEventsByDate(eventType, dateAndTime));
+    }
+
+    public List<CompanyEventDto> findEventsByCurrentDate(EventType eventType) {
+        if (eventType == null) {
+            return fetchAndTransform(companyEventRepository::findEventsByCurrentDate);
+        } else {
+            return fetchAndTransform(() -> companyEventRepository.findEventsByCurrentDate(eventType));
+        }
+    }
+
+    public List<CompanyEventDto> findEventsByEventTypeAndDateRange(EventType eventType, LocalDate startDate,
+                                                                   LocalDate endDate) {
+        return fetchAndTransform(() ->
+                companyEventRepository.findEventsByEventTypeAndDateRange(eventType, startDate, endDate));
+    }
+
+    public List<CompanyEventDto> findEventsByMonthAndYear(EventType eventType, int month, int year) {
+        return fetchAndTransform(() -> companyEventRepository.findEventsByMonthAndYear(eventType, month, year));
+    }
+
+    public List<CompanyEventDto> findEventsByWeek(EventType eventType, Integer week) {
+        return findEvents(eventType, week, eventsByWeek);
+    }
+
+    public List<CompanyEventDto> findEventsByMonth(EventType eventType, Integer month) {
+        return findEvents(eventType, month, eventsByMonth);
+    }
+
+    public List<CompanyEventDto> findEventsByYear(EventType eventType, Integer year) {
+        return findEvents(eventType, year, eventsByYear);
     }
 
     private Page<CompanyEventDto> validateAndGetPages(int page, Page<CompanyEvent> resultPage) {
         if (page > resultPage.getTotalPages()) {
-            throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " + "requested page [%d] does not exist", resultPage.getTotalPages(), page));
+            throw new LnFEntityNotFoundException(prepareErrorMessage(resultPage.getTotalPages(), page));
         }
         return resultPage.map(CompanyEventConverter::toTransportModel);
     }
 
-    public List<CompanyEventDto> findEventsByTypeAndDate(EventType eventType, LocalDate dateAndTime) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByDate(eventType, dateAndTime);
+    private String prepareErrorMessage(int totalPages, int requestedPage) {
+        return String.format("Total number of pages [%d], requested page [%d] does not exist",
+                totalPages, requestedPage);
+    }
+
+    private List<CompanyEventDto> convertAndFilter(List<CompanyEvent> entities) {
+        return entities.stream()
+                .map(CompanyEventConverter::toTransportModel)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private List<CompanyEventDto> fetchAndTransform(Supplier<List<CompanyEvent>> fetcher) {
+        List<CompanyEvent> entities = fetcher.get();
         return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
-    public List<CompanyEventDto> findEventsByCurrentDate() {
-        List<CompanyEvent> entities = companyEventRepository.findEventsByCurrentDate();
-        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
-    }
-
-    public List<CompanyEventDto> findEventsByEventTypeAndDateRange(EventType eventType, LocalDate startDate, LocalDate endDate) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByEventTypeAndDateRange(eventType, startDate, endDate);
-        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
-    }
-
-    public List<CompanyEventDto> findEventsByWeek(EventType eventType, int week) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByWeek(eventType, week);
-        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
-    }
-
-    public List<CompanyEventDto> findEventsByMonth(EventType eventType, int month) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByMonth(eventType, month);
-        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
-    }
-
-    public List<CompanyEventDto> findEventsByYear(EventType eventType, int year) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByYear(eventType, year);
-        return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
-    }
-
-    public List<CompanyEventDto> findEventsByMonthAndYear(EventType eventType, int month, int year) {
-        List<CompanyEvent> entities = companyEventRepository.getEventsByMonthAndYear(eventType, month, year);
+    private List<CompanyEventDto> findEvents(EventType eventType, Integer timeOffset,
+                                             BiFunction<EventType, Integer, List<CompanyEvent>> repositoryFunc) {
+        List<CompanyEvent> entities;
+        if (timeOffset != null) {
+            entities = repositoryFunc.apply(eventType, timeOffset);
+        } else if (eventType == null) {
+            entities = companyEventRepository.findAll();
+        } else {
+            entities = companyEventRepository.findEventsByType(eventType);
+        }
         return entities.stream().map(CompanyEventConverter::toTransportModel).toList();
     }
 
