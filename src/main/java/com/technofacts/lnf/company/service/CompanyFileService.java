@@ -9,6 +9,8 @@ import com.technofacts.lnf.company.model.CompanyFile;
 import com.technofacts.lnf.company.repository.CompanyFileRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.dto.company.CompanyFileDto;
+import com.technofacts.lnf.dto.file.FileDto;
+import com.technofacts.lnf.service.file.FileFolderService;
 import com.technofacts.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -29,7 +31,6 @@ import java.util.stream.IntStream;
 @Log
 public class CompanyFileService {
 
-    public static final String S_S_S = "%s/%s/%s/";
     @Value("${aws.s3.bucket.enabled}")
     private boolean awsS3BucketEnabled;
     @Value("${aws.s3.bucket.folderName}")
@@ -37,17 +38,18 @@ public class CompanyFileService {
     private static final String FAILED_TO_CREATE_COMPANY_FILE_NULL_PAYLOAD = "Failed to create companyFile for " +
             "company [%s] with null payload";
     public static final String FILES = "files";
+    public static final String S_S_S = "%s/%s/%s/";
     private final CompanyFileRepository repository;
     private final CompanyRepository companyRepository;
     private final FileService fileService;
-
+    private final FileFolderService fileFolderService;
 
     public List<CompanyFileDto> findByCompanyId(UUID companyId) {
         String filePath = String.format(S_S_S, folderName, companyId, FILES);
-        List<String> files = fileService.findFilesInFolder(filePath);
+        List<FileDto> files = fileFolderService.findFiles(filePath);
         List<CompanyFileDto> companyFileDtos = new ArrayList<>();
         files.forEach(file -> {
-            String fileName = StringUtils.substringAfterLast(file, "/");
+            String fileName = StringUtils.substringAfterLast(file.getFileName(), "/");
             String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(String.format("/lnf/company/%s/files/%s", companyId, fileName))
                     .toUriString();
@@ -57,6 +59,8 @@ public class CompanyFileService {
             companyFileDto.setFileName(fileName);
             companyFileDto.setUrl(downloadURL);
             companyFileDto.setDescription(entity.getDescription());
+            companyFileDto.setSize(file.getFileSize());
+            companyFileDto.setLastModified(file.getLastModified());
             companyFileDtos.add(companyFileDto);
         });
         return companyFileDtos;
@@ -72,7 +76,6 @@ public class CompanyFileService {
             throw new LnFException(errorMessage, e);
         }
     }
-
 
     public void create(UUID companyId, MultipartFile[] files, List<CompanyFileDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_FILE_NULL_PAYLOAD, companyId));
