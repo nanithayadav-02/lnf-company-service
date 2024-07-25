@@ -68,7 +68,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
     }
     private List<CompanyDto> convertToDtos(List<Company> entities) {
         return entities.stream()
-                .map(CompanyConverter::toTransportModel)
+                .map(this::findCompanyWithImage)
                 .filter(Objects::nonNull)
                 .toList();
     }
