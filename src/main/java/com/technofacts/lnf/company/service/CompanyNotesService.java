@@ -13,7 +13,7 @@ import com.technofacts.lnf.dto.company.NotesDto;
 import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> {
 
     private final CompanyRepository companyRepository;
@@ -76,7 +76,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
             entities.add(entity);
         });
         save(entities);
-        log.info(() -> String.format("Notes for company[%s] successfully created", companyId));
+        log.debug("Notes for company {} successfully created", companyId);
     }
 
     public void create(UUID companyId, NotesDto resource) {
@@ -86,8 +86,9 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         CompanyNotes entity = CompanyNotesConverter.toEntityModel(resource);
         entity.setCompany(companyEntity);
         save(entity);
-        log.info(() -> String.format("notes for company[%s] successfully created", companyId));
+        log.debug("notes for company {} successfully created", companyId);
     }
+
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
@@ -111,14 +112,14 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         }
     }
 
-public void update(UUID companyId, UUID notesId, NotesDto resource) {
+    public void update(UUID companyId, UUID notesId, NotesDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, "Failed to update Notes with null payload");
         searchForCompany(companyId);
         CompanyNotes entity = searchForNotes(notesId);
         entity.setNotes(resource.getNotes());
         save(CompanyNotesConverter.toEntityModel(resource, entity));
-        log.info(() -> String.format("Notes for Employee[%s] successfully created", notesId));
-}
+        log.debug("Notes for Employee {} successfully created", notesId);
+    }
 
     private CompanyNotes searchForNotes(UUID notesId) {
         return companyNotesRepository.findById(notesId).
@@ -130,7 +131,7 @@ public void update(UUID companyId, UUID notesId, NotesDto resource) {
         CompanyNotes entity = searchForNotes(notesId);
         try {
             companyNotesRepository.delete(entity);
-            log.info(() -> String.format("Notes[%s] for company[%s] successfully deleted", notesId, companyId));
+            log.debug("Notes {} for company {} successfully deleted", notesId, companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete Notes[%s] for company [%s]", notesId, companyId);
             throw new LnFException(errorMessage);
@@ -142,7 +143,7 @@ public void update(UUID companyId, UUID notesId, NotesDto resource) {
         List<CompanyNotes> entities = companyNotesRepository.findByCompanyId(companyId);
         try {
             companyNotesRepository.deleteAll(entities);
-            log.info(() -> String.format("Notes for company[%s] successfully deleted", companyId));
+            log.debug("Notes for company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete notes for company [%s]", companyId);
             throw new LnFException(errorMessage);
