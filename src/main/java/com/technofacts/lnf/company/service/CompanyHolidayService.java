@@ -110,7 +110,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
             entities.add(entity);
         });
         save(entities);
-        log.info("Holidays for the company {} is successfully created", companyId);
+        log.debug("Holidays for the company {} is successfully created", companyId);
     }
 
     private void save(List<CompanyHoliday> entities) {
@@ -129,7 +129,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
         searchForCompany(companyId);
         CompanyHoliday entity = searchForHoliday(holidayId);
         save(CompanyHolidayConverter.toEntityModel(resource, entity));
-        log.info("Holiday for Company {} successfully created", companyId);
+        log.debug("Holiday for Company {} successfully created", companyId);
     }
 
     public void deleteAll(UUID companyId) {
@@ -137,7 +137,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
         List<CompanyHoliday> entities = repository.findByCompanyId(companyId);
         try {
             repository.deleteAll(entities);
-            log.info("Company {} all holiday are successfully deleted", companyId);
+            log.debug("Company {} all holiday are successfully deleted", companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete Holiday for company [%s]", companyId);
             throw new LnFException(errorMessage);
@@ -149,7 +149,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
         CompanyHoliday entity = searchForHoliday(holidayId);
         try {
             repository.delete(entity);
-            log.info("Company {} holiday {} is successfully deleted", holidayId, companyId);
+            log.debug("Company {} holiday {} is successfully deleted", holidayId, companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete Holiday[[%s] for company [%s]", holidayId, companyId);
             throw new LnFException(errorMessage);

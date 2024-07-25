@@ -11,7 +11,7 @@ import com.technofacts.lnf.dto.company.TaskDto;
 import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class TaskService implements PaginatedAndSortedService<TaskDto> {
 
     private final TaskRepository repository;
@@ -79,7 +79,7 @@ public class TaskService implements PaginatedAndSortedService<TaskDto> {
             entities.add(entity);
         });
         save(entities);
-        log.info(() -> String.format("Tasks[%s] successfully created", entities.get(0).getId()));
+        log.debug("Tasks {} successfully created", entities.get(0).getId());
     }
 
     private void save(Task entity) {
@@ -111,7 +111,7 @@ public class TaskService implements PaginatedAndSortedService<TaskDto> {
                 "Failed to update task with null payload");
         Task entity = searchForTask(taskId);
         save(TaskConverter.toEntityModel(resource, entity));
-        log.info(() -> String.format("Task [%s] successfully updated", taskId));
+        log.debug("Task {} successfully updated", taskId);
     }
 
 
@@ -119,7 +119,7 @@ public class TaskService implements PaginatedAndSortedService<TaskDto> {
         Task entity = searchForTask(taskId);
         try {
             repository.delete(entity);
-            log.info(() -> String.format("Task[%s] successfully deleted", taskId));
+            log.debug("Task {} successfully deleted", taskId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete Task[%s]", taskId);
             throw new LnFException(errorMessage);
