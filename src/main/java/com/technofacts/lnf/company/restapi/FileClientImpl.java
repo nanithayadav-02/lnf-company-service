@@ -92,7 +92,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
                     })
                     .block();
 
-        } catch (LnFEntityNotFoundException ex) {
+        } catch (Exception ex) {
             log.error("Failed to get the files from the folder {}", ex.getMessage());
             throw new LnFException("Failed to get the files from the folder", ex);
         }
@@ -165,7 +165,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
                     })
                     .block();
 
-        } catch (LnFEntityNotFoundException ex) {
+        } catch (Exception ex) {
             log.error("Failed to fetch the files in the folder {}", folderName);
             throw new LnFException("Failed to fetch the files in the folder", ex);
         }

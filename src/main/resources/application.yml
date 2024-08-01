@@ -52,8 +52,8 @@ management:
 logging:
   level:
     org:
-      springframework.web: DEBUG
-    root: DEBUG
+      springframework: INFO
+    root: ERROR
   com.technofacts.lnf.*: DEBUG
 
 springdoc:
