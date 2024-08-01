@@ -52,7 +52,9 @@ management:
 logging:
   level:
     org:
-      springframework: INFO
+      springframework.web: DEBUG
+    root: DEBUG
+  com.technofacts.lnf.*: DEBUG
 
 springdoc:
   api-docs:
