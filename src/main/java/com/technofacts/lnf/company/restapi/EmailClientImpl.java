@@ -2,6 +2,7 @@ package com.technofacts.lnf.company.restapi;
 
 import com.technofacts.lnf.dto.email.ThymeleafDocumentDto;
 import com.technofacts.lnf.dto.email.ThymeleafEmailDto;
+import com.technofacts.lnf.exception.LnFException;
 import com.technofacts.lnf.service.email.ThymeleafDocumentService;
 import com.technofacts.lnf.service.email.ThymeleafEmailService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,15 +25,22 @@ public class EmailClientImpl extends BaseWebClientService implements ThymeleafDo
 
     @Override
     public byte[] generatePdf(ThymeleafDocumentDto resource) {
-        WebClient.RequestHeadersSpec<?> spec = webClient.post()
-                .uri("/lnf/pdf")
-                .body(BodyInserters.fromValue(resource));
+        try {
+            WebClient.RequestHeadersSpec<?> spec = webClient.post()
+                    .uri("/lnf/pdf")
+                    .body(BodyInserters.fromValue(resource));
 
-        addJwtToken(spec);
+            // Conditionally add the JWT token to the request headers
+            addJwtToken(spec);
 
-        return spec.retrieve()
-                .bodyToMono(byte[].class)
-                .block();
+            // Execute the request and block to get the response
+            return spec.retrieve()
+                    .bodyToMono(byte[].class)
+                    .block();
+        } catch (Exception ex) {
+            log.error("Failed to generate Pdf {}", ex.getMessage());
+            throw new LnFException("Failed to generate Pdf with exception: ", ex);
+        }
     }
 
     @Override
