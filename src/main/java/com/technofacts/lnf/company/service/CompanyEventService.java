@@ -13,7 +13,7 @@ import com.technofacts.lnf.dto.company.CompanyEventDto;
 import com.technofacts.lnf.service.common.page.PaginatedAndSortedService;
 import com.technofacts.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,7 +28,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CompanyEventService implements PaginatedAndSortedService<CompanyEventDto> {
     private static final String FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD = "Failed to create companyEvent for " +
             "company [%s] with null payload";
@@ -81,12 +81,12 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
     }
 
     public void create(UUID companyId, CompanyEventDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD, companyId)) ;
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD, companyId));
         Company companyEntity = searchForCompany(companyId);
         CompanyEvent entity = CompanyEventConverter.toEntityModel(resource, new CompanyEvent());
         entity.setCompany(companyEntity);
         save(entity);
-        log.info(() -> String.format("CompanyEvent for Company[%s] successfully created", companyId));
+        log.debug("CompanyEvent for Company {} successfully created", companyId);
     }
 
 
@@ -100,7 +100,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
             entities.add(entity);
         });
         save(entities);
-        log.info(() -> String.format("companyEvents for Company[%s] successfully created", companyId));
+        log.debug("companyEvents for Company {} successfully created", companyId);
     }
 
     private void save(CompanyEvent entity) {
@@ -135,7 +135,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         searchForCompany(companyId);
         CompanyEvent entity = searchForCompanyEvent(eventId);
         save(CompanyEventConverter.toEntityModel(resource, entity));
-        log.info(() -> String.format("companyEvent for Company[%s] successfully updated", companyId));
+        log.debug("companyEvent for Company {} successfully updated", companyId);
     }
 
 
@@ -144,7 +144,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         CompanyEvent entity = searchForCompanyEvent(eventId);
         try {
             companyEventRepository.delete(entity);
-            log.info(() -> String.format("CompanyEvent[%s] for company [%s] successfully deleted", eventId, companyId));
+            log.debug("CompanyEvent {} for company {} successfully deleted", eventId, companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete CompanyEvent[[%s] for company [%s]", eventId, companyId);
             throw new LnFException(errorMessage);
@@ -156,7 +156,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
         try {
             companyEventRepository.deleteAll(entities);
-            log.info(() -> String.format("CompanyEvent for company[%s] successfully deleted", companyId));
+            log.debug("CompanyEvent for company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete event for company [%s]", companyId);
             throw new LnFException(errorMessage);

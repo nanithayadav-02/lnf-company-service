@@ -10,7 +10,7 @@ import com.technofacts.lnf.company.repository.CompanyAddressRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.dto.company.AddressDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CompanyAddressService {
 
     private final CompanyAddressRepository repository;
@@ -57,7 +57,7 @@ public class CompanyAddressService {
             entities.add(entity);
         });
         save(entities);
-        log.info(() -> String.format("Address for Company[%s] successfully created", companyId));
+        log.debug("Address for Company {} successfully created", companyId);
     }
 
     public void create(UUID companyId, AddressDto resource) {
@@ -67,7 +67,7 @@ public class CompanyAddressService {
         CompanyAddress entity = (CompanyAddress) AddressConverter.toEntityModel(resource, new CompanyAddress());
         entity.setCompany(companyEntity);
         save(entity);
-        log.info(() -> String.format("Address for Company[%s] successfully created", companyId));
+        log.debug("Address for Company {} successfully created", companyId);
     }
 
     public void update(UUID companyId, UUID addressId, AddressDto resource) {
@@ -76,7 +76,7 @@ public class CompanyAddressService {
         searchForCompany(companyId);
         CompanyAddress entity = searchForAddress(addressId);
         save((CompanyAddress) AddressConverter.toEntityModel(resource, entity));
-        log.info(() -> String.format("Address for Company[%s] successfully created", companyId));
+        log.debug("Address for Company {} successfully created", companyId);
     }
 
     public void deleteById(UUID companyId, UUID addressId) {
@@ -84,7 +84,7 @@ public class CompanyAddressService {
         CompanyAddress entity = searchForAddress(addressId);
         try {
             repository.delete(entity);
-            log.info(() -> String.format("Address[%s] for company [%s] successfully deleted", addressId, companyId));
+            log.debug("Address {} for company {} successfully deleted", addressId, companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete Address[[%s] for company [%s]", addressId, companyId);
             throw new LnFException(errorMessage);
@@ -96,7 +96,7 @@ public class CompanyAddressService {
         List<CompanyAddress> entities = repository.findByCompanyId(companyId);
         try {
             repository.deleteAll(entities);
-            log.info(() -> String.format("Address for Company[%s] successfully deleted", companyId));
+            log.debug("Address for Company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete Address for company [%s]", companyId);
             throw new LnFException(errorMessage);

@@ -10,7 +10,7 @@ import com.technofacts.lnf.company.repository.CompanyGstRepository;
 import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.dto.company.GstDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CompanyGstService {
 
     private final CompanyGstRepository repository;
@@ -58,28 +58,28 @@ public class CompanyGstService {
             entities.add(entity);
         });
         save(entities);
-        log.info(() -> String.format("Gst for company[%s] successfully created", companyId));
+        log.debug("Gst for company {} successfully created", companyId);
     }
 
     public void create(UUID companyId, GstDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, 
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to create gst for company [%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
         CompanyGst entity = GstConverter.toEntityModel(resource);
         entity.setCompany(companyEntity);
         save(entity);
-        log.info(() -> String.format("Gst for company[%s] successfully created", companyId));
+        log.debug("Gst for company {} successfully created", companyId);
     }
 
     public void update(UUID companyId, UUID gstId, GstDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, 
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to gst company[%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
         searchForGst(gstId);
         CompanyGst updatedEntity = GstConverter.toEntityModel(resource);
         updatedEntity.setCompany(companyEntity);
         save(updatedEntity);
-        log.info(() -> String.format("Gst for company[%s] successfully updated", companyId));
+        log.debug("Gst for company {} successfully updated", companyId);
     }
 
     public void deleteById(UUID companyId, UUID gstId) {
@@ -87,7 +87,7 @@ public class CompanyGstService {
         CompanyGst entity = searchForGst(gstId);
         try {
             repository.delete(entity);
-            log.info(() -> String.format("Gst[%s] for company[%s] successfully deleted", gstId, companyId));
+            log.debug("Gst {} for company {} successfully deleted", gstId, companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete gst[%s] for company [%s]", gstId, companyId);
             throw new LnFException(errorMessage);
@@ -99,7 +99,7 @@ public class CompanyGstService {
         List<CompanyGst> entities = repository.findByCompanyId(companyId);
         try {
             repository.deleteAll(entities);
-            log.info(() -> String.format("Gsts for company[%s] successfully deleted", companyId));
+            log.debug("Gsts for company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete gsts for company [%s]", companyId);
             throw new LnFException(errorMessage);

@@ -13,7 +13,7 @@ import com.technofacts.lnf.service.specification.GenericSpecificationBuilder;
 import com.technofacts.lnf.util.RestUtil;
 import com.technofacts.lnf.util.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,7 +29,7 @@ import java.util.function.Function;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     private final CompanyRepository repository;
@@ -66,12 +66,14 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
         List<Company> entities = repository.findAll(specification);
         return convertToDtos(entities);
     }
+
     private List<CompanyDto> convertToDtos(List<Company> entities) {
         return entities.stream()
                 .map(this::findCompanyWithImage)
                 .filter(Objects::nonNull)
                 .toList();
     }
+
     private Specification<Company> buildCompanySpecification(String search) {
         GenericSpecificationBuilder<Company> companySpecBuilder = new GenericSpecificationBuilder<>();
         Function<String, Class<?>> fieldClassForCompany = this::getFieldClassFromCompany;
@@ -89,7 +91,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     private CompanyDto findCompanyWithImage(Company entity) {
         CompanyDto dto = CompanyConverter.toTransportModel(entity);
-        if(dto != null) {
+        if (dto != null) {
             dto.setImage(imageService.findByCompanyId(dto.getId()));
         }
         return dto;
@@ -100,7 +102,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
                 "Failed to create Company with null payload");
         Company entity = CompanyConverter.toEntityModel(resource);
         saveEntity(entity);
-        log.info(() -> String.format("Company[%s] successfully created", entity.getCode()));
+        log.debug("Company {} successfully created", entity.getCode());
     }
 
     @Transactional
@@ -111,14 +113,14 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
         Company updatedEntity = CompanyConverter.toEntityModel(resource);
         updatedEntity.setId(entity.getId());
         saveEntity(updatedEntity);
-        log.info(() -> String.format("Company[%s] successfully updated", companyId));
+        log.debug("Company {} successfully updated", companyId);
     }
 
     public void delete(UUID companyId) {
         Company entity = search(companyId);
         try {
             repository.delete(entity);
-            log.info(() -> String.format("Company[%s] successfully deleted", entity.getCode()));
+            log.debug("Company {} successfully deleted", entity.getCode());
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete Company [%s]", entity.getCode());
             throw new LnFException(errorMessage, e);

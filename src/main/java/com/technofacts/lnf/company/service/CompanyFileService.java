@@ -13,7 +13,7 @@ import com.technofacts.lnf.dto.file.FileDto;
 import com.technofacts.lnf.service.file.FileFolderService;
 import com.technofacts.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class CompanyFileService {
 
     @Value("${aws.s3.bucket.enabled}")
@@ -93,7 +93,7 @@ public class CompanyFileService {
 
                 String folder = String.format(S_S_S, folderName, companyId, FILES);
                 String filePath = uploadFile(folder, file);
-                log.info("File uploaded successfully to S3 bucket: " + filePath);
+                log.debug("File uploaded successfully to S3 bucket: " + filePath);
             } catch (RuntimeException e) {
                 String errorMessage = String.format("Failed to create file[%s] for company [%s]", file.getName(), companyId);
                 throw new LnFException(errorMessage, e);
@@ -114,8 +114,8 @@ public class CompanyFileService {
             //Before Updating the file we are deleting from the s3 bucket
             String folder = String.format(S_S_S, folderName, companyId, FILES);
             String filePath = uploadFile(folder, file);
-            log.info("File uploaded successfully to S3 bucket: " + filePath);
-            log.info(() -> String.format("fileName [%s] for Company[%s] successfully updated", fileName, companyId));
+            log.debug("File uploaded successfully to S3 bucket: " + filePath);
+            log.debug("fileName {} for Company {} successfully updated", fileName, companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to update fileName[%s] for company [%s]", fileName, companyId);
             throw new LnFException(errorMessage, e);
@@ -129,9 +129,9 @@ public class CompanyFileService {
             String s3ObjectKey = String.format("%s/%s/%s/%s", folderName, companyId, FILES, fileName);
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileService.delete(filePaths);
-            log.info("S3 object deleted for company file");
+            log.debug("S3 object deleted for company file");
             repository.delete(entity);
-            log.info(() -> String.format("file[%s] for company [%s] successfully deleted", fileName, companyId));
+            log.debug("file {} for company {} successfully deleted", fileName, companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete File[[%s] for company [%s]", fileName, companyId);
             throw new LnFException(errorMessage);
