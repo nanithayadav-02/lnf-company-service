@@ -10,7 +10,7 @@ import com.technofacts.lnf.company.repository.CompanyRepository;
 import com.technofacts.lnf.company.repository.ThemeRepository;
 import com.technofacts.lnf.dto.company.ThemeDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class ThemeService {
 
     private final ThemeRepository repository;
@@ -44,7 +44,7 @@ public class ThemeService {
 
     public ThemeDto findById(UUID companyId, UUID themeId) {
         searchForCompany(companyId);
-        return ThemeConverter.toTransportModel(searchForTheme (themeId));
+        return ThemeConverter.toTransportModel(searchForTheme(themeId));
     }
 
     public void create(UUID companyId, List<ThemeDto> resource) {
@@ -58,36 +58,36 @@ public class ThemeService {
             entities.add(entity);
         });
         save(entities);
-        log.info(() -> String.format("Theme for company[%s] successfully created", companyId));
+        log.debug("Theme for company {} successfully created", companyId);
     }
 
     public void create(UUID companyId, ThemeDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, 
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to create theme for company [%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
         Theme entity = ThemeConverter.toEntityModel(resource);
         entity.setCompany(companyEntity);
         save(entity);
-        log.info(() -> String.format("Theme for company[%s] successfully created", companyId));
+        log.debug("Theme for company {} successfully created", companyId);
     }
 
     public void update(UUID companyId, UUID themeId, ThemeDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, 
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 String.format("Failed to theme company[%s] with null payload", companyId));
         Company companyEntity = searchForCompany(companyId);
-        searchForTheme (themeId);
+        searchForTheme(themeId);
         Theme updatedEntity = ThemeConverter.toEntityModel(resource);
         updatedEntity.setCompany(companyEntity);
         save(updatedEntity);
-        log.info(() -> String.format("Theme for company[%s] successfully updated", companyId));
+        log.debug("Theme for company {} successfully updated", companyId);
     }
 
     public void deleteById(UUID companyId, UUID themeId) {
         searchForCompany(companyId);
-        Theme entity = searchForTheme (themeId);
+        Theme entity = searchForTheme(themeId);
         try {
             repository.delete(entity);
-            log.info(() -> String.format("Theme[%s] for company[%s] successfully deleted", themeId, companyId));
+            log.debug("Theme {} for company {} successfully deleted", themeId, companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete theme[%s] for company [%s]", themeId, companyId);
             throw new LnFException(errorMessage);
@@ -99,7 +99,7 @@ public class ThemeService {
         List<Theme> entities = repository.findByCompanyId(companyId);
         try {
             repository.deleteAll(entities);
-            log.info(() -> String.format("Theme for company[%s] successfully deleted", companyId));
+            log.debug("Theme for company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to delete gsts for company [%s]", companyId);
             throw new LnFException(errorMessage);
@@ -129,7 +129,7 @@ public class ThemeService {
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
     }
 
-    private Theme searchForTheme (UUID themeId) {
+    private Theme searchForTheme(UUID themeId) {
         return repository.findById(themeId).
                 orElseThrow(() -> new LnFEntityNotFoundException(String.format("Theme with id [%s] does not exist", themeId)));
     }

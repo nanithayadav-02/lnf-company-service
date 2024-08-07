@@ -11,7 +11,7 @@ import com.technofacts.lnf.company.repository.ImageRepository;
 import com.technofacts.lnf.dto.company.ImageDto;
 import com.technofacts.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,12 +27,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log
+@Slf4j
 public class ImageService {
 
     public static final String S_S_S = "%s/%s/%s/";
@@ -51,8 +50,8 @@ public class ImageService {
         if (awsS3BucketEnabled) {
             String filePath = String.format(S_S_S, folderName, companyId, IMAGE);
             List<String> filePaths = fileService.findFilesInFolder(filePath);
-            if(filePaths == null || filePaths.isEmpty()) {
-                log.info(String.format("Image not found for company[%s]", companyId));
+            if (filePaths == null || filePaths.isEmpty()) {
+                log.debug("Image not found for company {}", companyId);
                 return null;
             }
             String fileName = Paths.get(filePaths.get(0)).getFileName().toString();
@@ -109,14 +108,14 @@ public class ImageService {
             if (awsS3BucketEnabled) {
                 String folder = String.format(S_S_S, folderName, companyId, IMAGE);
                 String filePath = uploadFile(folder, file);
-                log.info("File uploaded successfully to S3 bucket: " + filePath);
+                log.debug("File uploaded successfully to S3 bucket: " + filePath);
             } else {
                 Company company = searchForCompany(companyId);
                 Image entity = ImageConverter.toEntityModel(file, false);
                 entity.setCompany(company);
                 save(entity);
-                log.info(() -> String.format("Image [%s] for Company[%s] successfully created",
-                        file.getOriginalFilename(), companyId));
+                log.debug("Image {} for Company {} successfully created",
+                        file.getOriginalFilename(), companyId);
             }
         } catch (RuntimeException | IOException e) {
 
@@ -133,13 +132,13 @@ public class ImageService {
             if (awsS3BucketEnabled) {
                 String folder = String.format(S_S_S, folderName, companyId, IMAGE);
                 String filePath = uploadFile(folder, file);
-                log.info("File uploaded successfully to S3 bucket: " + filePath);
+                log.debug("File uploaded successfully to S3 bucket: " + filePath);
             } else {
                 searchForCompany(companyId);
                 Image entity = searchForImage(fileId);
                 Image updatedEntity = ImageConverter.toEntityModel(file, entity, false);
                 save(updatedEntity);
-                log.info(() -> String.format("Image [%s] for Company[%s] successfully updated", fileId, companyId));
+                log.debug("Image {} for Company {} successfully updated", fileId, companyId);
             }
         } catch (RuntimeException | IOException e) {
             String errorMessage = String.format("Failed to update file[%s] for company [%s]", fileId, companyId);
@@ -164,13 +163,13 @@ public class ImageService {
             String s3ObjectKey = String.format("%s/%s/%s/%s", folderName, companyId, IMAGE, fileName);
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileService.delete(filePaths);
-            log.info("S3 object deleted for company");
+            log.debug("S3 object deleted for company");
         } else {
             searchForCompany(companyId);
             Image entity = searchForImage(fileId);
             try {
                 repository.delete(entity);
-                log.info(() -> String.format("Image[%s] for company [%s] successfully deleted", fileId, companyId));
+                log.debug("Image {} for company {} successfully deleted", fileId, companyId);
             } catch (RuntimeException e) {
                 String errorMessage = String.format("Failed to delete Image[[%s] for company [%s]", fileId, companyId);
                 throw new LnFException(errorMessage);
