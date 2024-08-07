@@ -54,7 +54,7 @@ logging:
     org:
       springframework: INFO
     root: ERROR
-  com.technofacts.lnf.*: DEBUG
+  com.technofacts.lnf.company.*: DEBUG
 
 springdoc:
   api-docs:
