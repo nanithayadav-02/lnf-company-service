@@ -31,6 +31,10 @@ email:
   service:
     url: "http://localhost:8081/api/v3"
 
+company:
+  holidays:
+    template: "company-holidays"
+
 # Metrics Configuration
 management:
   endpoint:
