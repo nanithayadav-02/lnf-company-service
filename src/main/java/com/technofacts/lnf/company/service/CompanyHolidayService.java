@@ -18,6 +18,7 @@ import com.technofacts.lnf.util.RestUtil;
 import com.technofacts.lnf.util.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,6 +38,9 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
     private final ThymeleafDocumentService documentService;
     private final CompanyHolidayRepository repository;
     private final CompanyRepository companyRepository;
+
+    @Value("${company.holidays.template}")
+    private String companyHolidaysTemplate;
 
     @Override
     public Page<CompanyHolidayDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -92,7 +96,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
         dynamicData.put("listObjects", holidays);
 
         ThymeleafDocumentDto thymeleafDocumentDto = new ThymeleafDocumentDto();
-        thymeleafDocumentDto.setTemplateName("company-holidays");
+        thymeleafDocumentDto.setTemplateName(companyHolidaysTemplate);
         thymeleafDocumentDto.setFileName("company-holidays.pdf");
         thymeleafDocumentDto.setDynamicData(dynamicData);
 
