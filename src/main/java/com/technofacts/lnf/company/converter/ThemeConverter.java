@@ -6,6 +6,9 @@ import com.technofacts.lnf.dto.company.ThemeDto;
 
 public class ThemeConverter {
 
+    private ThemeConverter() {
+    }
+
     public static ThemeDto toTransportModel(Theme entity) {
         if (entity == null) {
             return null;

@@ -25,6 +25,8 @@ import java.util.UUID;
 @Slf4j
 public class CompanyAddressService {
 
+    public static final String ADDRESS_FOR_COMPANY_SUCCESSFULLY_CREATED = "Address for Company {} successfully created";
+    public static final String FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD = "Failed to create Address for company [%s] with null payload";
     private final CompanyAddressRepository repository;
     private final CompanyRepository companyRepository;
 
@@ -48,7 +50,7 @@ public class CompanyAddressService {
 
     public void create(UUID companyId, List<AddressDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create Address for company [%s] with null payload", companyId));
+                String.format(FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD, companyId));
         Company company = searchForCompany(companyId);
         List<CompanyAddress> entities = new ArrayList<>();
         resource.stream().filter(Objects::nonNull).forEach(addressDto -> {
@@ -57,26 +59,26 @@ public class CompanyAddressService {
             entities.add(entity);
         });
         save(entities);
-        log.debug("Address for Company {} successfully created", companyId);
+        log.debug(ADDRESS_FOR_COMPANY_SUCCESSFULLY_CREATED, companyId);
     }
 
     public void create(UUID companyId, AddressDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create Address for company [%s] with null payload", companyId));
+                String.format(FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD, companyId));
         Company companyEntity = searchForCompany(companyId);
         CompanyAddress entity = (CompanyAddress) AddressConverter.toEntityModel(resource, new CompanyAddress());
         entity.setCompany(companyEntity);
         save(entity);
-        log.debug("Address for Company {} successfully created", companyId);
+        log.debug(ADDRESS_FOR_COMPANY_SUCCESSFULLY_CREATED, companyId);
     }
 
     public void update(UUID companyId, UUID addressId, AddressDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create Address for company [%s] with null payload", companyId));
+                String.format(FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD, companyId));
         searchForCompany(companyId);
         CompanyAddress entity = searchForAddress(addressId);
         save((CompanyAddress) AddressConverter.toEntityModel(resource, entity));
-        log.debug("Address for Company {} successfully created", companyId);
+        log.debug(ADDRESS_FOR_COMPANY_SUCCESSFULLY_CREATED, companyId);
     }
 
     public void deleteById(UUID companyId, UUID addressId) {

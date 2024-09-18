@@ -1,7 +1,6 @@
 package com.technofacts.lnf.company.restapi;
 
 import com.technofacts.lnf.dto.file.FileDto;
-import com.technofacts.lnf.exception.LnFEntityNotFoundException;
 import com.technofacts.lnf.exception.LnFException;
 import com.technofacts.lnf.service.file.FileFolderService;
 import com.technofacts.lnf.service.file.FileService;
@@ -36,7 +35,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
     private String s3Service;
 
     @Autowired
-    public FileClientImpl(@Qualifier("fileService") WebClient webClient) {
+    public FileClientImpl(@Qualifier("fileWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 

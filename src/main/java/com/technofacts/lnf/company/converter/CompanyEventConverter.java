@@ -7,6 +7,9 @@ import com.technofacts.lnf.dto.company.CompanyEventDto;
 
 public class CompanyEventConverter {
 
+    private CompanyEventConverter() {
+    }
+
     public static CompanyEventDto toTransportModel(CompanyEvent entity) {
         return CompanyEventDto.builder()
                 .id(entity.getId())

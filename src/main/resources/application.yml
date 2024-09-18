@@ -19,17 +19,17 @@ connection:
   timeout: 10000
 
 server:
-  port: 8081
+  port: 8066
   servlet:
     context-path: /api/v3
 
 file:
   service:
-    url: "http://localhost:8081/api/v3"
+    url: "http://localhost:8088/api/v3"
 
 email:
   service:
-    url: "http://localhost:8081/api/v3"
+    url: "http://localhost:8089/api/v3"
 
 company:
   holidays:
