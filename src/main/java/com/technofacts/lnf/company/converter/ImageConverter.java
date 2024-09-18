@@ -9,6 +9,9 @@ import java.io.IOException;
 
 public class ImageConverter {
 
+    private ImageConverter() {
+    }
+
     public static ImageDto toTransportModel(Image entity) {
         if (entity == null) {
             return null;

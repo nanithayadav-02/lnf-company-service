@@ -31,6 +31,7 @@ import java.util.stream.IntStream;
 @Slf4j
 public class CompanyFileService {
 
+    public static final String S_S_S_S = "%s/%s/%s/%s";
     @Value("${aws.s3.bucket.enabled}")
     private boolean awsS3BucketEnabled;
     @Value("${aws.s3.bucket.folderName}")
@@ -69,7 +70,7 @@ public class CompanyFileService {
     public ResponseEntity<byte[]> findById(UUID companyId, String fileName) {
         try {
             searchForFileName(fileName);
-            String filePath = String.format("%s/%s/%s/%s", folderName, companyId, FILES, fileName);
+            String filePath = String.format(S_S_S_S, folderName, companyId, FILES, fileName);
             return fileService.findFileContent(filePath);
         } catch (RuntimeException e) {
             String errorMessage = String.format("file not found for Company[%s]", companyId);
@@ -108,7 +109,7 @@ public class CompanyFileService {
             CompanyFile entity = searchForFileName(fileName);
             CompanyFile updatedEntity = CompanyFileConverter.toEntityModel(resource, entity);
             save(updatedEntity);
-            String s3ObjectKey = String.format("%s/%s/%s/%s", folderName, companyId, FILES, fileName);
+            String s3ObjectKey = String.format(S_S_S_S, folderName, companyId, FILES, fileName);
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileService.delete(filePaths);
             //Before Updating the file we are deleting from the s3 bucket
@@ -126,7 +127,7 @@ public class CompanyFileService {
         searchForCompany(companyId);
         CompanyFile entity = searchForFileName(fileName);
         try {
-            String s3ObjectKey = String.format("%s/%s/%s/%s", folderName, companyId, FILES, fileName);
+            String s3ObjectKey = String.format(S_S_S_S, folderName, companyId, FILES, fileName);
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileService.delete(filePaths);
             log.debug("S3 object deleted for company file");
