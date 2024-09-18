@@ -6,6 +6,9 @@ import com.technofacts.lnf.dto.company.TaskDto;
 
 public class TaskConverter {
 
+    private TaskConverter() {
+    }
+
     public static TaskDto toTransportModel(Task entity) {
 
         if (entity == null) {

@@ -5,6 +5,9 @@ import com.technofacts.lnf.dto.company.CompanyHolidayDto;
 
 public class CompanyHolidayConverter {
 
+    private CompanyHolidayConverter() {
+    }
+
     public static CompanyHolidayDto toTransportModel(CompanyHoliday entity) {
         if (entity == null) {
             return null;

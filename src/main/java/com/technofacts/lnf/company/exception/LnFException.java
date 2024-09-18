@@ -2,7 +2,7 @@ package com.technofacts.lnf.company.exception;
 
 public class LnFException extends RuntimeException {
 
-    protected LnFExceptionType exceptionType;
+    protected final LnFExceptionType exceptionType;
 
     public LnFExceptionType getExceptionType() { return exceptionType; }
 

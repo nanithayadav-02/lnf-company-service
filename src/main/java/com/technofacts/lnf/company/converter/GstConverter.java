@@ -5,6 +5,9 @@ import com.technofacts.lnf.dto.company.GstDto;
 
 public class GstConverter {
 
+    private GstConverter() {
+    }
+
     public static GstDto toTransportModel(CompanyGst entity) {
         if (entity == null) {
             return null;

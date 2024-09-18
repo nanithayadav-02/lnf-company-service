@@ -19,7 +19,7 @@ public class EmailClientImpl extends BaseWebClientService implements ThymeleafDo
     private final WebClient webClient;
 
     @Autowired
-    public EmailClientImpl(@Qualifier("emailService") WebClient webClient) {
+    public EmailClientImpl(@Qualifier("emailWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 

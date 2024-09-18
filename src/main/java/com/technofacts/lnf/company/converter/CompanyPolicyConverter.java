@@ -8,6 +8,9 @@ import java.io.IOException;
 
 public class CompanyPolicyConverter {
 
+    private CompanyPolicyConverter() {
+    }
+
     public static CompanyPolicyDto toTransportModel(CompanyPolicy entity) {
         if (entity == null) {
             return null;

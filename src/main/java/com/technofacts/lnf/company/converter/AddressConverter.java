@@ -6,6 +6,9 @@ import com.technofacts.lnf.dto.company.AddressDto;
 
 public class AddressConverter {
 
+    private AddressConverter() {
+    }
+
     public static AddressDto toTransportModel(Address entity) {
         if (entity == null) {
             return null;

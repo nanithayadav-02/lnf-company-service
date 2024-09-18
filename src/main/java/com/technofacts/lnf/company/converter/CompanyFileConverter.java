@@ -5,6 +5,9 @@ import com.technofacts.lnf.dto.company.CompanyFileDto;
 
 public class CompanyFileConverter {
 
+    private CompanyFileConverter() {
+    }
+
     public static CompanyFileDto toTransportModel(CompanyFile entity) {
 
         if (entity == null) {
