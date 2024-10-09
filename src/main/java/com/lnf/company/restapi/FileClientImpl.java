@@ -36,6 +36,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -92,7 +93,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
 
     @Override
     public List<String> findFilesInFolder(String folderName) {
-        List<String> files;
+        List<String> files = new ArrayList<>();
         try {
             WebClient.RequestHeadersSpec<?> spec = webClient.get()
                     .uri(s3Service + "/folder-name?folderName={folderName}", folderName)
@@ -109,7 +110,6 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
 
         } catch (Exception ex) {
             log.error("Failed to get the files from the folder {}", ex.getMessage());
-            throw new LnFException("Failed to get the files from the folder", ex);
         }
         return files;
     }
