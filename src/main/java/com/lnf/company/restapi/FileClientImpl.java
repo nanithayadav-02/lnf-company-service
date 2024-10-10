@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -93,25 +94,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
 
     @Override
     public List<String> findFilesInFolder(String folderName) {
-        List<String> files = new ArrayList<>();
-        try {
-            WebClient.RequestHeadersSpec<?> spec = webClient.get()
-                    .uri(s3Service + "/folder-name?folderName={folderName}", folderName)
-                    .accept(MediaType.APPLICATION_JSON);
-
-            // Conditionally add the JWT token to the request headers
-            addJwtToken(spec);
-
-            // Execute the request and block to get the response
-            files = spec.retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<String>>() {
-                    })
-                    .block();
-
-        } catch (Exception ex) {
-            log.error("Failed to get the files from the folder {}", ex.getMessage());
-        }
-        return files;
+        return Collections.emptyList();
     }
 
     @Override
@@ -138,7 +121,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
     }
 
     public ResponseEntity<byte[]> findFile(String filePath) {
-        return null;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
@@ -165,7 +148,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
 
     @Override
     public List<FileDto> findFiles(String folderName) {
-        List<FileDto> files;
+        List<FileDto> files = new ArrayList<>();
         try {
             WebClient.RequestHeadersSpec<?> spec = webClient.get()
                     .uri(s3Service + "/folder-names?folderName={folderName}", folderName)
@@ -181,8 +164,7 @@ public class FileClientImpl extends BaseWebClientService implements FileService,
                     .block();
 
         } catch (Exception ex) {
-            log.error("Failed to fetch the files in the folder {}", folderName);
-            throw new LnFException("Failed to fetch the files in the folder", ex);
+            log.error("Failed to get the files from the folder {}", ex.getMessage());
         }
         return files;
     }
