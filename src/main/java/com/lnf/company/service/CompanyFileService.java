@@ -16,13 +16,13 @@
 
 package com.lnf.company.service;
 
+import com.lnf.company.converter.CompanyFileConverter;
 import com.lnf.company.exception.LnFBadRequestException;
 import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyFile;
 import com.lnf.company.repository.CompanyFileRepository;
-import com.lnf.company.converter.CompanyFileConverter;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.CompanyFileDto;
 import com.lnf.dto.file.FileDto;
@@ -70,17 +70,22 @@ public class CompanyFileService {
             String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(String.format("/lnf/company/%s/files/%s", companyId, fileName))
                     .toUriString();
-            CompanyFileDto companyFileDto = new CompanyFileDto();
-            CompanyFile entity = searchForFileName(fileName);
-            companyFileDto.setId(entity.getId());
-            companyFileDto.setFileName(fileName);
-            companyFileDto.setUrl(downloadURL);
-            companyFileDto.setDescription(entity.getDescription());
-            companyFileDto.setSize(file.getFileSize());
-            companyFileDto.setLastModified(file.getLastModified());
-            companyFileDtos.add(companyFileDto);
+
+            setCompanyFile(companyFileDtos, file, fileName, downloadURL);
         });
         return companyFileDtos;
+    }
+
+    private void setCompanyFile(List<CompanyFileDto> companyFileDtos, FileDto file, String fileName, String downloadURL) {
+        CompanyFileDto companyFileDto = new CompanyFileDto();
+        CompanyFile entity = searchForFileName(fileName);
+        companyFileDto.setId(entity.getId());
+        companyFileDto.setFileName(fileName);
+        companyFileDto.setUrl(downloadURL);
+        companyFileDto.setDescription(entity.getDescription());
+        companyFileDto.setSize(file.getFileSize());
+        companyFileDto.setLastModified(file.getLastModified());
+        companyFileDtos.add(companyFileDto);
     }
 
     public ResponseEntity<byte[]> findById(UUID companyId, String fileName) {
