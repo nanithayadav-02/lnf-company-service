@@ -22,9 +22,11 @@ import com.lnf.company.model.CompanyPolicy;
 import com.lnf.company.repository.CompanyPolicyRepository;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.CompanyPolicyDto;
+import com.lnf.dto.file.FileDto;
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.exception.LnFException;
+import com.lnf.service.file.FileFolderService;
 import com.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,10 +59,9 @@ public class CompanyPolicyService {
     private String folderName;
 
     private final CompanyRepository companyRepository;
-
     private final CompanyPolicyRepository repository;
-
     private final FileService fileService;
+    private final FileFolderService fileFolderService;
 
     public List<CompanyPolicyDto> findAll() {
         List<CompanyPolicy> entities = repository.findAll();
@@ -72,17 +73,14 @@ public class CompanyPolicyService {
     public List<CompanyPolicyDto> findByCompanyId(UUID companyId) {
         if (awsS3BucketEnabled) {
             String filePath = String.format(S_S_S, folderName, companyId, POLICIES);
-            List<String> files = fileService.findFilesInFolder(filePath);
+            List<FileDto> files = fileFolderService.findFiles(filePath);
             List<CompanyPolicyDto> companyPolicyDtos = new ArrayList<>();
             files.forEach(file -> {
-                String fileName = StringUtils.substringAfterLast(file, "/");
+                String fileName = StringUtils.substringAfterLast(file.getFileName(), "/");
                 String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                         .path(String.format("/lnf/company/%s/policies/%s", companyId, fileName))
                         .toUriString();
-                CompanyPolicyDto companyPolicyDto = new CompanyPolicyDto();
-                companyPolicyDto.setName(fileName);
-                companyPolicyDto.setUrl(downloadURL);
-                companyPolicyDtos.add(companyPolicyDto);
+                setCompanyPolicyDto(companyPolicyDtos, file, fileName, downloadURL);
             });
             return companyPolicyDtos;
         } else {
@@ -101,6 +99,15 @@ public class CompanyPolicyService {
             });
             return companyPolicyDtos;
         }
+    }
+
+    private void setCompanyPolicyDto(List<CompanyPolicyDto> companyPolicyDtos, FileDto file, String fileName,
+                                     String downloadURL) {
+        CompanyPolicyDto companyPolicyDto = new CompanyPolicyDto();
+        companyPolicyDto.setName(fileName);
+        companyPolicyDto.setUrl(downloadURL);
+        companyPolicyDto.setSize(file.getFileSize());
+        companyPolicyDtos.add(companyPolicyDto);
     }
 
     public ResponseEntity<byte[]> findById(UUID companyId, UUID policyId, String fileName) {

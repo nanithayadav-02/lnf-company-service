@@ -25,9 +25,12 @@ import com.lnf.company.model.Image;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.company.repository.ImageRepository;
 import com.lnf.dto.company.ImageDto;
+import com.lnf.dto.file.FileDto;
+import com.lnf.service.file.FileFolderService;
 import com.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -55,6 +58,7 @@ public class ImageService {
     private final CompanyRepository companyRepository;
     private final ImageRepository repository;
     private final FileService fileService;
+    private final FileFolderService fileFolderService;
 
     @Value("${aws.s3.bucket.enabled}")
     private boolean awsS3BucketEnabled;
@@ -65,18 +69,19 @@ public class ImageService {
     public ImageDto findByCompanyId(UUID companyId) {
         if (awsS3BucketEnabled) {
             String filePath = String.format(S_S_S, folderName, companyId, IMAGE);
-            List<String> filePaths = fileService.findFilesInFolder(filePath);
+            List<FileDto> filePaths = fileFolderService.findFiles(filePath);
             if (filePaths == null || filePaths.isEmpty()) {
                 log.debug("Image not found for company {}", companyId);
                 return null;
             }
-            String fileName = Paths.get(filePaths.get(0)).getFileName().toString();
+            String fileName = StringUtils.substringAfterLast(filePaths.get(0).getFileName(), "/");
             String url = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(String.format("/lnf/company/%s/image/%s", companyId, fileName))
                     .toUriString();
 
             ImageDto imageDto = new ImageDto();
             imageDto.setName(fileName);
+            imageDto.setSize(filePaths.get(0).getFileSize());
             imageDto.setUrl(url);
 
             return imageDto;
