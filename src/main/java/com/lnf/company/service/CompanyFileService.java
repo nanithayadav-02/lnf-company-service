@@ -62,13 +62,13 @@ public class CompanyFileService {
     private final FileFolderService fileFolderService;
 
     public List<CompanyFileDto> findByCompanyId(UUID companyId) {
-        String filePath = String.format(S_S_S, folderName, companyId, FILES);
+        String filePath = S_S_S.formatted(folderName, companyId, FILES);
         List<FileDto> files = fileFolderService.findFiles(filePath);
         List<CompanyFileDto> companyFileDtos = new ArrayList<>();
         files.forEach(file -> {
             String fileName = StringUtils.substringAfterLast(file.getFileName(), "/");
             String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(String.format("/lnf/company/%s/files/%s", companyId, fileName))
+                    .path("/lnf/company/%s/files/%s".formatted(companyId, fileName))
                     .toUriString();
 
             setCompanyFile(companyFileDtos, file, fileName, downloadURL);
@@ -91,16 +91,16 @@ public class CompanyFileService {
     public ResponseEntity<byte[]> findById(UUID companyId, String fileName) {
         try {
             searchForFileName(fileName);
-            String filePath = String.format(S_S_S_S, folderName, companyId, FILES, fileName);
+            String filePath = S_S_S_S.formatted(folderName, companyId, FILES, fileName);
             return fileService.findFileContent(filePath);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("file not found for Company[%s]", companyId);
+            String errorMessage = "file not found for Company[%s]".formatted(companyId);
             throw new LnFException(errorMessage, e);
         }
     }
 
     public void create(UUID companyId, MultipartFile[] files, List<CompanyFileDto> resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_FILE_NULL_PAYLOAD, companyId));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, FAILED_TO_CREATE_COMPANY_FILE_NULL_PAYLOAD.formatted(companyId));
         Company company = searchForCompany(companyId);
         List<CompanyFile> entities = new ArrayList<>();
 
@@ -113,11 +113,11 @@ public class CompanyFileService {
                 entities.add(entity);
                 save(entities);
 
-                String folder = String.format(S_S_S, folderName, companyId, FILES);
+                String folder = S_S_S.formatted(folderName, companyId, FILES);
                 String filePath = uploadFile(folder, file);
                 log.debug("File uploaded successfully to S3 bucket: " + filePath);
             } catch (RuntimeException e) {
-                String errorMessage = String.format("Failed to create file[%s] for company [%s]", file.getName(), companyId);
+                String errorMessage = "Failed to create file[%s] for company [%s]".formatted(file.getName(), companyId);
                 throw new LnFException(errorMessage, e);
             }
         });
@@ -125,21 +125,21 @@ public class CompanyFileService {
 
     public void update(UUID companyId, String fileName, MultipartFile file, CompanyFileDto resource) {
         com.lnf.exception.LnFBadRequestException.throwOnCondition(Objects::isNull, file,
-                String.format("Failed to update file for company [%s] with null payload", companyId));
+                "Failed to update file for company [%s] with null payload".formatted(companyId));
         try {
             CompanyFile entity = searchForFileName(fileName);
             CompanyFile updatedEntity = CompanyFileConverter.toEntityModel(resource, entity);
             save(updatedEntity);
-            String s3ObjectKey = String.format(S_S_S_S, folderName, companyId, FILES, fileName);
+            String s3ObjectKey = S_S_S_S.formatted(folderName, companyId, FILES, fileName);
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileService.delete(filePaths);
             //Before Updating the file we are deleting from the s3 bucket
-            String folder = String.format(S_S_S, folderName, companyId, FILES);
+            String folder = S_S_S.formatted(folderName, companyId, FILES);
             String filePath = uploadFile(folder, file);
             log.debug("File uploaded successfully to S3 bucket: " + filePath);
             log.debug("fileName {} for Company {} successfully updated", fileName, companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to update fileName[%s] for company [%s]", fileName, companyId);
+            String errorMessage = "Failed to update fileName[%s] for company [%s]".formatted(fileName, companyId);
             throw new LnFException(errorMessage, e);
         }
     }
@@ -148,14 +148,14 @@ public class CompanyFileService {
         searchForCompany(companyId);
         CompanyFile entity = searchForFileName(fileName);
         try {
-            String s3ObjectKey = String.format(S_S_S_S, folderName, companyId, FILES, fileName);
+            String s3ObjectKey = S_S_S_S.formatted(folderName, companyId, FILES, fileName);
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileService.delete(filePaths);
             log.debug("S3 object deleted for company file");
             repository.delete(entity);
             log.debug("file {} for company {} successfully deleted", fileName, companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete File[[%s] for company [%s]", fileName, companyId);
+            String errorMessage = "Failed to delete File[[%s] for company [%s]".formatted(fileName, companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -180,13 +180,13 @@ public class CompanyFileService {
 
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId)
-                .orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
+                .orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(companyId)));
     }
 
     private CompanyFile searchForFileName(String fileName) {
         return repository.findByFileName(fileName).
                 orElseThrow(() -> new LnFEntityNotFoundException(
-                        String.format("Company file with fileName [%s] does not exist", fileName)));
+                        "Company file with fileName [%s] does not exist".formatted(fileName)));
     }
 
     private String uploadFile(String folder, MultipartFile file) {

@@ -17,13 +17,13 @@
 package com.lnf.company.service;
 
 import com.google.common.collect.Lists;
+import com.lnf.company.converter.CompanyEventConverter;
 import com.lnf.company.exception.LnFBadRequestException;
 import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyEvent;
 import com.lnf.company.repository.CompanyEventRepository;
-import com.lnf.company.converter.CompanyEventConverter;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.CompanyEventDto;
 import com.lnf.service.common.page.PaginatedAndSortedService;
@@ -80,7 +80,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
 
     private Page<CompanyEventDto> validateAndGetPages(int page, Page<CompanyEvent> resultPage) {
         if (page > resultPage.getTotalPages()) {
-            throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " + "requested page [%d] does not exist", resultPage.getTotalPages(), page));
+            throw new LnFEntityNotFoundException(("Total number of pages [%d], " + "requested page [%d] does not exist").formatted(resultPage.getTotalPages(), page));
         }
         return resultPage.map(CompanyEventConverter::toTransportModel);
     }
@@ -93,11 +93,11 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
 
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId)
-                .orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
+                .orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(companyId)));
     }
 
     public void create(UUID companyId, CompanyEventDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD, companyId));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD.formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
         CompanyEvent entity = CompanyEventConverter.toEntityModel(resource, new CompanyEvent());
         entity.setCompany(companyEntity);
@@ -107,7 +107,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
 
 
     public void create(UUID companyId, List<CompanyEventDto> resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD, companyId));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD.formatted(companyId));
         Company company = searchForCompany(companyId);
         List<CompanyEvent> entities = new ArrayList<>();
         resource.stream().filter(Objects::nonNull).forEach(companyEventDto -> {
@@ -138,7 +138,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
     }
 
     private CompanyEvent searchForCompanyEvent(UUID eventId) {
-        return companyEventRepository.findById(eventId).orElseThrow(() -> new LnFEntityNotFoundException(String.format("companyEvent with id [%s] does not exist", eventId)));
+        return companyEventRepository.findById(eventId).orElseThrow(() -> new LnFEntityNotFoundException("companyEvent with id [%s] does not exist".formatted(eventId)));
     }
 
     public CompanyEventDto findById(UUID companyId, UUID eventId) {
@@ -147,7 +147,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
     }
 
     public void update(UUID companyId, UUID eventId, CompanyEventDto resource) {
-        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, String.format(FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD, companyId));
+        LnFBadRequestException.throwOnCondition(Objects::isNull, resource, FAILED_TO_CREATE_COMPANY_EVENT_NULL_PAYLOAD.formatted(companyId));
         searchForCompany(companyId);
         CompanyEvent entity = searchForCompanyEvent(eventId);
         save(CompanyEventConverter.toEntityModel(resource, entity));
@@ -162,7 +162,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
             companyEventRepository.delete(entity);
             log.debug("CompanyEvent {} for company {} successfully deleted", eventId, companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete CompanyEvent[[%s] for company [%s]", eventId, companyId);
+            String errorMessage = "Failed to delete CompanyEvent[[%s] for company [%s]".formatted(eventId, companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -174,7 +174,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
             companyEventRepository.deleteAll(entities);
             log.debug("CompanyEvent for company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete event for company [%s]", companyId);
+            String errorMessage = "Failed to delete event for company [%s]".formatted(companyId);
             throw new LnFException(errorMessage);
         }
     }

@@ -44,12 +44,12 @@ public class CompanyController {
     }
 
     @GetMapping(value = "/company", params = {"search"})
-    public List<CompanyDto> search(@RequestParam(value = "search") String search) {
+    public List<CompanyDto> search(@RequestParam String search) {
         return service.findAll(search);
     }
 
     @GetMapping(value = "/company/{companyCode}")
-    public CompanyDto findCompany(@PathVariable("companyCode") final String companyCode) {
+    public CompanyDto findCompany(@PathVariable final String companyCode) {
         return service.findByCompanyCode(companyCode);
     }
 
@@ -61,13 +61,13 @@ public class CompanyController {
 
     @PutMapping(value = "/company/{companyId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @RequestBody final CompanyDto resource) {
+    public void update(@PathVariable final UUID companyId, @RequestBody final CompanyDto resource) {
         service.update(companyId, resource);
     }
 
     @DeleteMapping(value = "/company/{companyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId) {
+    public void delete(@PathVariable final UUID companyId) {
         service.delete(companyId);
     }
 

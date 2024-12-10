@@ -36,7 +36,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -88,7 +88,7 @@ class CompanyNotesControllerTest extends BaseTestClass {
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
         // Pagination with  sortBy and sortOrder
-        pageRequest = new PageRequestDto(0, 10,null,null);
+        pageRequest = new PageRequestDto(0, 10, null, null);
         response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
@@ -107,12 +107,12 @@ class CompanyNotesControllerTest extends BaseTestClass {
     void findByCompanyId() throws Exception {
         List<NotesDto> expectedDto = Arrays.asList(mockNotes1(), mockNotes2());
 
-        given(service.findByCompanyId (any(UUID.class))).willReturn(expectedDto);
+        given(service.findByCompanyId(any(UUID.class))).willReturn(expectedDto);
 
         String url = "/lnf/company/" + companyId + "/notes";
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-notes.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-notes.json")
                         .toURI())));
 
         mockMvc.perform(get(url)
@@ -120,7 +120,7 @@ class CompanyNotesControllerTest extends BaseTestClass {
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
-        verify(service, times(1)).findByCompanyId (any(UUID.class));
+        verify(service, times(1)).findByCompanyId(any(UUID.class));
     }
 
     @Test
@@ -141,8 +141,8 @@ class CompanyNotesControllerTest extends BaseTestClass {
     @Test
     void createCompanyNotes() {
         // Arrange
-        List<NotesDto> mockNotes = List.of (mockNotes1 (), mockNotes2 ());
-        doNothing ().when (service).create (companyId, mockNotes);
+        List<NotesDto> mockNotes = List.of(mockNotes1(), mockNotes2());
+        doNothing().when(service).create(companyId, mockNotes);
         String url = "/lnf/company/" + companyId + "/notes";
 
         @SuppressWarnings("unchecked")
@@ -150,24 +150,24 @@ class CompanyNotesControllerTest extends BaseTestClass {
 
         // Act
         try {
-            mockMvc.perform (post (url)
-                            .contentType (APPLICATION_JSON)
-                            .content (asJsonString(mockNotes)))
-                    .andExpect (status ().isCreated());
+            mockMvc.perform(post(url)
+                            .contentType(APPLICATION_JSON)
+                            .content(asJsonString(mockNotes)))
+                    .andExpect(status().isCreated());
         } catch (Exception e) {
-            fail ("Unexpected exception: " + e.getMessage());
+            fail("Unexpected exception: " + e.getMessage());
         }
 
         // Assert
-        verify (service).create (eq(companyId), captor.capture());
+        verify(service).create(eq(companyId), captor.capture());
         List<NotesDto> actualNotes = captor.getValue();
 
         // Check if the lists have the same size
         assertEquals(actualNotes.size(), actualNotes.size(), "The number of notes created should match");
 
         // Check if the details of each event match
-        for (int i = 0; i < actualNotes.size (); i++) {
-            assertEquals (actualNotes.get(i).getNotes(), actualNotes.get(i).getNotes (),
+        for (int i = 0; i < actualNotes.size(); i++) {
+            assertEquals(actualNotes.get(i).getNotes(), actualNotes.get(i).getNotes(),
                     "Notes should match for company at index " + i);
         }
     }
@@ -192,10 +192,10 @@ class CompanyNotesControllerTest extends BaseTestClass {
     }
 
     @Test
-    void update () {
+    void update() {
         // Arrange
-        UUID notesId = UUID.fromString ("cfe94b9f-c86f-4733-be96-a9b619f7bca7");
-        NotesDto updatedNotes = mockNotes1 ();
+        UUID notesId = UUID.fromString("cfe94b9f-c86f-4733-be96-a9b619f7bca7");
+        NotesDto updatedNotes = mockNotes1();
         updatedNotes.setId(notesId);
 
         Mockito.doNothing().when(service).update(Mockito.eq(companyId), Mockito.eq(notesId), Mockito.any(NotesDto.class));
@@ -217,7 +217,7 @@ class CompanyNotesControllerTest extends BaseTestClass {
         NotesDto actualNotes = captor.getValue();
 
         assertEquals(updatedNotes.getId(), actualNotes.getId(), "Notes IDs should match");
-        assertEquals(updatedNotes.getNotes (), actualNotes.getNotes (), "notes  should match");
+        assertEquals(updatedNotes.getNotes(), actualNotes.getNotes(), "notes  should match");
     }
 
     @Test
@@ -228,13 +228,13 @@ class CompanyNotesControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(service).deleteByCompanyId (companyId);
+        verify(service).deleteByCompanyId(companyId);
     }
 
     @Test
     void deleteByCompanyIdAndId() throws Exception {
         UUID id = UUID.randomUUID();
-        String urlTemplate = String.format("/lnf/company/%s/notes/%s", companyId, id);
+        String urlTemplate = "/lnf/company/%s/notes/%s".formatted(companyId, id);
 
         mockMvc.perform(delete(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -252,9 +252,9 @@ class CompanyNotesControllerTest extends BaseTestClass {
     }
 
     private NotesDto createNotes(String id, String notes) {
-        NotesDto dto = new NotesDto ();
+        NotesDto dto = new NotesDto();
         dto.setId(UUID.fromString(id));
-        dto.setNotes (notes);
+        dto.setNotes(notes);
 
         return dto;
     }
@@ -270,8 +270,8 @@ class CompanyNotesControllerTest extends BaseTestClass {
 
     private static String asJsonString(final Object obj) {
         try {
-            return new ObjectMapper ()
-                    .registerModule(new JavaTimeModule ())
+            return new ObjectMapper()
+                    .registerModule(new JavaTimeModule())
                     .writeValueAsString(obj);
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -32,7 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -57,7 +57,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
     @BeforeAll
     void beforeAll() {
-       //TobeImplemented
+        //TobeImplemented
     }
 
     @BeforeEach
@@ -81,7 +81,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
         // Pagination with  sortBy and sortOrder
-        pageRequest = new PageRequestDto(0, 10,null,null);
+        pageRequest = new PageRequestDto(0, 10, null, null);
         response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
@@ -110,7 +110,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         given(service.findEventsByTypeAndDate(eventType, date)).willReturn(events);
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
         mockMvc.perform(get(url, eventType, date))
@@ -132,7 +132,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         given(service.findEventsByCurrentDate(null)).willReturn(events);
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
         mockMvc.perform(get(url)
@@ -144,7 +144,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     }
 
     @Test
-    void findEventsByEventTypeAndDateRange () throws Exception {
+    void findEventsByEventTypeAndDateRange() throws Exception {
         EventType eventType = EventType.Birthday;
         LocalDate startDate = LocalDate.of(2024, 3, 25);
         LocalDate endDate = LocalDate.of(2024, 4, 2);
@@ -157,7 +157,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         given(service.findEventsByEventTypeAndDateRange(eventType, startDate, endDate)).willReturn(events);
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
         mockMvc.perform(get(url, String.valueOf(eventType), startDate.toString(), endDate.toString()))
@@ -168,7 +168,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     }
 
     @Test
-    void findEventsByWeek () throws Exception {
+    void findEventsByWeek() throws Exception {
         EventType eventType = EventType.Birthday;
         int week = 1;
         CompanyEventDto event1 = mockEvent1();
@@ -180,7 +180,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         given(service.findEventsByWeek(eventType, week)).willReturn(events);
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
         mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(week)))
@@ -191,7 +191,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     }
 
     @Test
-    void findEventsByMonth () throws Exception {
+    void findEventsByMonth() throws Exception {
         EventType eventType = EventType.Birthday;
         int month = 2;
         CompanyEventDto event1 = mockEvent1();
@@ -203,7 +203,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         given(service.findEventsByMonth(eventType, month)).willReturn(events);
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
         mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(month)))
@@ -214,7 +214,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     }
 
     @Test
-    void findEventsByYear () throws Exception {
+    void findEventsByYear() throws Exception {
         EventType eventType = EventType.Birthday;
         int year = 2024;
         CompanyEventDto event1 = mockEvent1();
@@ -226,7 +226,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         given(service.findEventsByYear(eventType, year)).willReturn(events);
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
         mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(year)))
@@ -237,7 +237,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     }
 
     @Test
-    void findEventsByMonthAndYear () throws Exception {
+    void findEventsByMonthAndYear() throws Exception {
         EventType eventType = EventType.Birthday;
         int month = 2;
         int year = 2024;
@@ -250,10 +250,10 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         given(service.findEventsByMonthAndYear(eventType, month, year)).willReturn(events);
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
                         .toURI())));
 
-        mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(month),  String.valueOf(year)))
+        mockMvc.perform(get(url, String.valueOf(eventType), String.valueOf(month), String.valueOf(year)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
@@ -261,17 +261,17 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     }
 
     private CompanyEventDto mockEvent1() {
-        return  createEvent("019d9f96-8f91-4725-9056-ed022b4cb65f", "Pritham k Shende",
+        return createEvent("019d9f96-8f91-4725-9056-ed022b4cb65f", "Pritham k Shende",
                 "25th birthday");
     }
 
     private CompanyEventDto mockEvent2() {
-        return  createEvent("9060225c-f356-45b4-a89a-ef91ea859e60", "Kushbu Sharma",
+        return createEvent("9060225c-f356-45b4-a89a-ef91ea859e60", "Kushbu Sharma",
                 "28th birthday");
     }
 
     private CompanyEventDto createEvent(String id, String assignTo, String eventDescription) {
-        CompanyEventDto dto = new CompanyEventDto ();
+        CompanyEventDto dto = new CompanyEventDto();
         dto.setId(UUID.fromString(id));
         dto.setEventType("Birthday");
         dto.setDateAndTime(LocalDate.parse(("2024-04-02")));
