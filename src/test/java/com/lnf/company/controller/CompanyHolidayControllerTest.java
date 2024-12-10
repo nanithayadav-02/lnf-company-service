@@ -45,7 +45,8 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -104,7 +105,7 @@ class CompanyHolidayControllerTest extends BaseTestClass {
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
         // Pagination with  sortBy and sortOrder
-        pageRequest = new PageRequestDto(0, 10,null,null);
+        pageRequest = new PageRequestDto(0, 10, null, null);
         response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, holidayService);
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
@@ -126,7 +127,7 @@ class CompanyHolidayControllerTest extends BaseTestClass {
                 .willReturn(Arrays.asList(mockHoliday1(), mockHoliday2()));
 
         // When & Then
-        mockMvc.perform(get(String.format("/lnf/company/%s/holidays/%d/%s", companyId, 2024, "Hyderabad")))
+        mockMvc.perform(get("/lnf/company/%s/holidays/%d/%s".formatted(companyId, 2024, "Hyderabad")))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("New Year")))
                 .andExpect(content().string(containsString("Independence Day")));
@@ -239,9 +240,9 @@ class CompanyHolidayControllerTest extends BaseTestClass {
 
     @Test
     void shouldDeleteHolidayByIdAndCompanyId() throws Exception {
-             UUID holidayId = UUID.randomUUID();
+        UUID holidayId = UUID.randomUUID();
 
-        String urlTemplate = String.format("/lnf/company/%s/holidays/%s", companyId, holidayId);
+        String urlTemplate = "/lnf/company/%s/holidays/%s".formatted(companyId, holidayId);
 
         mockMvc.perform(delete(urlTemplate))
                 .andExpect(status().isNoContent());

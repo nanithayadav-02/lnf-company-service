@@ -32,7 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,7 +73,7 @@ class ThemeControllerTest extends BaseTestClass {
         String url = "/lnf/company/" + companyId + "/theme";
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-theme.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-theme.json")
                         .toURI())));
 
         mockMvc.perform(get(url)
@@ -102,35 +102,35 @@ class ThemeControllerTest extends BaseTestClass {
     @Test
     void createTheme() {
         // Arrange
-        List<ThemeDto> mockTheme = List.of (mockTheme1(), mockTheme2());
-        doNothing ().when (service).create (companyId, mockTheme);
+        List<ThemeDto> mockTheme = List.of(mockTheme1(), mockTheme2());
+        doNothing().when(service).create(companyId, mockTheme);
         String url = "/lnf/company/" + companyId + "/theme";
 
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<ThemeDto>> captor = ArgumentCaptor.forClass (List.class);
+        ArgumentCaptor<List<ThemeDto>> captor = ArgumentCaptor.forClass(List.class);
 
         // Act
         try {
-            mockMvc.perform (post (url)
-                            .contentType (APPLICATION_JSON)
-                            .content (asJsonString (mockTheme)))
-                    .andExpect (status ().isCreated ());
+            mockMvc.perform(post(url)
+                            .contentType(APPLICATION_JSON)
+                            .content(asJsonString(mockTheme)))
+                    .andExpect(status().isCreated());
         } catch (Exception e) {
-            fail ("Unexpected exception: " + e.getMessage ());
+            fail("Unexpected exception: " + e.getMessage());
         }
 
         // Assert
-        verify (service).create (eq (companyId), captor.capture ());
-        List<ThemeDto> actualThemes = captor.getValue ();
+        verify(service).create(eq(companyId), captor.capture());
+        List<ThemeDto> actualThemes = captor.getValue();
 
         // Check if the lists have the same size
-        assertEquals (actualThemes.size (), actualThemes.size (), "The number of themes created should match");
+        assertEquals(actualThemes.size(), actualThemes.size(), "The number of themes created should match");
 
         // Check if the details of each event match
-        for (int i = 0; i < actualThemes.size (); i++) {
-            assertEquals (actualThemes.get (i).getType(), actualThemes.get (i).getType(),
+        for (int i = 0; i < actualThemes.size(); i++) {
+            assertEquals(actualThemes.get(i).getType(), actualThemes.get(i).getType(),
                     "location should match for company at index " + i);
-            assertEquals (actualThemes.get (i).getValue(), actualThemes.get (i).getValue(),
+            assertEquals(actualThemes.get(i).getValue(), actualThemes.get(i).getValue(),
                     "number should match for company at index " + i);
         }
     }
@@ -138,7 +138,7 @@ class ThemeControllerTest extends BaseTestClass {
     @Test
     void updateTheme() {
         // Arrange
-        UUID themeId = UUID.fromString ("019d9f96-8f91-4725-9056-ed022b4cb65f");
+        UUID themeId = UUID.fromString("019d9f96-8f91-4725-9056-ed022b4cb65f");
         ThemeDto updatedTheme = mockTheme2();
         updatedTheme.setId(themeId);
 
@@ -173,13 +173,13 @@ class ThemeControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(service).deleteByCompanyId (companyId);
+        verify(service).deleteByCompanyId(companyId);
     }
 
     @Test
     void testDeleteByCompanyIdAndId() throws Exception {
         UUID id = UUID.randomUUID();
-        String urlTemplate = String.format("/lnf/company/%s/theme/%s", companyId, id);
+        String urlTemplate = "/lnf/company/%s/theme/%s".formatted(companyId, id);
 
         mockMvc.perform(delete(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))

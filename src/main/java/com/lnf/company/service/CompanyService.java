@@ -17,11 +17,11 @@
 package com.lnf.company.service;
 
 import com.google.common.collect.Lists;
+import com.lnf.company.converter.CompanyConverter;
 import com.lnf.company.exception.LnFBadRequestException;
 import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
-import com.lnf.company.converter.CompanyConverter;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.CompanyDto;
 import com.lnf.service.common.page.PaginatedAndSortedService;
@@ -145,8 +145,8 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     private Page<CompanyDto> validateAndGetPages(int page, Page<Company> resultPage) {
         if (page > resultPage.getTotalPages()) {
-            throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " +
-                    "requested page [%d] does not exist", resultPage.getTotalPages(), page));
+            throw new LnFEntityNotFoundException(("Total number of pages [%d], " +
+                    "requested page [%d] does not exist").formatted(resultPage.getTotalPages(), page));
         }
         return resultPage.map(CompanyConverter::toTransportModel);
     }
@@ -169,7 +169,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
     }
 
     private LnFEntityNotFoundException entityNotFoundException(Object companyIdentifier) {
-        return new LnFEntityNotFoundException(String.format("Company with id/code [%s] does not exist", companyIdentifier));
+        return new LnFEntityNotFoundException("Company with id/code [%s] does not exist".formatted(companyIdentifier));
     }
 
 }

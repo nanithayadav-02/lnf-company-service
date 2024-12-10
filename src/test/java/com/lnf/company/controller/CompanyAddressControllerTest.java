@@ -32,7 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -68,14 +68,14 @@ class CompanyAddressControllerTest extends BaseTestClass {
 
     @Test
     void findByCompanyId() throws Exception {
-        List<AddressDto> expectedDto = Arrays.asList(mockAddress1(),mockAddress2());
+        List<AddressDto> expectedDto = Arrays.asList(mockAddress1(), mockAddress2());
 
-        given(service.findByCompanyId (any(UUID.class))).willReturn(expectedDto);
+        given(service.findByCompanyId(any(UUID.class))).willReturn(expectedDto);
 
         String url = "/lnf/company/" + companyId + "/address";
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-addresses.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-addresses.json")
                         .toURI())));
 
         mockMvc.perform(get(url)
@@ -83,7 +83,7 @@ class CompanyAddressControllerTest extends BaseTestClass {
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
-        verify(service, times(1)).findByCompanyId (any(UUID.class));
+        verify(service, times(1)).findByCompanyId(any(UUID.class));
     }
 
     @Test
@@ -152,13 +152,13 @@ class CompanyAddressControllerTest extends BaseTestClass {
 
     @Test
     void update() {
-        UUID id = UUID.fromString ("2c3d8b47-83d7-4e6c-9fb7-9845cfb2f157");
+        UUID id = UUID.fromString("2c3d8b47-83d7-4e6c-9fb7-9845cfb2f157");
 
         AddressDto updatedAddress = mockAddress2();
         updatedAddress.setId(companyId);
 
-        Mockito.doNothing().when(service).update(Mockito.eq(companyId),eq(id), Mockito.any(AddressDto.class));
-        String urlTemplate = String.format("/lnf/company/%s/address/%s", companyId, id);
+        Mockito.doNothing().when(service).update(Mockito.eq(companyId), eq(id), Mockito.any(AddressDto.class));
+        String urlTemplate = "/lnf/company/%s/address/%s".formatted(companyId, id);
         ArgumentCaptor<AddressDto> captor = ArgumentCaptor.forClass(AddressDto.class);
 
         // Act
@@ -197,13 +197,13 @@ class CompanyAddressControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(service).deleteByCompanyId (companyId);
+        verify(service).deleteByCompanyId(companyId);
     }
 
     @Test
     void testDeleteByCompanyIdAndId() throws Exception {
         UUID id = UUID.randomUUID();
-        String urlTemplate = String.format("/lnf/company/%s/address/%s", companyId, id);
+        String urlTemplate = "/lnf/company/%s/address/%s".formatted(companyId, id);
 
         mockMvc.perform(delete(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))

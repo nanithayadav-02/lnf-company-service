@@ -83,7 +83,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
 
     public void create(UUID companyId, List<NotesDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create notes for company [%s] with null payload", companyId));
+                "Failed to create notes for company [%s] with null payload".formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
         List<CompanyNotes> entities = new ArrayList<>();
         resource.stream().filter(Objects::nonNull).forEach(notesDto -> {
@@ -97,7 +97,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
 
     public void create(UUID companyId, NotesDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create notes for company [%s] with null payload", companyId));
+                "Failed to create notes for company [%s] with null payload".formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
         CompanyNotes entity = CompanyNotesConverter.toEntityModel(resource);
         entity.setCompany(companyEntity);
@@ -107,7 +107,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
 
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
+                orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(companyId)));
     }
 
     private void save(List<CompanyNotes> entities) {
@@ -139,7 +139,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
 
     private CompanyNotes searchForNotes(UUID notesId) {
         return companyNotesRepository.findById(notesId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("notes with id [%s] does not exist", notesId)));
+                orElseThrow(() -> new LnFEntityNotFoundException("notes with id [%s] does not exist".formatted(notesId)));
     }
 
     public void deleteById(UUID companyId, UUID notesId) {
@@ -149,7 +149,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
             companyNotesRepository.delete(entity);
             log.debug("Notes {} for company {} successfully deleted", notesId, companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Notes[%s] for company [%s]", notesId, companyId);
+            String errorMessage = "Failed to delete Notes[%s] for company [%s]".formatted(notesId, companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -161,7 +161,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
             companyNotesRepository.deleteAll(entities);
             log.debug("Notes for company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete notes for company [%s]", companyId);
+            String errorMessage = "Failed to delete notes for company [%s]".formatted(companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -180,8 +180,8 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
 
     private Page<NotesDto> validateAndGetPages(int page, Page<CompanyNotes> resultPage) {
         if (page > resultPage.getTotalPages()) {
-            throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " +
-                    "requested page [%d] does not exist", resultPage.getTotalPages(), page));
+            throw new LnFEntityNotFoundException(("Total number of pages [%d], " +
+                    "requested page [%d] does not exist").formatted(resultPage.getTotalPages(), page));
         }
         return resultPage.map(CompanyNotesConverter::toTransportModel);
     }

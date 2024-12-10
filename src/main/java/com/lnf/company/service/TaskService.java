@@ -75,7 +75,7 @@ public class TaskService implements PaginatedAndSortedService<TaskDto> {
 
     private Page<TaskDto> validateAndGetPages(int page, Page<Task> resultPage) {
         if (page > resultPage.getTotalPages()) {
-            throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " + "requested page [%d] does not exist", resultPage.getTotalPages(), page));
+            throw new LnFEntityNotFoundException(("Total number of pages [%d], " + "requested page [%d] does not exist").formatted(resultPage.getTotalPages(), page));
         }
         return resultPage.map(TaskConverter::toTransportModel);
     }
@@ -118,7 +118,7 @@ public class TaskService implements PaginatedAndSortedService<TaskDto> {
 
     private Task searchForTask(UUID taskId) {
         return repository.findById(taskId)
-                .orElseThrow(() -> new LnFEntityNotFoundException(String.format("Task with id [%s] does not exist", taskId)));
+                .orElseThrow(() -> new LnFEntityNotFoundException("Task with id [%s] does not exist".formatted(taskId)));
     }
 
 
@@ -137,7 +137,7 @@ public class TaskService implements PaginatedAndSortedService<TaskDto> {
             repository.delete(entity);
             log.debug("Task {} successfully deleted", taskId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Task[%s]", taskId);
+            String errorMessage = "Failed to delete Task[%s]".formatted(taskId);
             throw new LnFException(errorMessage);
         }
     }

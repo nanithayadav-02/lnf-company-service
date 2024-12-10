@@ -22,7 +22,6 @@ import com.lnf.exception.LnFException;
 import com.lnf.service.email.ThymeleafDocumentService;
 import com.lnf.service.email.ThymeleafEmailService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -34,7 +33,6 @@ public class EmailClientImpl extends BaseWebClientService implements ThymeleafDo
 
     private final WebClient webClient;
 
-    @Autowired
     public EmailClientImpl(@Qualifier("emailWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
