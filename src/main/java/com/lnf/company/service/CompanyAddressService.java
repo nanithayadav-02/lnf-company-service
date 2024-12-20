@@ -16,13 +16,13 @@
 
 package com.lnf.company.service;
 
+import com.lnf.company.converter.AddressConverter;
 import com.lnf.company.exception.LnFBadRequestException;
 import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyAddress;
 import com.lnf.company.repository.CompanyAddressRepository;
-import com.lnf.company.converter.AddressConverter;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.AddressDto;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +66,7 @@ public class CompanyAddressService {
 
     public void create(UUID companyId, List<AddressDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format(FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD, companyId));
+                FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD.formatted(companyId));
         Company company = searchForCompany(companyId);
         List<CompanyAddress> entities = new ArrayList<>();
         resource.stream().filter(Objects::nonNull).forEach(addressDto -> {
@@ -80,7 +80,7 @@ public class CompanyAddressService {
 
     public void create(UUID companyId, AddressDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format(FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD, companyId));
+                FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD.formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
         CompanyAddress entity = (CompanyAddress) AddressConverter.toEntityModel(resource, new CompanyAddress());
         entity.setCompany(companyEntity);
@@ -90,7 +90,7 @@ public class CompanyAddressService {
 
     public void update(UUID companyId, UUID addressId, AddressDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format(FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD, companyId));
+                FAILED_TO_CREATE_ADDRESS_FOR_COMPANY_S_WITH_NULL_PAYLOAD.formatted(companyId));
         searchForCompany(companyId);
         CompanyAddress entity = searchForAddress(addressId);
         save((CompanyAddress) AddressConverter.toEntityModel(resource, entity));
@@ -104,7 +104,7 @@ public class CompanyAddressService {
             repository.delete(entity);
             log.debug("Address {} for company {} successfully deleted", addressId, companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Address[[%s] for company [%s]", addressId, companyId);
+            String errorMessage = "Failed to delete Address[[%s] for company [%s]".formatted(addressId, companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -116,7 +116,7 @@ public class CompanyAddressService {
             repository.deleteAll(entities);
             log.debug("Address for Company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Address for company [%s]", companyId);
+            String errorMessage = "Failed to delete Address for company [%s]".formatted(companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -143,13 +143,13 @@ public class CompanyAddressService {
 
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist",
+                orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(
                         companyId)));
     }
 
     private CompanyAddress searchForAddress(UUID addressId) {
         return repository.findById(addressId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Address with id [%s] does not exist",
+                orElseThrow(() -> new LnFEntityNotFoundException("Address with id [%s] does not exist".formatted(
                         addressId)));
     }
 

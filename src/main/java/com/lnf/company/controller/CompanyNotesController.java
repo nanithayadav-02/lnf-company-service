@@ -43,43 +43,43 @@ public class CompanyNotesController {
     }
 
     @GetMapping(value = "/company/{companyId}/notes")
-    public List<NotesDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) {
+    public List<NotesDto> findByCompanyId(@PathVariable final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
     @GetMapping(value = "/company/{companyId}/notes/{notesID}")
-    public NotesDto findById(@PathVariable("companyId") final UUID companyId, @PathVariable("notesID") final UUID notesID) {
+    public NotesDto findById(@PathVariable final UUID companyId, @PathVariable final UUID notesID) {
         return service.findById(companyId, notesID);
     }
 
     @PostMapping(value = "/company/{companyId}/notes")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final UUID companyId, @RequestBody final List<NotesDto> resource) {
+    public void create(@PathVariable final UUID companyId, @RequestBody final List<NotesDto> resource) {
         service.create(companyId, resource);
     }
 
     @PostMapping(value = "/company/{companyId}/note")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final UUID companyId, @RequestBody final NotesDto resource) {
+    public void create(@PathVariable final UUID companyId, @RequestBody final NotesDto resource) {
         service.create(companyId, resource);
     }
 
     @PutMapping(value = "/company/{companyId}/notes/{notesId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("notesId") final UUID notesId,
+    public void update(@PathVariable final UUID companyId, @PathVariable final UUID notesId,
                        @RequestBody final NotesDto resource) {
         service.update(companyId, notesId, resource);
     }
 
     @DeleteMapping(value = "/company/{companyId}/notes")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId) {
+    public void delete(@PathVariable final UUID companyId) {
         service.deleteByCompanyId(companyId);
     }
 
     @DeleteMapping(value = "/company/{companyId}/notes/{notesId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId, @PathVariable("notesId") final UUID notesId) {
+    public void delete(@PathVariable final UUID companyId, @PathVariable final UUID notesId) {
         service.deleteById(companyId, notesId);
     }
 }

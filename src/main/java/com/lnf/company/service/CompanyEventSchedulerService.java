@@ -16,11 +16,11 @@
 
 package com.lnf.company.service;
 
+import com.lnf.company.converter.CompanyEventConverter;
 import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.model.CompanyEvent;
 import com.lnf.company.model.enums.EventType;
 import com.lnf.company.repository.CompanyEventRepository;
-import com.lnf.company.converter.CompanyEventConverter;
 import com.lnf.dto.company.CompanyEventDto;
 import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
@@ -126,7 +126,7 @@ public class CompanyEventSchedulerService implements PaginatedAndSortedService<C
     }
 
     private String prepareErrorMessage(int totalPages, int requestedPage) {
-        return String.format("Total number of pages [%d], requested page [%d] does not exist",
+        return "Total number of pages [%d], requested page [%d] does not exist".formatted(
                 totalPages, requestedPage);
     }
 

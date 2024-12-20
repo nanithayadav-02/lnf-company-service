@@ -46,32 +46,32 @@ public class WebClientConfiguration {
     private int timeOut;
 
     @Bean
-    public WebClient emailWebClient () {
-        return createWebClient (emailServiceUrl);
+    WebClient emailWebClient() {
+        return createWebClient(emailServiceUrl);
     }
 
     @Bean
-    public WebClient fileWebClient () {
-        return createWebClient (fileServiceUrl);
+    WebClient fileWebClient() {
+        return createWebClient(fileServiceUrl);
     }
 
-    private WebClient createWebClient (String baseUrl) {
+    private WebClient createWebClient(String baseUrl) {
 
-        ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder ()
-                .codecs (codecs -> codecs.defaultCodecs ().maxInMemorySize (maxInMemorySize))
-                .build ();
+        ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
+                .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(maxInMemorySize))
+                .build();
 
-        HttpClient httpClient = HttpClient.create ()
-                .option (ChannelOption.CONNECT_TIMEOUT_MILLIS, timeOut)
-                .responseTimeout (Duration.ofMillis (timeOut))
-                .doOnConnected (conn -> conn.addHandlerLast (new ReadTimeoutHandler (timeOut, TimeUnit.MILLISECONDS))
-                        .addHandlerLast (new WriteTimeoutHandler (timeOut, TimeUnit.MILLISECONDS)));
+        HttpClient httpClient = HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeOut)
+                .responseTimeout(Duration.ofMillis(timeOut))
+                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(timeOut, TimeUnit.MILLISECONDS))
+                        .addHandlerLast(new WriteTimeoutHandler(timeOut, TimeUnit.MILLISECONDS)));
 
-        return WebClient.builder ()
-                .baseUrl (baseUrl)
-                .clientConnector (new ReactorClientHttpConnector (httpClient))
-                .exchangeStrategies (exchangeStrategies)
-                .build ();
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .exchangeStrategies(exchangeStrategies)
+                .build();
     }
 
 }
