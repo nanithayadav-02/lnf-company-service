@@ -43,7 +43,7 @@ public class TaskController {
     }
 
     @GetMapping(value = "/company/task/{taskId}")
-    public TaskDto findById(@PathVariable("taskId") final UUID taskId) {
+    public TaskDto findById(@PathVariable final UUID taskId) {
         return service.findByTaskId(taskId);
     }
 
@@ -55,14 +55,14 @@ public class TaskController {
 
     @PutMapping(value = "/company/task/{taskId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("taskId") final UUID taskId,
+    public void update(@PathVariable final UUID taskId,
                        @RequestBody final TaskDto resource) {
         service.update(taskId, resource);
     }
 
     @DeleteMapping(value = "/company/task/{taskId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete( @PathVariable("taskId") final UUID taskId) {
+    public void delete(@PathVariable final UUID taskId) {
         service.deleteById(taskId);
     }
 

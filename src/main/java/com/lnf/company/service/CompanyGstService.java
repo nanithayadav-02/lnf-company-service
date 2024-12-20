@@ -65,7 +65,7 @@ public class CompanyGstService {
 
     public void create(UUID companyId, List<GstDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create gst for company [%s] with null payload", companyId));
+                "Failed to create gst for company [%s] with null payload".formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
         List<CompanyGst> entities = new ArrayList<>();
         resource.stream().filter(Objects::nonNull).forEach(gstDto -> {
@@ -79,7 +79,7 @@ public class CompanyGstService {
 
     public void create(UUID companyId, GstDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create gst for company [%s] with null payload", companyId));
+                "Failed to create gst for company [%s] with null payload".formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
         CompanyGst entity = GstConverter.toEntityModel(resource);
         entity.setCompany(companyEntity);
@@ -89,7 +89,7 @@ public class CompanyGstService {
 
     public void update(UUID companyId, UUID gstId, GstDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to gst company[%s] with null payload", companyId));
+                "Failed to gst company[%s] with null payload".formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
         searchForGst(gstId);
         CompanyGst updatedEntity = GstConverter.toEntityModel(resource);
@@ -105,7 +105,7 @@ public class CompanyGstService {
             repository.delete(entity);
             log.debug("Gst {} for company {} successfully deleted", gstId, companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete gst[%s] for company [%s]", gstId, companyId);
+            String errorMessage = "Failed to delete gst[%s] for company [%s]".formatted(gstId, companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -117,7 +117,7 @@ public class CompanyGstService {
             repository.deleteAll(entities);
             log.debug("Gsts for company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete gsts for company [%s]", companyId);
+            String errorMessage = "Failed to delete gsts for company [%s]".formatted(companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -142,12 +142,12 @@ public class CompanyGstService {
 
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist", companyId)));
+                orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(companyId)));
     }
 
     private CompanyGst searchForGst(UUID gstId) {
         return repository.findById(gstId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Gst with id [%s] does not exist", gstId)));
+                orElseThrow(() -> new LnFEntityNotFoundException("Gst with id [%s] does not exist".formatted(gstId)));
     }
 
 }

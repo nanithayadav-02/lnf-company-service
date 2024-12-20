@@ -24,7 +24,10 @@ import com.lnf.service.common.page.PageableAsQueryParam;
 import com.lnf.service.common.page.PaginationAndSortingHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -60,22 +63,22 @@ public class CompanyEventSchedulerController {
 
     @GetMapping("/company/events/{eventType}/week/{week}")
     public List<CompanyEventDto> findEventsByWeek(
-            @PathVariable(value = "eventType",required = false) EventType eventType,
-            @PathVariable(value = "week",required = false) Integer week) {
+            @PathVariable(required = false) EventType eventType,
+            @PathVariable(required = false) Integer week) {
         return service.findEventsByWeek(eventType, week);
     }
 
     @GetMapping("/company/events/{eventType}/month/{month}")
     public List<CompanyEventDto> findEventsByMonth(
-            @PathVariable(value = "eventType",required = false) EventType eventType,
-            @PathVariable(value = "month",required = false) Integer month) {
+            @PathVariable(required = false) EventType eventType,
+            @PathVariable(required = false) Integer month) {
         return service.findEventsByMonth(eventType, month);
     }
 
     @GetMapping("/company/events/{eventType}/year/{year}")
     public List<CompanyEventDto> findEventsByYear(
-            @PathVariable(value = "eventType",required = false) EventType eventType,
-            @PathVariable(value = "year",required = false) Integer year) {
+            @PathVariable(required = false) EventType eventType,
+            @PathVariable(required = false) Integer year) {
         return service.findEventsByYear(eventType, year);
     }
 

@@ -43,8 +43,8 @@ public class CompanyHolidayController {
 
     @GetMapping("/company/{companyId}/holidays/{holidayId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompanyHolidayDto findHoliday(@PathVariable("companyId") final UUID companyId,
-                                        @PathVariable("holidayId") final UUID holidayId) {
+    public CompanyHolidayDto findHoliday(@PathVariable final UUID companyId,
+                                         @PathVariable final UUID holidayId) {
         return service.findHolidayById(companyId, holidayId);
     }
 
@@ -56,60 +56,60 @@ public class CompanyHolidayController {
 
     @GetMapping("/company/{companyId}/holidays/{year}/{location}")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompanyHolidayDto> findHolidaysByYearAndLocation(@PathVariable("companyId") final UUID companyId,
-                                                                 @PathVariable("year") final long year,
-                                                                 @PathVariable("location") final String location) {
+    public List<CompanyHolidayDto> findHolidaysByYearAndLocation(@PathVariable final UUID companyId,
+                                                                 @PathVariable final long year,
+                                                                 @PathVariable final String location) {
         return service.findHolidaysByYearAndLocation(companyId, year, location);
     }
 
     @GetMapping("/company/{companyId}/holidays")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompanyHolidayDto> findHolidaysByYear(@PathVariable("companyId") final UUID companyId,
-                                                                 @RequestParam("year") final long year) {
+    public List<CompanyHolidayDto> findHolidaysByYear(@PathVariable final UUID companyId,
+                                                      @RequestParam final long year) {
         return service.findHolidaysByYear(companyId, year);
     }
 
     @GetMapping("/company/{companyId}/holidays/pdf")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<byte[]> getCompanyHolidaysAsPdf(@PathVariable("companyId") final UUID companyId) {
+    public ResponseEntity<byte[]> getCompanyHolidaysAsPdf(@PathVariable final UUID companyId) {
         byte[] pdfContent = service.getCompanyHolidaysAsPdf(companyId);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+ COMPANY_HOLIDAYS_PDF_FILE)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + COMPANY_HOLIDAYS_PDF_FILE)
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfContent);
     }
 
     @PostMapping("/company/{companyId}/holidays")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createHolidays(@PathVariable("companyId") final UUID companyId,
+    public void createHolidays(@PathVariable final UUID companyId,
                                @RequestBody final List<CompanyHolidayDto> holidays) {
         service.create(companyId, holidays);
     }
 
     @PutMapping("/company/{companyId}/holidays/{holidayId}")
     @ResponseStatus(HttpStatus.OK)
-    public void updateHoliday(@PathVariable("companyId") final UUID companyId,
-                              @PathVariable("holidayId") final UUID holidayId,
+    public void updateHoliday(@PathVariable final UUID companyId,
+                              @PathVariable final UUID holidayId,
                               @RequestBody final CompanyHolidayDto updatedHoliday) {
         service.update(companyId, holidayId, updatedHoliday);
     }
 
     @DeleteMapping("/company/{companyId}/holidays")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAllHolidaysByCompanyId(@PathVariable("companyId") final UUID companyId) {
+    public void deleteAllHolidaysByCompanyId(@PathVariable final UUID companyId) {
         service.deleteAll(companyId);
     }
 
     @DeleteMapping("/company/{companyId}/holidays/{holidayId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteHolidayByIdAndCompanyId(@PathVariable("companyId") final UUID companyId,
-                                              @PathVariable("holidayId") final UUID holidayId) {
+    public void deleteHolidayByIdAndCompanyId(@PathVariable final UUID companyId,
+                                              @PathVariable final UUID holidayId) {
         service.deleteById(companyId, holidayId);
     }
 
 
     @GetMapping(value = "/company/holidays", params = {"search"})
-    public List<CompanyHolidayDto> search(@RequestParam(value = "search") String search) {
+    public List<CompanyHolidayDto> search(@RequestParam String search) {
         return service.findAll(search);
     }
 

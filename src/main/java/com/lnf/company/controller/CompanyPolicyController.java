@@ -35,39 +35,39 @@ public class CompanyPolicyController {
     private final CompanyPolicyService service;
 
     @GetMapping(value = "/company/{companyId}/policies")
-    public List<CompanyPolicyDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) {
+    public List<CompanyPolicyDto> findByCompanyId(@PathVariable final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
     @GetMapping(value = "/company/{companyId}/policies/{fileName}")
-    public ResponseEntity<byte[]> findById(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
-                                           @PathVariable("fileName") String fileName) {
+    public ResponseEntity<byte[]> findById(@PathVariable final UUID companyId, @RequestParam(required = false) final UUID policyId,
+                                           @PathVariable String fileName) {
         return service.findById(companyId, policyId, fileName);
     }
 
     @PostMapping(value = "/company/{companyId}/policies")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final UUID companyId, @RequestParam MultipartFile[] policies) {
+    public void create(@PathVariable final UUID companyId, @RequestParam MultipartFile[] policies) {
         service.create(companyId, policies);
     }
 
     @PutMapping(value = "/company/{companyId}/policies")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
+    public void update(@PathVariable final UUID companyId, @RequestParam(required = false) final UUID policyId,
                        @RequestParam MultipartFile policy) {
         service.update(companyId, policyId, policy);
     }
 
     @DeleteMapping(value = "/company/{companyId}/policies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId) {
+    public void delete(@PathVariable final UUID companyId) {
         service.deleteByCompanyId(companyId);
     }
 
     @DeleteMapping(value = "/company/{companyId}/policies/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId, @RequestParam(value = "policyId", required = false) final UUID policyId,
-                       @PathVariable("fileName") final String fileName) {
+    public void delete(@PathVariable final UUID companyId, @RequestParam(required = false) final UUID policyId,
+                       @PathVariable final String fileName) {
         service.deleteById(companyId, policyId, fileName);
     }
 

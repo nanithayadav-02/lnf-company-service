@@ -135,7 +135,6 @@ spring:
     url: jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name:company_db}
     username: ${database.username:company_user}
     password: ${database.password:company@12345}
-    data: classpath*:db/data.sql
     driverClassName: ${database.drive:org.postgresql.Driver}
     hikari:
       maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:20}
@@ -178,6 +177,8 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
+
+  sql.init.data-locations: classpath*:db/data.sql
 
 printStackTrace: true
 
@@ -191,7 +192,6 @@ spring:
     url: jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name:company_db}
     username: ${database.username:company_user}
     password: ${database.password:company@12345}
-    data: classpath*:db/data.sql
     driverClassName: ${database.drive:org.postgresql.Driver}
     hikari:
       maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:20}
@@ -235,6 +235,8 @@ spring:
           keycloak:
             issuer-uri: http://${KEYCLOAK_HOST:localhost}:${KEYCLOAK_PORT:8080}/auth/realms/lnf
 
+  sql.init.data-locations: classpath*:db/data.sql
+
 printStackTrace: true
 
 ---
@@ -247,7 +249,6 @@ spring:
     url: jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name:company_db}
     username: ${database.username:company_user}
     password: ${database.password:company@12345}
-    data: classpath*:db/data.sql
     driverClassName: ${database.drive:org.postgresql.Driver}
     hikari:
       maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:20}
@@ -278,6 +279,8 @@ spring:
     exclude:
       - org.keycloak.adapters.springboot.KeycloakAutoConfiguration
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+  sql.init.data-locations: classpath*:db/data.sql
 
 printStackTrace: true
 ---

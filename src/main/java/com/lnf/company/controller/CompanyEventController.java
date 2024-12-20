@@ -43,33 +43,33 @@ public class CompanyEventController {
     }
 
     @GetMapping(value = "/company/{companyId}/event")
-    public List<CompanyEventDto> findByCompanyId(@PathVariable("companyId") final UUID companyId) {
+    public List<CompanyEventDto> findByCompanyId(@PathVariable final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
     @GetMapping(value = "/company/{companyId}/event/{eventId}")
-    public CompanyEventDto findById(@PathVariable("companyId") final UUID companyId,
-                                    @PathVariable("eventId") final UUID eventId) {
+    public CompanyEventDto findById(@PathVariable final UUID companyId,
+                                    @PathVariable final UUID eventId) {
         return service.findById(companyId, eventId);
     }
 
     @PostMapping(value = "/company/{companyId}/event")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final UUID companyId,
+    public void create(@PathVariable final UUID companyId,
                        @RequestBody final CompanyEventDto resource) {
         service.create(companyId, resource);
     }
 
     @PostMapping(value = "/company/{companyId}/events")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable("companyId") final UUID companyId,
+    public void create(@PathVariable final UUID companyId,
                        @RequestBody final List<CompanyEventDto> resource) {
         service.create(companyId, resource);
     }
 
     @PutMapping(value = "/company/{companyId}/event/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable("companyId") final UUID companyId, @PathVariable("eventId") final UUID eventId,
+    public void update(@PathVariable final UUID companyId, @PathVariable final UUID eventId,
                        @RequestBody final CompanyEventDto resource) {
         service.update(companyId, eventId, resource);
     }
@@ -77,13 +77,13 @@ public class CompanyEventController {
 
     @DeleteMapping(value = "/company/{companyId}/events")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId) {
+    public void delete(@PathVariable final UUID companyId) {
         service.deleteByCompanyId(companyId);
     }
 
     @DeleteMapping(value = "/company/{companyId}/event/{eventId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("companyId") final UUID companyId, @PathVariable("eventId") final UUID eventId) {
+    public void delete(@PathVariable final UUID companyId, @PathVariable final UUID eventId) {
         service.deleteById(companyId, eventId);
     }
 

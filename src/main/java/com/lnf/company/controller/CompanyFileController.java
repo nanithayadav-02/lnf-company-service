@@ -37,13 +37,13 @@ public class CompanyFileController {
 
     @GetMapping(value = "/company/{companyId}/files")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompanyFileDto> findByCompanyId(@PathVariable("companyId") UUID companyId) {
+    public List<CompanyFileDto> findByCompanyId(@PathVariable UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
     @GetMapping(value = "/company/{companyId}/files/{fileName}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<byte[]> findById(@PathVariable("companyId") UUID companyId, @PathVariable("fileName") String fileName) {
+    public ResponseEntity<byte[]> findById(@PathVariable UUID companyId, @PathVariable String fileName) {
         return service.findById(companyId, fileName);
     }
 
@@ -62,7 +62,7 @@ public class CompanyFileController {
 
     @DeleteMapping(value = "/company/{companyId}/files")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteByIdAndFileName(@PathVariable("companyId") UUID companyId, @RequestParam String fileName) {
+    public void deleteByIdAndFileName(@PathVariable UUID companyId, @RequestParam String fileName) {
         service.deleteByIdAndFileName(companyId, fileName);
     }
 

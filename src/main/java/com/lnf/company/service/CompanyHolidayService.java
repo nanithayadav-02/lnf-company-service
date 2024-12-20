@@ -17,13 +17,13 @@
 package com.lnf.company.service;
 
 import com.google.common.collect.Lists;
+import com.lnf.company.converter.CompanyHolidayConverter;
 import com.lnf.company.exception.LnFBadRequestException;
 import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyHoliday;
 import com.lnf.company.repository.CompanyHolidayRepository;
-import com.lnf.company.converter.CompanyHolidayConverter;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.CompanyHolidayDto;
 import com.lnf.dto.email.ThymeleafDocumentDto;
@@ -86,7 +86,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
 
     private Page<CompanyHolidayDto> validateAndGetPages(int page, Page<CompanyHoliday> resultPage) {
         if (page > resultPage.getTotalPages()) {
-            throw new LnFEntityNotFoundException(String.format("Total number of pages [%d], " + "requested page [%d] does not exist", resultPage.getTotalPages(), page));
+            throw new LnFEntityNotFoundException(("Total number of pages [%d], " + "requested page [%d] does not exist").formatted(resultPage.getTotalPages(), page));
         }
         return resultPage.map(CompanyHolidayConverter::toTransportModel);
     }
@@ -121,7 +121,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
 
     public void create(UUID companyId, List<CompanyHolidayDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create Holidays for company [%s] with null payload", companyId));
+                "Failed to create Holidays for company [%s] with null payload".formatted(companyId));
         Company company = searchForCompany(companyId);
         List<CompanyHoliday> entities = new ArrayList<>();
         resource.stream().filter(Objects::nonNull).forEach(companyHolidayDto -> {
@@ -145,7 +145,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
 
     public void update(UUID companyId, UUID holidayId, CompanyHolidayDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                String.format("Failed to create holiday for company [%s] with null payload", companyId));
+                "Failed to create holiday for company [%s] with null payload".formatted(companyId));
         searchForCompany(companyId);
         CompanyHoliday entity = searchForHoliday(holidayId);
         save(CompanyHolidayConverter.toEntityModel(resource, entity));
@@ -159,7 +159,7 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
             repository.deleteAll(entities);
             log.debug("Company {} all holiday are successfully deleted", companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Holiday for company [%s]", companyId);
+            String errorMessage = "Failed to delete Holiday for company [%s]".formatted(companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -171,20 +171,20 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
             repository.delete(entity);
             log.debug("Company {} holiday {} is successfully deleted", holidayId, companyId);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to delete Holiday[[%s] for company [%s]", holidayId, companyId);
+            String errorMessage = "Failed to delete Holiday[[%s] for company [%s]".formatted(holidayId, companyId);
             throw new LnFException(errorMessage);
         }
     }
 
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Company with id [%s] does not exist",
+                orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(
                         companyId)));
     }
 
     private CompanyHoliday searchForHoliday(UUID holidayId) {
         return repository.findById(holidayId).
-                orElseThrow(() -> new LnFEntityNotFoundException(String.format("Holiday with id [%s] does not exist",
+                orElseThrow(() -> new LnFEntityNotFoundException("Holiday with id [%s] does not exist".formatted(
                         holidayId)));
     }
 

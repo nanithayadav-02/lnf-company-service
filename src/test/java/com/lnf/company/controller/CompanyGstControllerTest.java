@@ -32,7 +32,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,7 +73,7 @@ class CompanyGstControllerTest extends BaseTestClass {
         String url = "/lnf/company/" + companyId + "/gst";
 
         String resultContent = new String(Files
-                .readAllBytes(Paths.get(ClassLoader.getSystemResource("testdata/company-gsts.json")
+                .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-gsts.json")
                         .toURI())));
 
         mockMvc.perform(get(url)
@@ -88,7 +88,7 @@ class CompanyGstControllerTest extends BaseTestClass {
     void findByCompanyIdAndId() throws Exception {
         UUID id = UUID.fromString("cfe94b9f-c86f-4733-be96-a9b619f7bca7");
 
-        GstDto expectedDto = mockGst1 ();
+        GstDto expectedDto = mockGst1();
 
         given(service.findById(any(UUID.class), any(UUID.class))).willReturn(expectedDto);
 
@@ -103,35 +103,35 @@ class CompanyGstControllerTest extends BaseTestClass {
     void createGsts() {
 
         // Arrange
-        List<GstDto> mockGst = List.of (mockGst1(), mockGst2());
-        doNothing ().when (service).create (companyId, mockGst);
+        List<GstDto> mockGst = List.of(mockGst1(), mockGst2());
+        doNothing().when(service).create(companyId, mockGst);
         String url = "/lnf/company/" + companyId + "/gsts";
 
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<GstDto>> captor = ArgumentCaptor.forClass (List.class);
+        ArgumentCaptor<List<GstDto>> captor = ArgumentCaptor.forClass(List.class);
 
         // Act
         try {
-            mockMvc.perform (post (url)
-                            .contentType (APPLICATION_JSON)
-                            .content (asJsonString (mockGst)))
-                    .andExpect (status ().isCreated ());
+            mockMvc.perform(post(url)
+                            .contentType(APPLICATION_JSON)
+                            .content(asJsonString(mockGst)))
+                    .andExpect(status().isCreated());
         } catch (Exception e) {
-            fail ("Unexpected exception: " + e.getMessage ());
+            fail("Unexpected exception: " + e.getMessage());
         }
 
         // Assert
-        verify (service).create (eq (companyId), captor.capture ());
-        List<GstDto> actualGsts = captor.getValue ();
+        verify(service).create(eq(companyId), captor.capture());
+        List<GstDto> actualGsts = captor.getValue();
 
         // Check if the lists have the same size
-        assertEquals (actualGsts.size (), actualGsts.size (), "The number of Gsts created should match");
+        assertEquals(actualGsts.size(), actualGsts.size(), "The number of Gsts created should match");
 
         // Check if the details of each event match
-        for (int i = 0; i < actualGsts.size (); i++) {
-            assertEquals (actualGsts.get (i).getLocation(), actualGsts.get (i).getLocation(),
+        for (int i = 0; i < actualGsts.size(); i++) {
+            assertEquals(actualGsts.get(i).getLocation(), actualGsts.get(i).getLocation(),
                     "location should match for company at index " + i);
-            assertEquals (actualGsts.get (i).getNumber(), actualGsts.get (i).getNumber(),
+            assertEquals(actualGsts.get(i).getNumber(), actualGsts.get(i).getNumber(),
                     "number should match for company at index " + i);
         }
     }
@@ -158,7 +158,7 @@ class CompanyGstControllerTest extends BaseTestClass {
     @Test
     void updateGst() {
         // Arrange
-        UUID gstId = UUID.fromString ("cfe94b9f-c86f-4733-be96-a9b619f7bca7");
+        UUID gstId = UUID.fromString("cfe94b9f-c86f-4733-be96-a9b619f7bca7");
         GstDto updatedGst = mockGst2();
         updatedGst.setId(gstId);
 
@@ -193,13 +193,13 @@ class CompanyGstControllerTest extends BaseTestClass {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(service).deleteByCompanyId (companyId);
+        verify(service).deleteByCompanyId(companyId);
     }
 
     @Test
     void testDeleteByCompanyIdAndId() throws Exception {
         UUID id = UUID.randomUUID();
-        String urlTemplate = String.format("/lnf/company/%s/gst/%s", companyId, id);
+        String urlTemplate = "/lnf/company/%s/gst/%s".formatted(companyId, id);
 
         mockMvc.perform(delete(urlTemplate)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -216,7 +216,7 @@ class CompanyGstControllerTest extends BaseTestClass {
         return createGst("019d9f96-8f91-4725-9056-ed022b4cb65f", "begumpet", "GSTIN1e793bo4nj");
     }
 
-    private GstDto createGst(String id, String location,String number) {
+    private GstDto createGst(String id, String location, String number) {
         GstDto dto = new GstDto();
         dto.setId(UUID.fromString(id));
         dto.setLocation(location);
@@ -238,8 +238,8 @@ class CompanyGstControllerTest extends BaseTestClass {
 
     private static String asJsonString(final Object obj) {
         try {
-            return new ObjectMapper ()
-                    .registerModule(new JavaTimeModule ())
+            return new ObjectMapper()
+                    .registerModule(new JavaTimeModule())
                     .writeValueAsString(obj);
         } catch (Exception e) {
             throw new RuntimeException(e);
