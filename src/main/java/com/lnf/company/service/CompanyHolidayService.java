@@ -25,6 +25,7 @@ import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyHoliday;
 import com.lnf.company.repository.CompanyHolidayRepository;
 import com.lnf.company.repository.CompanyRepository;
+import com.lnf.dto.common.PageRequestDto;
 import com.lnf.dto.company.CompanyHolidayDto;
 import com.lnf.dto.email.ThymeleafDocumentDto;
 import com.lnf.service.common.page.PaginatedAndSortedService;
@@ -35,9 +36,7 @@ import com.lnf.util.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +82,15 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
         List<CompanyHoliday> entities = Lists.newArrayList(repository.findAll(sortInfo));
         return entities.stream().map(CompanyHolidayConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
+
+    public Page<CompanyHolidayDto> findingAllWithPagination(String search, PageRequestDto pageRequestDto) {
+        Pageable pageable = PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize(),
+                RestUtil.constructSort(pageRequestDto.getSortBy(), pageRequestDto.getSortOrder()));
+        Specification<CompanyHoliday> specification = buildCompanySpecification(search);
+        Page<CompanyHoliday> resultPage = repository.findAll(specification, pageable);
+        return resultPage.map(CompanyHolidayConverter::toTransportModel);
+    }
+
 
     private Page<CompanyHolidayDto> validateAndGetPages(int page, Page<CompanyHoliday> resultPage) {
         if (page > resultPage.getTotalPages()) {
@@ -199,12 +207,12 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
     }
 
     public List<CompanyHolidayDto> findAll(String search) {
-        Specification<CompanyHoliday> specification = buildEmployeeSpecification(search);
+        Specification<CompanyHoliday> specification = buildCompanySpecification(search);
         List<CompanyHoliday> entities = repository.findAll(specification);
         return convertToDtos(entities);
     }
 
-    private Specification<CompanyHoliday> buildEmployeeSpecification(String search) {
+    private Specification<CompanyHoliday> buildCompanySpecification(String search) {
         GenericSpecificationBuilder<CompanyHoliday> employeeBuilder = new GenericSpecificationBuilder<>();
         Function<String, Class<?>> fieldClassForEmployee = this::getFieldClassFromEmployee;
         return SpecificationUtil.buildSpecification(search, employeeBuilder, fieldClassForEmployee);
@@ -221,9 +229,30 @@ public class CompanyHolidayService implements PaginatedAndSortedService<CompanyH
                 .toList();
     }
 
-    public List<CompanyHolidayDto> findHolidaysByYear(UUID companyId, long year) {
+    public Page<CompanyHolidayDto> findHolidaysByYear(UUID companyId, long year, PageRequestDto pageRequest) {
+        Pageable pageable = createPageable(pageRequest);
         List<CompanyHoliday> entities = repository.findByYear(companyId, year);
-        return entities.stream().map(CompanyHolidayConverter::toTransportModel).toList();
+        List<CompanyHolidayDto> holidayDtoList = entities.stream().map(CompanyHolidayConverter::toTransportModel).toList();
+
+        return createPaginatedResponse(holidayDtoList, pageable);
 
     }
+
+    private Pageable createPageable(PageRequestDto pageRequest) {
+        return PageRequest.of(
+                pageRequest.getPage(),
+                pageRequest.getSize(),
+                RestUtil.constructSort(pageRequest.getSortBy(), pageRequest.getSortOrder())
+        );
+    }
+
+    private Page<CompanyHolidayDto> createPaginatedResponse(List<CompanyHolidayDto> companyHolidayDto, Pageable pageable) {
+        int totalRecords = companyHolidayDto.size();
+        int start = pageable.getPageNumber() * pageable.getPageSize();
+        int end = Math.min(start + pageable.getPageSize(), totalRecords);
+
+        List<CompanyHolidayDto> paginatedRecruiterProfiles = companyHolidayDto.subList(start, end);
+        return new PageImpl<>(paginatedRecruiterProfiles, pageable, totalRecords);
+    }
+
 }
