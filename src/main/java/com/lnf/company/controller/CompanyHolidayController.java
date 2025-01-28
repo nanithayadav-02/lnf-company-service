@@ -22,6 +22,7 @@ import com.lnf.dto.company.CompanyHolidayDto;
 import com.lnf.service.common.page.PageableAsQueryParam;
 import com.lnf.service.common.page.PaginationAndSortingHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,8 +51,17 @@ public class CompanyHolidayController {
 
     @GetMapping("/company/holidays")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest) {
-        return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+    public ResponseEntity<?> findAll(@RequestParam(required = false) String search,
+                                     @PageableAsQueryParam PageRequestDto pageRequest) {
+        if (search != null && !search.isEmpty()) {
+            if (pageRequest != null && pageRequest.getPage() != null) {
+                return ResponseEntity.ok(service.findingAllWithPagination(search, pageRequest));
+            } else {
+                return ResponseEntity.ok(service.findAll(search));
+            }
+        } else {
+            return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
+        }
     }
 
     @GetMapping("/company/{companyId}/holidays/{year}/{location}")
@@ -64,9 +74,10 @@ public class CompanyHolidayController {
 
     @GetMapping("/company/{companyId}/holidays")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompanyHolidayDto> findHolidaysByYear(@PathVariable final UUID companyId,
-                                                      @RequestParam final long year) {
-        return service.findHolidaysByYear(companyId, year);
+    public Page<CompanyHolidayDto> findHolidaysByYear(@PathVariable final UUID companyId,
+                                                      @RequestParam final long year,
+                                                      @PageableAsQueryParam PageRequestDto pageRequest) {
+        return service.findHolidaysByYear(companyId, year, pageRequest);
     }
 
     @GetMapping("/company/{companyId}/holidays/pdf")
@@ -105,12 +116,6 @@ public class CompanyHolidayController {
     public void deleteHolidayByIdAndCompanyId(@PathVariable final UUID companyId,
                                               @PathVariable final UUID holidayId) {
         service.deleteById(companyId, holidayId);
-    }
-
-
-    @GetMapping(value = "/company/holidays", params = {"search"})
-    public List<CompanyHolidayDto> search(@RequestParam String search) {
-        return service.findAll(search);
     }
 
 }
