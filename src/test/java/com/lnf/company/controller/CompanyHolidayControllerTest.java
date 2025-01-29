@@ -89,19 +89,22 @@ class CompanyHolidayControllerTest extends BaseTestClass {
     }
 
     @Test
-    void findAllHolidays_ReturnsCompanyHolidays() {
+    void findAllWithPagination() {
+        String search = "location:Bangalore";
         Page<CompanyHolidayDto> mockedPage = mock(Page.class);
         PageRequestDto pageRequest = new PageRequestDto(0, 10, "description", "asc");
 
-        List<CompanyHolidayDto> mockedList = List.of(mockHoliday1(), mockHoliday2());
+        List<CompanyHolidayDto> mockedList = List.of(mockHoliday1(), mockHoliday2(), mockHoliday3());
+
         when(holidayService.findPaginatedAndSorted(0, 10, "description", "asc")).thenReturn(mockedPage);
         when(holidayService.findPaginated(0, 10)).thenReturn(mockedPage);
         when(holidayService.findAllSorted("description", "asc")).thenReturn(mockedList);
         when(holidayService.findAll()).thenReturn(mockedList);
+        when(holidayService.findingAllWithPagination(search, pageRequest)).thenReturn(mockedPage);
 
         CompanyHolidayController controller = new CompanyHolidayController(holidayService, paginationAndSortingHandler);
         // Test for paginated and sorted request
-        ResponseEntity<?> response = controller.findAll(pageRequest);
+        ResponseEntity<?> response = controller.findAll(search, pageRequest);
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
         // Pagination with  sortBy and sortOrder
@@ -118,7 +121,6 @@ class CompanyHolidayControllerTest extends BaseTestClass {
         pageRequest = new PageRequestDto();
         response = paginationAndSortingHandler.handleFindAllRequest(pageRequest, holidayService);
         assertEquals(ResponseEntity.ok(mockedList), response);
-
     }
 
     @Test
