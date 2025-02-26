@@ -48,8 +48,6 @@ import java.util.stream.IntStream;
 public class CompanyFileService {
 
     public static final String S_S_S_S = "%s/%s/%s/%s";
-    @Value("${aws.s3.bucket.enabled}")
-    private boolean awsS3BucketEnabled;
     @Value("${aws.s3.bucket.folderName}")
     private String folderName;
     private static final String FAILED_TO_CREATE_COMPANY_FILE_NULL_PAYLOAD = "Failed to create companyFile for " +
@@ -164,7 +162,7 @@ public class CompanyFileService {
         try {
             repository.saveAll(entities);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to save companyFile for company [%s]", entities.get(0).getCompany().getId());
+            String errorMessage = String.format("Failed to save companyFile for company [%s]", entities.getFirst().getCompany().getId());
             throw new LnFException(errorMessage);
         }
     }

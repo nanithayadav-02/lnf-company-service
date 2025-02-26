@@ -95,7 +95,7 @@ public class TaskService implements PaginatedAndSortedService<TaskDto> {
             entities.add(entity);
         });
         save(entities);
-        log.debug("Tasks {} successfully created", entities.get(0).getId());
+        log.debug("Tasks {} successfully created", entities.getFirst().getId());
     }
 
     private void save(Task entity) {
@@ -111,7 +111,7 @@ public class TaskService implements PaginatedAndSortedService<TaskDto> {
         try {
             repository.saveAll(entities);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to save Task [%s]", entities.get(0).getId());
+            String errorMessage = String.format("Failed to save Task [%s]", entities.getFirst().getId());
             throw new LnFException(errorMessage);
         }
     }

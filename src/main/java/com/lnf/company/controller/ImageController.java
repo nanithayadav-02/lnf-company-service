@@ -41,8 +41,8 @@ public class ImageController {
 
     @GetMapping(value = "/company/{companyId}/image/{fileName}")
     public ResponseEntity<byte[]> findById(@PathVariable final UUID companyId,
-                                           @RequestParam(required = false) final UUID imageId, @PathVariable String fileName) {
-        return service.findById(companyId, imageId, fileName);
+                                           @PathVariable String fileName) {
+        return service.findById(companyId, fileName);
     }
 
     @PostMapping(value = "/company/{companyId}/image")
@@ -53,22 +53,16 @@ public class ImageController {
 
     @PutMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable final UUID companyId, @RequestParam(required = false) final UUID imageId,
+    public void update(@PathVariable final UUID companyId,
                        @RequestParam MultipartFile image) {
-        service.update(companyId, imageId, image);
-    }
-
-    @DeleteMapping(value = "/company/{companyId}/image")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID companyId) {
-        service.deleteByCompanyId(companyId);
+        service.update(companyId, image);
     }
 
     @DeleteMapping(value = "/company/{companyId}/image/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable final UUID companyId,
-                       @RequestParam(required = false) final UUID imageId, @PathVariable String fileName) {
-        service.deleteById(companyId, imageId, fileName);
+                       @PathVariable String fileName) {
+        service.deleteById(companyId, fileName);
     }
 
 }

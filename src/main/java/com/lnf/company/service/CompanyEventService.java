@@ -132,7 +132,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         try {
             companyEventRepository.saveAll(entities);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to save companyEvent for company [%s]", entities.get(0).getCompany().getId());
+            String errorMessage = String.format("Failed to save companyEvent for company [%s]", entities.getFirst().getCompany().getId());
             throw new LnFException(errorMessage);
         }
     }

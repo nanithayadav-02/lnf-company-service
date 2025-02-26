@@ -136,7 +136,7 @@ public class CompanyAddressService {
             repository.saveAll(entities);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to save Address for company [%s]",
-                    entities.get(0).getCompany().getCode());
+                    entities.getFirst().getCompany().getCode());
             throw new LnFException(errorMessage);
         }
     }
