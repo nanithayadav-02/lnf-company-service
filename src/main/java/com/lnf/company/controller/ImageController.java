@@ -35,13 +35,14 @@ public class ImageController {
     private final ImageService service;
 
     @GetMapping(value = "/company/{companyId}/image")
+    @ResponseStatus(HttpStatus.OK)
     public ImageDto findByCompanyId(@PathVariable final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
     @GetMapping(value = "/company/{companyId}/image/{fileName}")
-    public ResponseEntity<byte[]> findById(@PathVariable final UUID companyId,
-                                           @PathVariable String fileName) {
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<byte[]> findById(@PathVariable final UUID companyId, @PathVariable String fileName) {
         return service.findById(companyId, fileName);
     }
 
@@ -53,15 +54,13 @@ public class ImageController {
 
     @PutMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable final UUID companyId,
-                       @RequestParam MultipartFile image) {
+    public void update(@PathVariable final UUID companyId, @RequestParam MultipartFile image) {
         service.update(companyId, image);
     }
 
     @DeleteMapping(value = "/company/{companyId}/image/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID companyId,
-                       @PathVariable String fileName) {
+    public void delete(@PathVariable final UUID companyId, @PathVariable String fileName) {
         service.deleteById(companyId, fileName);
     }
 

@@ -40,8 +40,7 @@ public class CompanyPolicyController {
     }
 
     @GetMapping(value = "/company/{companyId}/policies/{fileName}")
-    public ResponseEntity<byte[]> findById(@PathVariable final UUID companyId,
-                                           @PathVariable String fileName) {
+    public ResponseEntity<byte[]> findById(@PathVariable final UUID companyId, @PathVariable String fileName) {
         return service.findById(companyId, fileName);
     }
 
@@ -53,8 +52,7 @@ public class CompanyPolicyController {
 
     @PutMapping(value = "/company/{companyId}/policies")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable final UUID companyId,
-                       @RequestParam MultipartFile policy) {
+    public void update(@PathVariable final UUID companyId, @RequestParam MultipartFile policy) {
         service.update(companyId, policy);
     }
 

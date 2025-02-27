@@ -17,7 +17,6 @@
 package com.lnf.company.service;
 
 import com.lnf.company.model.Company;
-import com.lnf.company.repository.CompanyPolicyRepository;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.CompanyPolicyDto;
 import com.lnf.dto.file.FileDto;
@@ -44,16 +43,13 @@ import java.util.*;
 @Slf4j
 public class CompanyPolicyService {
 
-    public static final String POLICIES = "policies";
-    public static final String S_S_S = "%s/%s/%s/";
-
-    @Value("${aws.s3.bucket.folderName}")
-    private String folderName;
-
     private final CompanyRepository companyRepository;
-    private final CompanyPolicyRepository repository;
     private final FileService fileService;
     private final FileFolderService fileFolderService;
+    public static final String POLICIES = "policies";
+    public static final String S_S_S = "%s/%s/%s/";
+    @Value("${aws.s3.bucket.folderName}")
+    private String folderName;
 
     public List<CompanyPolicyDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
@@ -91,15 +87,14 @@ public class CompanyPolicyService {
     }
 
     public void create(UUID companyId, MultipartFile[] policies) {
-        Company company = searchForCompany(companyId);
+        searchForCompany(companyId);
         for (MultipartFile policy : policies) {
             try {
                 LnFBadRequestException.throwOnCondition(Objects::isNull, policy,
                         "Failed to create Policy for company [%s] with null payload".formatted(companyId));
                 searchForCompany(companyId);
                 String folder = S_S_S.formatted(folderName, companyId, POLICIES);
-                String filePath = uploadFile(folder, policy);
-                log.debug("File uploaded successfully to S3 bucket: " + filePath);
+                uploadFile(folder, policy);
             } catch (RuntimeException e) {
                 String errorMessage = "Failed to create policy[%s] for company [%s]".formatted(
                         companyId, policy.getOriginalFilename());
@@ -114,8 +109,7 @@ public class CompanyPolicyService {
         try {
             searchForCompany(companyId);
             String folder = S_S_S.formatted(folderName, companyId, POLICIES);
-            String filePath = uploadFile(folder, policy);
-            log.debug("File uploaded successfully to S3 bucket: " + filePath);
+            uploadFile(folder, policy);
         } catch (RuntimeException e) {
             String errorMessage = "Failed to update policy for company [%s]".formatted(companyId);
             throw new LnFException(errorMessage, e);
@@ -137,8 +131,9 @@ public class CompanyPolicyService {
                         "Company with id [%s] does not exist".formatted(companyId)));
     }
 
-    private String uploadFile(String folder, MultipartFile file) {
-        return fileService.uploadFile(folder, file);
+    private void uploadFile(String folder, MultipartFile file) {
+        String filePath = fileService.uploadFile(folder, file);
+        log.debug("File uploaded successfully to S3 bucket: {}", filePath);
     }
 
 }

@@ -20,9 +20,7 @@ import com.lnf.company.exception.LnFBadRequestException;
 import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
-import com.lnf.company.model.Image;
 import com.lnf.company.repository.CompanyRepository;
-import com.lnf.company.repository.ImageRepository;
 import com.lnf.dto.company.ImageDto;
 import com.lnf.dto.file.FileDto;
 import com.lnf.service.file.FileFolderService;
@@ -48,13 +46,11 @@ import java.util.UUID;
 @Slf4j
 public class ImageService {
 
-    public static final String S_S_S = "%s/%s/%s/";
-    public static final String IMAGE = "image";
     private final CompanyRepository companyRepository;
-    private final ImageRepository repository;
     private final FileService fileService;
     private final FileFolderService fileFolderService;
-
+    public static final String S_S_S = "%s/%s/%s/";
+    public static final String IMAGE = "image";
     @Value("${aws.s3.bucket.folderName}")
     private String folderName;
 
@@ -62,7 +58,6 @@ public class ImageService {
         String filePath = S_S_S.formatted(folderName, companyId, IMAGE);
         List<FileDto> filePaths = fileFolderService.findFiles(filePath);
         if (filePaths == null || filePaths.isEmpty()) {
-            log.debug("Image not found for company {}", companyId);
             return null;
         }
         String fileName = StringUtils.substringAfterLast(filePaths.getFirst().getFileName(), "/");
@@ -95,8 +90,7 @@ public class ImageService {
                     "Failed to create Image for company [%s] with null payload".formatted(companyId));
             searchForCompany(companyId);
             String folder = S_S_S.formatted(folderName, companyId, IMAGE);
-            String filePath = uploadFile(folder, file);
-            log.debug("File uploaded successfully to S3 bucket: " + filePath);
+            uploadFile(folder, file);
         } catch (RuntimeException e) {
             String errorMessage = "Failed to create image[%s] for company [%s]".formatted(companyId,
                     file.getOriginalFilename());
@@ -110,8 +104,7 @@ public class ImageService {
         try {
             searchForCompany(companyId);
             String folder = S_S_S.formatted(folderName, companyId, IMAGE);
-            String filePath = uploadFile(folder, file);
-            log.debug("File uploaded successfully to S3 bucket: " + filePath);
+            uploadFile(folder, file);
         } catch (RuntimeException e) {
             String errorMessage = "Failed to update file for company [%s]".formatted(companyId);
             throw new LnFException(errorMessage, e);
@@ -126,24 +119,15 @@ public class ImageService {
         log.debug("S3 object deleted for company");
     }
 
-    private void save(Image entity) {
-        try {
-            repository.save(entity);
-        } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to save Image for company [%s]",
-                    entity.getCompany().getCode());
-            throw new LnFException(errorMessage);
-        }
-    }
-
     private Company searchForCompany(UUID companyId) {
         return companyRepository.findByCompanyId(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(
                         companyId)));
     }
 
-    private String uploadFile(String folder, MultipartFile file) {
-        return fileService.uploadFile(folder, file);
+    private void uploadFile(String folder, MultipartFile file) {
+        String filePath = fileService.uploadFile(folder, file);
+        log.debug("File uploaded successfully to S3 bucket: {}", filePath);
     }
 
 }
