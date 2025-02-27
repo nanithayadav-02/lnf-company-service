@@ -55,6 +55,7 @@ public class CompanyFileController {
     }
 
     @PutMapping(value = "/company/{companyId}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable UUID companyId, @RequestParam String fileName,
                        @RequestPart("file") MultipartFile file, @RequestPart("resource") CompanyFileDto resource) {
         service.update(companyId, fileName, file, resource);

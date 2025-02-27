@@ -48,8 +48,6 @@ import java.util.stream.IntStream;
 public class CompanyFileService {
 
     public static final String S_S_S_S = "%s/%s/%s/%s";
-    @Value("${aws.s3.bucket.enabled}")
-    private boolean awsS3BucketEnabled;
     @Value("${aws.s3.bucket.folderName}")
     private String folderName;
     private static final String FAILED_TO_CREATE_COMPANY_FILE_NULL_PAYLOAD = "Failed to create companyFile for " +
@@ -114,8 +112,7 @@ public class CompanyFileService {
                 save(entities);
 
                 String folder = S_S_S.formatted(folderName, companyId, FILES);
-                String filePath = uploadFile(folder, file);
-                log.debug("File uploaded successfully to S3 bucket: " + filePath);
+                uploadFile(folder, file);
             } catch (RuntimeException e) {
                 String errorMessage = "Failed to create file[%s] for company [%s]".formatted(file.getName(), companyId);
                 throw new LnFException(errorMessage, e);
@@ -130,14 +127,13 @@ public class CompanyFileService {
             CompanyFile entity = searchForFileName(fileName);
             CompanyFile updatedEntity = CompanyFileConverter.toEntityModel(resource, entity);
             save(updatedEntity);
+            log.debug("fileName {} for Company {} successfully updated", fileName, companyId);
             String s3ObjectKey = S_S_S_S.formatted(folderName, companyId, FILES, fileName);
             List<String> filePaths = Collections.singletonList(s3ObjectKey);
             fileService.delete(filePaths);
             //Before Updating the file we are deleting from the s3 bucket
             String folder = S_S_S.formatted(folderName, companyId, FILES);
-            String filePath = uploadFile(folder, file);
-            log.debug("File uploaded successfully to S3 bucket: " + filePath);
-            log.debug("fileName {} for Company {} successfully updated", fileName, companyId);
+            uploadFile(folder, file);
         } catch (RuntimeException e) {
             String errorMessage = "Failed to update fileName[%s] for company [%s]".formatted(fileName, companyId);
             throw new LnFException(errorMessage, e);
@@ -164,7 +160,7 @@ public class CompanyFileService {
         try {
             repository.saveAll(entities);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to save companyFile for company [%s]", entities.get(0).getCompany().getId());
+            String errorMessage = String.format("Failed to save companyFile for company [%s]", entities.getFirst().getCompany().getId());
             throw new LnFException(errorMessage);
         }
     }
@@ -189,8 +185,9 @@ public class CompanyFileService {
                         "Company file with fileName [%s] does not exist".formatted(fileName)));
     }
 
-    private String uploadFile(String folder, MultipartFile file) {
-        return fileService.uploadFile(folder, file);
+    private void uploadFile(String folder, MultipartFile file) {
+        String filePath = fileService.uploadFile(folder, file);
+        log.debug("File uploaded successfully to S3 bucket: {}", filePath);
     }
 
 }

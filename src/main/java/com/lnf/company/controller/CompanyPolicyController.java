@@ -40,9 +40,8 @@ public class CompanyPolicyController {
     }
 
     @GetMapping(value = "/company/{companyId}/policies/{fileName}")
-    public ResponseEntity<byte[]> findById(@PathVariable final UUID companyId, @RequestParam(required = false) final UUID policyId,
-                                           @PathVariable String fileName) {
-        return service.findById(companyId, policyId, fileName);
+    public ResponseEntity<byte[]> findById(@PathVariable final UUID companyId, @PathVariable String fileName) {
+        return service.findById(companyId, fileName);
     }
 
     @PostMapping(value = "/company/{companyId}/policies")
@@ -53,22 +52,14 @@ public class CompanyPolicyController {
 
     @PutMapping(value = "/company/{companyId}/policies")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable final UUID companyId, @RequestParam(required = false) final UUID policyId,
-                       @RequestParam MultipartFile policy) {
-        service.update(companyId, policyId, policy);
-    }
-
-    @DeleteMapping(value = "/company/{companyId}/policies")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID companyId) {
-        service.deleteByCompanyId(companyId);
+    public void update(@PathVariable final UUID companyId, @RequestParam MultipartFile policy) {
+        service.update(companyId, policy);
     }
 
     @DeleteMapping(value = "/company/{companyId}/policies/{fileName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID companyId, @RequestParam(required = false) final UUID policyId,
-                       @PathVariable final String fileName) {
-        service.deleteById(companyId, policyId, fileName);
+    public void delete(@PathVariable final UUID companyId, @PathVariable final String fileName) {
+        service.deleteById(companyId, fileName);
     }
 
 }
