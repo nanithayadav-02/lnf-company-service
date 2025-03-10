@@ -17,7 +17,6 @@
 package com.lnf.company.converter;
 
 import com.lnf.company.model.*;
-import com.lnf.company.model.*;
 import com.lnf.dto.company.CompanyDto;
 
 import java.util.ArrayList;
@@ -57,6 +56,7 @@ public class CompanyConverter {
                 .notes(safeConvert(entity.getCompanyNotes(), CompanyNotesConverter::toTransportModel))
                 .companyEvent(safeConvert(entity.getCompanyEvent(), CompanyEventConverter::toTransportModel))
                 .companyHoliday(safeConvert(entity.getCompanyHoliday(), CompanyHolidayConverter::toTransportModel))
+                .companyLnfPlans(safeConvert(entity.getCompanyLnfPlans(), CompanyLnfPlanConverter::toTransportModel))
                 .build();
     }
 
@@ -74,6 +74,7 @@ public class CompanyConverter {
         addNotesToEntityModel(transport, entity);
         addCompanyEventToEntityModel(transport, entity);
         addCompanyHolidayToEntityModel(transport, entity);
+        addCompanyLnfPlanToEntityModel(transport, entity);
         return entity;
     }
 
@@ -167,6 +168,18 @@ public class CompanyConverter {
                 companyEventList.add(entity);
             });
             company.getCompanyEvent().addAll(companyEventList);
+        }
+    }
+
+    private static void addCompanyLnfPlanToEntityModel(CompanyDto transport, Company company) {
+        if (transport.getCompanyLnfPlans() != null) {
+            List<CompanyLnfPlan> companyLnfPlans = new ArrayList<>();
+            transport.getCompanyLnfPlans().stream().filter(Objects::nonNull).forEach(dto -> {
+                CompanyLnfPlan entity = CompanyLnfPlanConverter.toEntityModel(dto, new CompanyLnfPlan());
+                entity.setCompany(company);
+                companyLnfPlans.add(entity);
+            });
+            company.getCompanyLnfPlans().addAll(companyLnfPlans);
         }
     }
 
