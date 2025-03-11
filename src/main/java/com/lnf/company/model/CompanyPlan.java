@@ -1,6 +1,6 @@
 package com.lnf.company.model;
 
-import com.lnf.company.model.enums.CompanyLnfPlanStatus;
+import com.lnf.company.model.enums.CompanyPlanStatus;
 import com.lnf.model.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "company_lnf_plan")
-public class CompanyLnfPlan extends AuditableEntity {
+public class CompanyPlan extends AuditableEntity {
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,18 +27,18 @@ public class CompanyLnfPlan extends AuditableEntity {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lnf_plan_id", referencedColumnName = "id", nullable = false)
-    private LnfPlan lnfPlan;
+    private Plan plan;
 
     @Column(name = "start_date")
     private Date startDate;
 
     @Column(nullable = false, name = "status")
     @Enumerated(EnumType.STRING)
-    private CompanyLnfPlanStatus status;
+    private CompanyPlanStatus status;
 
     @ToString.Exclude
     @Builder.Default
-    @OneToMany(mappedBy = "companyLnfPlan", cascade = CascadeType.ALL)
-    private Set<CompanyLnfPlanAudit> CompanyLnfPlanAudits = new HashSet<>();
+    @OneToMany(mappedBy = "companyPlan", cascade = CascadeType.ALL)
+    private Set<CompanyPlanAudit> CompanyPlanAudits = new HashSet<>();
 
 }

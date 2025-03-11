@@ -15,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "lnf_plan")
-public class LnfPlan extends AuditableEntity {
+public class Plan extends AuditableEntity {
 
     @Column(name = "plan_name", nullable = false, unique = true)
     private String planName;
@@ -25,7 +25,7 @@ public class LnfPlan extends AuditableEntity {
 
     @ToString.Exclude
     @Builder.Default
-    @OneToMany(mappedBy = "lnfPlan", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private Set<CompanyLnfPlan> companyLnfPlans = new HashSet<>();
+    @OneToMany(mappedBy = "plan", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<CompanyPlan> companyLnfPlans = new HashSet<>();
 
 }

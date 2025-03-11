@@ -1,25 +1,25 @@
 package com.lnf.company.converter;
 
-import com.lnf.company.model.CompanyLnfPlanAudit;
-import com.lnf.dto.company.CompanyLnfPlanAuditDto;
+import com.lnf.company.model.CompanyPlanAudit;
+import com.lnf.dto.company.CompanyPlanAuditDto;
 
-public class CompanyLnfPlanAuditConverter {
-    private CompanyLnfPlanAuditConverter() {
+public class CompanyPlanAuditConverter {
+    private CompanyPlanAuditConverter() {
     }
 
-    public static CompanyLnfPlanAuditDto toTransportModel(CompanyLnfPlanAudit entity) {
+    public static CompanyPlanAuditDto toTransportModel(CompanyPlanAudit entity) {
         if (entity == null) {
             return null;
         }
-        return CompanyLnfPlanAuditDto.builder()
+        return CompanyPlanAuditDto.builder()
                 .id(entity.getId())
                 .startDate(entity.getStartDate())
                 .status(entity.getStatus())
-                .companyPlanId(entity.getCompanyLnfPlan().getId())
+                .companyPlanId(entity.getCompanyPlan().getId())
                 .build();
     }
 
-    public static CompanyLnfPlanAudit toEntityModel(CompanyLnfPlanAuditDto transport, CompanyLnfPlanAudit entity) {
+    public static CompanyPlanAudit toEntityModel(CompanyPlanAuditDto transport, CompanyPlanAudit entity) {
         if (transport == null || entity == null) {
             return null;
         }

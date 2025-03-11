@@ -1,13 +1,13 @@
 package com.lnf.company.service;
 
 import com.google.common.collect.Lists;
-import com.lnf.company.converter.LnfPlanConverter;
+import com.lnf.company.converter.PlanConverter;
 import com.lnf.company.exception.LnFBadRequestException;
 import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.exception.LnFException;
-import com.lnf.company.model.LnfPlan;
-import com.lnf.company.repository.LnfPlanRepository;
-import com.lnf.dto.company.LnfPlanDto;
+import com.lnf.company.model.Plan;
+import com.lnf.company.repository.PlanRepository;
+import com.lnf.dto.company.PlanDto;
 import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
@@ -27,62 +27,62 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 @Slf4j
-public class LnfPlanService implements PaginatedAndSortedService<LnfPlanDto> {
+public class PlanService implements PaginatedAndSortedService<PlanDto> {
 
-    private final LnfPlanRepository repository;
+    private final PlanRepository repository;
 
     @Override
-    public Page<LnfPlanDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
+    public Page<PlanDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
-        Page<LnfPlan> resultPage = repository.findAll(PageRequest.of(page, size, sortInfo));
+        Page<Plan> resultPage = repository.findAll(PageRequest.of(page, size, sortInfo));
         return validateAndGetPages(page, resultPage);
     }
 
     @Override
-    public Page<LnfPlanDto> findPaginated(int page, int size) {
-        Page<LnfPlan> resultPage = repository.findAll(PageRequest.of(page, size));
+    public Page<PlanDto> findPaginated(int page, int size) {
+        Page<Plan> resultPage = repository.findAll(PageRequest.of(page, size));
         return validateAndGetPages(page, resultPage);
     }
 
     @Override
-    public List<LnfPlanDto> findAllSorted(String sortBy, String sortOrder) {
+    public List<PlanDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
-        List<LnfPlan> entities = Lists.newArrayList(repository.findAll(sortInfo));
-        return entities.stream().map(LnfPlanConverter::toTransportModel)
+        List<Plan> entities = Lists.newArrayList(repository.findAll(sortInfo));
+        return entities.stream().map(PlanConverter::toTransportModel)
                 .filter(Objects::nonNull)
                 .toList();
     }
 
     @Override
-    public List<LnfPlanDto> findAll() {
+    public List<PlanDto> findAll() {
         return repository.findAll().stream().
-                map(LnfPlanConverter::toTransportModel)
+                map(PlanConverter::toTransportModel)
                 .filter(Objects::nonNull)
                 .toList();
     }
 
-    public void create(List<LnfPlanDto> resource) {
+    public void create(List<PlanDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 "Failed to create LnfPlan with null payload");
-        List<LnfPlan> entities = new ArrayList<>();
-        resource.stream().filter(Objects::nonNull).forEach(LnfPlanDto -> {
-            LnfPlan entity = LnfPlanConverter.toEntityModel(LnfPlanDto, new LnfPlan());
+        List<Plan> entities = new ArrayList<>();
+        resource.stream().filter(Objects::nonNull).forEach(PlanDto -> {
+            Plan entity = PlanConverter.toEntityModel(PlanDto, new Plan());
             entities.add(entity);
         });
         save(entities);
         log.debug("LnfPlans successfully created");
     }
 
-    public void create(LnfPlanDto resource) {
+    public void create(PlanDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 "Failed to create LnfPlan with null payload");
-        LnfPlan entity = LnfPlanConverter.toEntityModel(resource, new LnfPlan());
+        Plan entity = PlanConverter.toEntityModel(resource, new Plan());
         save(entity);
         log.debug("LnfPlan successfully created");
     }
 
 
-    private void save(List<LnfPlan> entities) {
+    private void save(List<Plan> entities) {
         try {
             repository.saveAll(entities);
         } catch (RuntimeException e) {
@@ -91,7 +91,7 @@ public class LnfPlanService implements PaginatedAndSortedService<LnfPlanDto> {
         }
     }
 
-    private void save(LnfPlan entity) {
+    private void save(Plan entity) {
         try {
             repository.save(entity);
         } catch (RuntimeException e) {
@@ -100,39 +100,39 @@ public class LnfPlanService implements PaginatedAndSortedService<LnfPlanDto> {
         }
     }
 
-    public void update(UUID lnfPlanId, LnfPlanDto resource) {
+    public void update(UUID planId, PlanDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, "Failed to update LnfPlan with null payload");
-        LnfPlan entity = searchForLnfPlan(lnfPlanId);
-        save(LnfPlanConverter.toEntityModel(resource, entity));
-        log.debug("LnfPlan for Id {} successfully created", lnfPlanId);
+        Plan entity = searchForLnfPlan(planId);
+        save(PlanConverter.toEntityModel(resource, entity));
+        log.debug("LnfPlan for Id {} successfully created", planId);
     }
 
-    private LnfPlan searchForLnfPlan(UUID lnfPlanId) {
-        return repository.findById(lnfPlanId).
-                orElseThrow(() -> new LnFEntityNotFoundException("LnfPlan with id [%s] does not exist".formatted(lnfPlanId)));
+    private Plan searchForLnfPlan(UUID planId) {
+        return repository.findById(planId).
+                orElseThrow(() -> new LnFEntityNotFoundException("LnfPlan with id [%s] does not exist".formatted(planId)));
     }
 
-    public void deleteById(UUID lnfPlanId) {
-        LnfPlan entity = searchForLnfPlan(lnfPlanId);
+    public void deleteById(UUID planId) {
+        Plan entity = searchForLnfPlan(planId);
         try {
             repository.delete(entity);
-            log.debug("LnfPlan {} successfully deleted", lnfPlanId);
+            log.debug("LnfPlan {} successfully deleted", planId);
         } catch (RuntimeException e) {
-            String errorMessage = "Failed to delete LnfPlan[%s]".formatted(lnfPlanId);
+            String errorMessage = "Failed to delete LnfPlan[%s]".formatted(planId);
             throw new LnFException(errorMessage);
         }
     }
 
-    public LnfPlanDto findById(UUID lnfPlanId) {
-        return LnfPlanConverter.toTransportModel(searchForLnfPlan(lnfPlanId));
+    public PlanDto findById(UUID planId) {
+        return PlanConverter.toTransportModel(searchForLnfPlan(planId));
     }
 
-    private Page<LnfPlanDto> validateAndGetPages(int page, Page<LnfPlan> resultPage) {
+    private Page<PlanDto> validateAndGetPages(int page, Page<Plan> resultPage) {
         if (page > resultPage.getTotalPages()) {
             throw new LnFEntityNotFoundException(("Total number of pages [%d], " +
                     "requested page [%d] does not exist").formatted(resultPage.getTotalPages(), page));
         }
-        return resultPage.map(LnfPlanConverter::toTransportModel);
+        return resultPage.map(PlanConverter::toTransportModel);
     }
 
 }

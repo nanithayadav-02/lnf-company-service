@@ -13,12 +13,12 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "company_lnf_plan_audit")
-public class CompanyLnfPlanAudit extends AuditableEntity {
+public class CompanyPlanAudit extends AuditableEntity {
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_lnf_plan_id", referencedColumnName = "id", nullable = false)
-    private CompanyLnfPlan companyLnfPlan;
+    private CompanyPlan companyPlan;
 
     @Column(name = "start_date")
     private Date startDate;

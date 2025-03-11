@@ -1,9 +1,9 @@
 package com.lnf.company.repository;
 
-import com.lnf.company.model.LnfPlan;
+import com.lnf.company.model.Plan;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface LnfPlanRepository extends JpaRepository<LnfPlan, UUID> {
+public interface PlanRepository extends JpaRepository<Plan, UUID> {
 }

@@ -1,8 +1,8 @@
 package com.lnf.company.controller;
 
-import com.lnf.company.service.CompanyLnfPlanService;
+import com.lnf.company.service.CompanyPlanService;
 import com.lnf.dto.common.PageRequestDto;
-import com.lnf.dto.company.CompanyLnfPlanDto;
+import com.lnf.dto.company.CompanyPlanDto;
 import com.lnf.service.common.page.PageableAsQueryParam;
 import com.lnf.service.common.page.PaginationAndSortingHandler;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,12 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/lnf")
-public class CompanyLnfPlanController {
+public class CompanyPlanController {
 
-    private final CompanyLnfPlanService service;
+    private final CompanyPlanService service;
     private final PaginationAndSortingHandler paginationAndSortingHandler;
 
-    @GetMapping(value = "/company/companyLnfPlan")
+    @GetMapping(value = "/company/CompanyPlan")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest) {
         return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
@@ -29,27 +29,27 @@ public class CompanyLnfPlanController {
 
     @GetMapping(value = "/company/{companyId}/plan")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompanyLnfPlanDto> findByCompanyId(@PathVariable final UUID companyId) {
+    public List<CompanyPlanDto> findByCompanyId(@PathVariable final UUID companyId) {
         return service.findByCompanyId(companyId);
     }
 
-    @GetMapping(value = "/company/{companyId}/plan/{companyLnfPlanId}")
+    @GetMapping(value = "/company/{companyId}/plan/{CompanyPlanId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompanyLnfPlanDto findById(@PathVariable final UUID companyId, @PathVariable final UUID companyLnfPlanId) {
-        return service.findById(companyId, companyLnfPlanId);
+    public CompanyPlanDto findById(@PathVariable final UUID companyId, @PathVariable final UUID CompanyPlanId) {
+        return service.findById(companyId, CompanyPlanId);
     }
 
     @PostMapping(value = "/company/{companyId}/plan")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable final UUID companyId, @RequestBody final CompanyLnfPlanDto resource) {
+    public void create(@PathVariable final UUID companyId, @RequestBody final CompanyPlanDto resource) {
         service.create(companyId, resource);
     }
 
-    @PutMapping(value = "/company/{companyId}/plan/{companyLnfPlanId}")
+    @PutMapping(value = "/company/{companyId}/plan/{CompanyPlanId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable final UUID companyId, @PathVariable final UUID companyLnfPlanId,
-                       @RequestBody final CompanyLnfPlanDto resource) {
-        service.update(companyId, companyLnfPlanId, resource);
+    public void update(@PathVariable final UUID companyId, @PathVariable final UUID CompanyPlanId,
+                       @RequestBody final CompanyPlanDto resource) {
+        service.update(companyId, CompanyPlanId, resource);
     }
 
     @DeleteMapping(value = "/company/{companyId}/plan")
@@ -58,10 +58,10 @@ public class CompanyLnfPlanController {
         service.deleteByCompanyId(companyId);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/plan/{companyLnfPlanId}")
+    @DeleteMapping(value = "/company/{companyId}/plan/{CompanyPlanId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID companyId, @PathVariable final UUID companyLnfPlanId) {
-        service.deleteById(companyId, companyLnfPlanId);
+    public void delete(@PathVariable final UUID companyId, @PathVariable final UUID CompanyPlanId) {
+        service.deleteById(companyId, CompanyPlanId);
     }
 
 }

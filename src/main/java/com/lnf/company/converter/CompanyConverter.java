@@ -18,6 +18,7 @@ package com.lnf.company.converter;
 
 import com.lnf.company.model.*;
 import com.lnf.dto.company.CompanyDto;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,13 @@ public class CompanyConverter {
             return null;
         }
 
+        String planName = !CollectionUtils.isEmpty(entity.getCompanyPlans())
+                ? entity.getCompanyPlans().stream()
+                .map(companyPlan -> companyPlan.getPlan().getPlanName())
+                .findFirst()
+                .orElse(null)
+                : null;
+
         return CompanyDto.builder()
                 .id(entity.getId())
                 .code(entity.getCode())
@@ -50,13 +58,13 @@ public class CompanyConverter {
                 .arn(entity.getArn())
                 .arnIssueDate(entity.getArnIssueDate())
                 .sacCode(entity.getSacCode())
+                .planName(planName)
                 .address(safeConvert(entity.getAddress(), AddressConverter::toTransportModel))
                 .gst(safeConvert(entity.getGst(), GstConverter::toTransportModel))
                 .theme(safeConvert(entity.getTheme(), ThemeConverter::toTransportModel))
                 .notes(safeConvert(entity.getCompanyNotes(), CompanyNotesConverter::toTransportModel))
                 .companyEvent(safeConvert(entity.getCompanyEvent(), CompanyEventConverter::toTransportModel))
                 .companyHoliday(safeConvert(entity.getCompanyHoliday(), CompanyHolidayConverter::toTransportModel))
-                .companyLnfPlans(safeConvert(entity.getCompanyLnfPlans(), CompanyLnfPlanConverter::toTransportModel))
                 .build();
     }
 
@@ -74,7 +82,6 @@ public class CompanyConverter {
         addNotesToEntityModel(transport, entity);
         addCompanyEventToEntityModel(transport, entity);
         addCompanyHolidayToEntityModel(transport, entity);
-        addCompanyLnfPlanToEntityModel(transport, entity);
         return entity;
     }
 
@@ -168,18 +175,6 @@ public class CompanyConverter {
                 companyEventList.add(entity);
             });
             company.getCompanyEvent().addAll(companyEventList);
-        }
-    }
-
-    private static void addCompanyLnfPlanToEntityModel(CompanyDto transport, Company company) {
-        if (transport.getCompanyLnfPlans() != null) {
-            List<CompanyLnfPlan> companyLnfPlans = new ArrayList<>();
-            transport.getCompanyLnfPlans().stream().filter(Objects::nonNull).forEach(dto -> {
-                CompanyLnfPlan entity = CompanyLnfPlanConverter.toEntityModel(dto, new CompanyLnfPlan());
-                entity.setCompany(company);
-                companyLnfPlans.add(entity);
-            });
-            company.getCompanyLnfPlans().addAll(companyLnfPlans);
         }
     }
 

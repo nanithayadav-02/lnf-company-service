@@ -1,8 +1,8 @@
 package com.lnf.company.controller;
 
-import com.lnf.company.service.LnfPlanService;
+import com.lnf.company.service.PlanService;
 import com.lnf.dto.common.PageRequestDto;
-import com.lnf.dto.company.LnfPlanDto;
+import com.lnf.dto.company.PlanDto;
 import com.lnf.service.common.page.PageableAsQueryParam;
 import com.lnf.service.common.page.PaginationAndSortingHandler;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/lnf")
-public class LnfPlanController {
+public class PlanController {
 
-    private final LnfPlanService service;
+    private final PlanService service;
     private final PaginationAndSortingHandler paginationAndSortingHandler;
 
     @GetMapping(value = "/company/plans")
@@ -28,20 +28,20 @@ public class LnfPlanController {
 
     @GetMapping(value = "/company/plans/{planId}")
     @ResponseStatus(HttpStatus.OK)
-    public LnfPlanDto findById(@PathVariable final UUID planId) {
+    public PlanDto findById(@PathVariable final UUID planId) {
         return service.findById(planId);
     }
 
     @PostMapping(value = "/company/plans")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@RequestBody final LnfPlanDto resource) {
+    public void create(@RequestBody final PlanDto resource) {
         service.create(resource);
     }
 
     @PutMapping(value = "/company/plans/{planId}")
     @ResponseStatus(HttpStatus.OK)
     public void update(@PathVariable final UUID planId,
-                       @RequestBody final LnfPlanDto resource) {
+                       @RequestBody final PlanDto resource) {
         service.update(planId, resource);
     }
 

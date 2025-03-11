@@ -1,6 +1,6 @@
 package com.lnf.company.model.enums;
 
-public enum CompanyLnfPlanStatus {
+public enum CompanyPlanStatus {
 
     ACTIVE("ACTIVE"),
 
@@ -8,7 +8,7 @@ public enum CompanyLnfPlanStatus {
 
     private final String label;
 
-    CompanyLnfPlanStatus(String label) {
+    CompanyPlanStatus(String label) {
         this.label = label;
     }
 
@@ -16,8 +16,8 @@ public enum CompanyLnfPlanStatus {
         return label;
     }
 
-    public static CompanyLnfPlanStatus valueOfLabel(String label) {
-        for (CompanyLnfPlanStatus at : values()) {
+    public static CompanyPlanStatus valueOfLabel(String label) {
+        for (CompanyPlanStatus at : values()) {
             if (at.label.equals(label)) {
                 return at;
             }
