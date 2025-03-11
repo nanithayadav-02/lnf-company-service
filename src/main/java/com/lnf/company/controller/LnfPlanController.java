@@ -21,11 +21,13 @@ public class LnfPlanController {
     private final PaginationAndSortingHandler paginationAndSortingHandler;
 
     @GetMapping(value = "/company/plans")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest) {
         return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
     }
 
     @GetMapping(value = "/company/plans/{planId}")
+    @ResponseStatus(HttpStatus.OK)
     public LnfPlanDto findById(@PathVariable final UUID planId) {
         return service.findById(planId);
     }

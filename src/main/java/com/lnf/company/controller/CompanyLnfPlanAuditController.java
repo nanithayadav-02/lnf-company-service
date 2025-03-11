@@ -22,16 +22,19 @@ public class CompanyLnfPlanAuditController {
     private final PaginationAndSortingHandler paginationAndSortingHandler;
 
     @GetMapping(value = "/company/plan/history")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest) {
         return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
     }
 
     @GetMapping(value = "/company/{companyLnfPlanId}/plan/history")
+    @ResponseStatus(HttpStatus.OK)
     public List<CompanyLnfPlanAuditDto> findByCompanyLnfPlanId(@PathVariable final UUID companyLnfPlanId) {
         return service.findByCompanyLnfPlanId(companyLnfPlanId);
     }
 
     @GetMapping(value = "/company/{companyLnfPlanId}/plan/history/{historyId}")
+    @ResponseStatus(HttpStatus.OK)
     public CompanyLnfPlanAuditDto findById(@PathVariable final UUID companyLnfPlanId, @PathVariable final UUID historyId) {
         return service.findById(companyLnfPlanId, historyId);
     }

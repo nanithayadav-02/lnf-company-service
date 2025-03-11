@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.lnf.util.CommonUtils.safeConvert;
+
 public class CompanyLnfPlanConverter {
 
     private CompanyLnfPlanConverter() {
@@ -25,6 +27,7 @@ public class CompanyLnfPlanConverter {
                 .status(entity.getStatus().name())
                 .companyId(entity.getCompany().getId())
                 .lnfPlanId(entity.getLnfPlan().getId())
+                .companyLnfPlanAudits(safeConvert(entity.getCompanyLnfPlanAudits(), CompanyLnfPlanAuditConverter::toTransportModel))
                 .build();
     }
 

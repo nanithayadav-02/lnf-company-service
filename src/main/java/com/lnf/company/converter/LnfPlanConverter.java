@@ -13,11 +13,18 @@ public class LnfPlanConverter {
     }
 
     public static LnfPlanDto toTransportModel(LnfPlan entity) {
-        return LnfPlanDto.builder()
-                .id(entity.getId())
-                .planName(entity.getPlanName())
-                .description(entity.getDescription()).build();
+        if (entity == null) {
+            return null;
+        }
+        LnfPlanDto dto = new LnfPlanDto();
+        dto.setId(entity.getId());
+        dto.setPlanName(entity.getPlanName());
+        dto.setDescription(entity.getDescription());
+        dto.setCompanyLnfPlans(new ArrayList<>());
+        dto.getCompanyLnfPlans().addAll(entity.getCompanyLnfPlans().stream().
+                map(CompanyLnfPlanConverter::toTransportModel).filter(Objects::nonNull).toList());
 
+        return dto;
     }
 
     public static LnfPlan toEntityModel(LnfPlanDto transport, LnfPlan entity) {

@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -141,8 +140,7 @@ public class CompanyLnfPlanService implements PaginatedAndSortedService<CompanyL
     public List<CompanyLnfPlanDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyLnfPlan> entities = companyLnfPlanRepository.findByCompanyId(companyId);
-        return entities.stream().map(CompanyLnfPlanConverter::toTransportModel).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        return entities.stream().map(CompanyLnfPlanConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
     public CompanyLnfPlanDto findById(UUID companyId, UUID CompanyLnfPlanId) {

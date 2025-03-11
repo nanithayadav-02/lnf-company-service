@@ -8,12 +8,15 @@ public class CompanyLnfPlanAuditConverter {
     }
 
     public static CompanyLnfPlanAuditDto toTransportModel(CompanyLnfPlanAudit entity) {
+        if (entity == null) {
+            return null;
+        }
         return CompanyLnfPlanAuditDto.builder()
                 .id(entity.getId())
                 .startDate(entity.getStartDate())
                 .status(entity.getStatus())
+                .companyPlanId(entity.getCompanyLnfPlan().getId())
                 .build();
-
     }
 
     public static CompanyLnfPlanAudit toEntityModel(CompanyLnfPlanAuditDto transport, CompanyLnfPlanAudit entity) {
