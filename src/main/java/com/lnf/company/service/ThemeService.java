@@ -135,7 +135,7 @@ public class ThemeService {
         try {
             repository.saveAll(entities);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to save theme for company [%s]", entities.get(0).getCompany().getId());
+            String errorMessage = String.format("Failed to save theme for company [%s]", entities.getFirst().getCompany().getId());
             throw new LnFException(errorMessage);
         }
     }
