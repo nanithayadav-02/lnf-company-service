@@ -114,7 +114,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         try {
             companyNotesRepository.saveAll(entities);
         } catch (RuntimeException e) {
-            String errorMessage = String.format("Failed to save notes for company [%s]", entities.get(0).getCompany().getId());
+            String errorMessage = String.format("Failed to save notes for company [%s]", entities.getFirst().getCompany().getId());
             throw new LnFException(errorMessage);
         }
     }

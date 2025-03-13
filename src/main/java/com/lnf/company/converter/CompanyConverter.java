@@ -17,8 +17,8 @@
 package com.lnf.company.converter;
 
 import com.lnf.company.model.*;
-import com.lnf.company.model.*;
 import com.lnf.dto.company.CompanyDto;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,13 @@ public class CompanyConverter {
             return null;
         }
 
+        String planName = !CollectionUtils.isEmpty(entity.getCompanyPlans())
+                ? entity.getCompanyPlans().stream()
+                .map(companyPlan -> companyPlan.getPlan().getPlanName())
+                .findFirst()
+                .orElse(null)
+                : null;
+
         return CompanyDto.builder()
                 .id(entity.getId())
                 .code(entity.getCode())
@@ -51,6 +58,7 @@ public class CompanyConverter {
                 .arn(entity.getArn())
                 .arnIssueDate(entity.getArnIssueDate())
                 .sacCode(entity.getSacCode())
+                .planName(planName)
                 .address(safeConvert(entity.getAddress(), AddressConverter::toTransportModel))
                 .gst(safeConvert(entity.getGst(), GstConverter::toTransportModel))
                 .theme(safeConvert(entity.getTheme(), ThemeConverter::toTransportModel))

@@ -13,7 +13,6 @@ spring:
 aws:
   s3:
     bucket:
-      enabled: true
       service: "/lnf/files"
       folderName: "company"
 
