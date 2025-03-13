@@ -17,6 +17,9 @@ import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,6 +40,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
     private final CompanyPlanRepository CompanyPlanRepository;
     private final PlanRepository lnfPlanRepository;
     private final CompanyPlanAuditService lnfPlanAuditService;
+    private final CacheManager cacheManager;
 
     @Override
     public Page<CompanyPlanDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -72,7 +76,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 "Failed to create CompanyPlan for company [%s] with null payload".formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
-        Plan lnfPlan = searchForLnfPlan(resource.getLnfPlanId());
+        Plan lnfPlan = searchForPlan(resource.getLnfPlanId());
         CompanyPlan entity = CompanyPlanConverter.toEntityModel(resource, new CompanyPlan());
         entity.setCompany(companyEntity);
         entity.setPlan(lnfPlan);
@@ -85,9 +89,10 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
                 orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(companyId)));
     }
 
-    private Plan searchForLnfPlan(UUID lnfPlanId) {
-        return lnfPlanRepository.findById(lnfPlanId).
-                orElseThrow(() -> new LnFEntityNotFoundException("LnfPlan with id [%s] does not exist".formatted(lnfPlanId)));
+    @Cacheable(value="companyPlan" ,key = "#planId")
+    private Plan searchForPlan(UUID planId) {
+        return lnfPlanRepository.findById(planId).
+                orElseThrow(() -> new LnFEntityNotFoundException("LnfPlan with id [%s] does not exist".formatted(planId)));
     }
 
     private void save(CompanyPlan entity) {
@@ -100,27 +105,28 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         }
     }
 
-    public void update(UUID companyId, UUID CompanyPlanId, CompanyPlanDto resource) {
+    public void update(UUID companyId, UUID companyPlanId, CompanyPlanDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, "Failed to update CompanyPlan with null payload");
         searchForCompany(companyId);
-        CompanyPlan entity = searchForCompanyPlan(CompanyPlanId);
+        CompanyPlan entity = searchForCompanyPlan(companyPlanId);
         save(CompanyPlanConverter.toEntityModel(resource, entity));
-        log.debug("CompanyPlan for Employee {} successfully created", CompanyPlanId);
+        log.debug("CompanyPlan for Employee {} successfully created", companyPlanId);
     }
 
-    private CompanyPlan searchForCompanyPlan(UUID CompanyPlanId) {
-        return CompanyPlanRepository.findById(CompanyPlanId).
-                orElseThrow(() -> new LnFEntityNotFoundException("CompanyPlan with id [%s] does not exist".formatted(CompanyPlanId)));
+    private CompanyPlan searchForCompanyPlan(UUID companyPlanId) {
+        return CompanyPlanRepository.findById(companyPlanId).
+                orElseThrow(() -> new LnFEntityNotFoundException("CompanyPlan with id [%s] does not exist".formatted(companyPlanId)));
     }
 
-    public void deleteById(UUID companyId, UUID CompanyPlanId) {
+    @CacheEvict(value="companyPlan" ,key = "#companyPlanId")
+    public void deleteById(UUID companyId, UUID companyPlanId) {
         searchForCompany(companyId);
-        CompanyPlan entity = searchForCompanyPlan(CompanyPlanId);
+        CompanyPlan entity = searchForCompanyPlan(companyPlanId);
         try {
             CompanyPlanRepository.delete(entity);
-            log.debug("CompanyPlan {} for company {} successfully deleted", CompanyPlanId, companyId);
+            log.debug("CompanyPlan {} for company {} successfully deleted", companyPlanId, companyId);
         } catch (RuntimeException e) {
-            String errorMessage = "Failed to delete CompanyPlan[%s] for company [%s]".formatted(CompanyPlanId, companyId);
+            String errorMessage = "Failed to delete CompanyPlan[%s] for company [%s]".formatted(companyPlanId, companyId);
             throw new LnFException(errorMessage);
         }
     }
@@ -137,15 +143,17 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         }
     }
 
+    @Cacheable(value="companyPlan" ,key = "#companyId")
     public List<CompanyPlanDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyPlan> entities = CompanyPlanRepository.findByCompanyId(companyId);
         return entities.stream().map(CompanyPlanConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
-    public CompanyPlanDto findById(UUID companyId, UUID CompanyPlanId) {
+    @Cacheable(value="companyPlan" ,key = "#companyPlanId")
+    public CompanyPlanDto findById(UUID companyId, UUID companyPlanId) {
         searchForCompany(companyId);
-        return CompanyPlanConverter.toTransportModel(searchForCompanyPlan(CompanyPlanId));
+        return CompanyPlanConverter.toTransportModel(searchForCompanyPlan(companyPlanId));
     }
 
     private Page<CompanyPlanDto> validateAndGetPages(int page, Page<CompanyPlan> resultPage) {
@@ -162,6 +170,11 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         planAuditDto.setStartDate(plan.getStartDate());
         planAuditDto.setStatus(plan.getStatus().name());
         lnfPlanAuditService.create(plan.getId(), planAuditDto);
+    }
+
+    public void clearCaches() {
+        Objects.requireNonNull(cacheManager.getCache("companyPlan")).clear();
+        log.debug("CompanyPlan cache cleared.");
     }
 
 }

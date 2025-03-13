@@ -30,6 +30,9 @@ import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -51,6 +54,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
 
     private final CompanyEventRepository companyEventRepository;
     private final CompanyRepository companyRepository;
+    private final CacheManager cacheManager;
 
     @Override
     public Page<CompanyEventDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -85,6 +89,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         return resultPage.map(CompanyEventConverter::toTransportModel);
     }
 
+    @Cacheable(value="companyEvent" ,key = "#companyId")
     public List<CompanyEventDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
@@ -141,6 +146,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         return companyEventRepository.findById(eventId).orElseThrow(() -> new LnFEntityNotFoundException("companyEvent with id [%s] does not exist".formatted(eventId)));
     }
 
+    @Cacheable(value="companyEvent" ,key = "#companyId")
     public CompanyEventDto findById(UUID companyId, UUID eventId) {
         searchForCompany(companyId);
         return CompanyEventConverter.toTransportModel(searchForCompanyEvent(eventId));
@@ -154,7 +160,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         log.debug("companyEvent for Company {} successfully updated", companyId);
     }
 
-
+    @CacheEvict(value="companyEvent" ,key = "#eventId")
     public void deleteById(UUID companyId, UUID eventId) {
         searchForCompany(companyId);
         CompanyEvent entity = searchForCompanyEvent(eventId);
@@ -167,6 +173,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         }
     }
 
+    @CacheEvict(value="companyEvent" ,key = "#companyId")
     public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
@@ -177,6 +184,11 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
             String errorMessage = "Failed to delete event for company [%s]".formatted(companyId);
             throw new LnFException(errorMessage);
         }
+    }
+
+    public void clearCaches() {
+        Objects.requireNonNull(cacheManager.getCache("companyEvent")).clear();
+        log.debug("CompanyEvent cache cleared.");
     }
 
 }

@@ -12,6 +12,8 @@ import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -111,7 +113,7 @@ public class PlanService implements PaginatedAndSortedService<PlanDto> {
         return repository.findById(planId).
                 orElseThrow(() -> new LnFEntityNotFoundException("LnfPlan with id [%s] does not exist".formatted(planId)));
     }
-
+    @CacheEvict(value="company" ,key = "#planId")
     public void deleteById(UUID planId) {
         Plan entity = searchForLnfPlan(planId);
         try {
@@ -123,6 +125,7 @@ public class PlanService implements PaginatedAndSortedService<PlanDto> {
         }
     }
 
+    @Cacheable(value="company" ,key = "#planId")
     public PlanDto findById(UUID planId) {
         return PlanConverter.toTransportModel(searchForLnfPlan(planId));
     }

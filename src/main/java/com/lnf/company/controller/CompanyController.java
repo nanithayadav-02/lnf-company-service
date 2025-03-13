@@ -71,4 +71,10 @@ public class CompanyController {
         service.delete(companyId);
     }
 
+    @PostMapping("/company/refresh")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void clearCaches() {
+        service.clearCaches();
+    }
+
 }
