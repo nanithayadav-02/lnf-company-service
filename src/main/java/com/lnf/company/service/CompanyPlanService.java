@@ -39,7 +39,7 @@ import java.util.UUID;
 public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlanDto> {
 
     private final CompanyRepository companyRepository;
-    private final CompanyPlanRepository CompanyPlanRepository;
+    private final CompanyPlanRepository companyPlanRepository;
     private final PlanRepository lnfPlanRepository;
     private final CompanyPlanAuditService lnfPlanAuditService;
     private final CacheManager cacheManager;
@@ -47,20 +47,20 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
     @Override
     public Page<CompanyPlanDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
-        Page<CompanyPlan> resultPage = CompanyPlanRepository.findAll(PageRequest.of(page, size, sortInfo));
+        Page<CompanyPlan> resultPage = companyPlanRepository.findAll(PageRequest.of(page, size, sortInfo));
         return validateAndGetPages(page, resultPage);
     }
 
     @Override
     public Page<CompanyPlanDto> findPaginated(int page, int size) {
-        Page<CompanyPlan> resultPage = CompanyPlanRepository.findAll(PageRequest.of(page, size));
+        Page<CompanyPlan> resultPage = companyPlanRepository.findAll(PageRequest.of(page, size));
         return validateAndGetPages(page, resultPage);
     }
 
     @Override
     public List<CompanyPlanDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
-        List<CompanyPlan> entities = Lists.newArrayList(CompanyPlanRepository.findAll(sortInfo));
+        List<CompanyPlan> entities = Lists.newArrayList(companyPlanRepository.findAll(sortInfo));
         return entities.stream().map(CompanyPlanConverter::toTransportModel)
                 .filter(Objects::nonNull)
                 .toList();
@@ -68,7 +68,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
 
     @Override
     public List<CompanyPlanDto> findAll() {
-        return CompanyPlanRepository.findAll().stream().
+        return companyPlanRepository.findAll().stream().
                 map(CompanyPlanConverter::toTransportModel)
                 .filter(Objects::nonNull)
                 .toList();
@@ -80,7 +80,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         Company companyEntity = searchForCompany(companyId);
         Plan lnfPlan = searchForPlan(resource.getLnfPlanId());
 
-        List<CompanyPlan> companyPlans = CompanyPlanRepository.findByCompanyId(companyId);
+        List<CompanyPlan> companyPlans = companyPlanRepository.findByCompanyId(companyId);
 
         if (companyPlans != null && !companyPlans.isEmpty()) {
             // Check if the plan already exists
@@ -94,16 +94,17 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
                 CompanyPlan previousCompanyPlan = companyPlans.stream()
                         .filter(companyPlan -> companyPlan.getEndDate() == null)
                         .findFirst()
-                        .get();
+                        .orElseThrow(() -> new LnFException("No active plan found."));
 
                 LocalDate startDate = previousCompanyPlan.getStartDate();
 
-                if (startDate.equals(resource.getStartDate()) || startDate.isAfter(resource.getStartDate())) {
+                if (!startDate.isBefore(resource.getStartDate())) {
                     throw new LnFException("The provided start date cannot be the same as the existing plan's start date or any previous date.");
                 }
-                List<CompanyPlanDto> list = companyPlans.stream()
+
+                companyPlans.stream()
                         .filter(companyPlan -> companyPlan.getEndDate() == null)
-                        .map(plan -> {
+                        .forEach(plan -> {
                             CompanyPlanDto planDto = new CompanyPlanDto();
                             planDto.setCompanyId(companyId);
                             planDto.setId(plan.getId());
@@ -113,11 +114,10 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
                             planDto.setEndDate(resource.getStartDate().minusDays(1));
 
                             update(companyId, plan.getId(), planDto);
-                            return planDto;
-                        }).toList();
-
+                        });
             }
         }
+
         CompanyPlan entity = CompanyPlanConverter.toEntityModel(resource, new CompanyPlan());
         entity.setCompany(companyEntity);
         entity.setPlan(lnfPlan);
@@ -138,8 +138,8 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
 
     private void save(CompanyPlan entity) {
         try {
-            CompanyPlan CompanyPlan = CompanyPlanRepository.save(entity);
-            createCompanyPlanAudit(CompanyPlan);
+            CompanyPlan companyPlan = companyPlanRepository.save(entity);
+            createCompanyPlanAudit(companyPlan);
         } catch (RuntimeException e) {
             String errorMessage = String.format("Failed to save CompanyPlan for company [%s]", entity.getCompany().getId());
             throw new LnFException(errorMessage);
@@ -155,7 +155,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
     }
 
     private CompanyPlan searchForCompanyPlan(UUID companyPlanId) {
-        return CompanyPlanRepository.findById(companyPlanId).
+        return companyPlanRepository.findById(companyPlanId).
                 orElseThrow(() -> new LnFEntityNotFoundException("CompanyPlan with id [%s] does not exist".formatted(companyPlanId)));
     }
 
@@ -164,7 +164,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         searchForCompany(companyId);
         CompanyPlan entity = searchForCompanyPlan(companyPlanId);
         try {
-            CompanyPlanRepository.delete(entity);
+            companyPlanRepository.delete(entity);
             log.debug("CompanyPlan {} for company {} successfully deleted", companyPlanId, companyId);
         } catch (RuntimeException e) {
             String errorMessage = "Failed to delete CompanyPlan[%s] for company [%s]".formatted(companyPlanId, companyId);
@@ -174,9 +174,9 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
 
     public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
-        List<CompanyPlan> entities = CompanyPlanRepository.findByCompanyId(companyId);
+        List<CompanyPlan> entities = companyPlanRepository.findByCompanyId(companyId);
         try {
-            CompanyPlanRepository.deleteAll(entities);
+            companyPlanRepository.deleteAll(entities);
             log.debug("CompanyPlan for company {} successfully deleted", companyId);
         } catch (RuntimeException e) {
             String errorMessage = "Failed to delete CompanyPlan for company [%s]".formatted(companyId);
@@ -187,7 +187,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
     @Cacheable(value = "companyPlan", key = "#companyId")
     public List<CompanyPlanDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
-        List<CompanyPlan> entities = CompanyPlanRepository.findByCompanyId(companyId);
+        List<CompanyPlan> entities = companyPlanRepository.findByCompanyId(companyId);
         return entities.stream().map(CompanyPlanConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
