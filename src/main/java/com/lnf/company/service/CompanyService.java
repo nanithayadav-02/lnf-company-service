@@ -30,6 +30,9 @@ import com.lnf.util.RestUtil;
 import com.lnf.util.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -50,6 +53,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     private final CompanyRepository repository;
     private final ImageService imageService;
+    private final CacheManager cacheManager;
 
     @Override
     public Page<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -100,6 +104,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
         return SpecificationUtil.getFieldClass(Company.class, fieldName);
     }
 
+    @Cacheable(value="company" ,key = "#companyCode")
     public CompanyDto findByCompanyCode(String companyCode) {
         Company entity = search(companyCode);
         return findCompanyWithImage(entity);
@@ -132,6 +137,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
         log.debug("Company {} successfully updated", companyId);
     }
 
+    @CacheEvict(value="company" ,key = "#companyId")
     public void delete(UUID companyId) {
         Company entity = search(companyId);
         try {
@@ -170,6 +176,11 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
 
     private LnFEntityNotFoundException entityNotFoundException(Object companyIdentifier) {
         return new LnFEntityNotFoundException("Company with id/code [%s] does not exist".formatted(companyIdentifier));
+    }
+
+    public void clearCaches() {
+        Objects.requireNonNull(cacheManager.getCache("company")).clear();
+        log.debug("Company cache cleared.");
     }
 
 }
