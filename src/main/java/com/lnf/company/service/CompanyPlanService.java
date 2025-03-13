@@ -8,6 +8,7 @@ import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyPlan;
 import com.lnf.company.model.Plan;
+import com.lnf.company.model.enums.CompanyPlanStatus;
 import com.lnf.company.repository.CompanyPlanRepository;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.company.repository.PlanRepository;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -77,6 +79,45 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
                 "Failed to create CompanyPlan for company [%s] with null payload".formatted(companyId));
         Company companyEntity = searchForCompany(companyId);
         Plan lnfPlan = searchForPlan(resource.getLnfPlanId());
+
+        List<CompanyPlan> companyPlans = CompanyPlanRepository.findByCompanyId(companyId);
+
+        if (companyPlans != null && !companyPlans.isEmpty()) {
+            // Check if the plan already exists
+            boolean matchFound = companyPlans.stream()
+                    .anyMatch(plan -> plan.getPlan().getId().equals(resource.getLnfPlanId()));
+
+            if (matchFound) {
+                throw new LnFException("The specified plan is already active.");
+            } else {
+                // Get the plan with no end date
+                CompanyPlan previousCompanyPlan = companyPlans.stream()
+                        .filter(companyPlan -> companyPlan.getEndDate() == null)
+                        .findFirst()
+                        .get();
+
+                LocalDate startDate = previousCompanyPlan.getStartDate();
+
+                if (startDate.equals(resource.getStartDate()) || startDate.isAfter(resource.getStartDate())) {
+                    throw new LnFException("The provided start date cannot be the same as the existing plan's start date or any previous date.");
+                }
+                List<CompanyPlanDto> list = companyPlans.stream()
+                        .filter(companyPlan -> companyPlan.getEndDate() == null)
+                        .map(plan -> {
+                            CompanyPlanDto planDto = new CompanyPlanDto();
+                            planDto.setCompanyId(companyId);
+                            planDto.setId(plan.getId());
+                            planDto.setLnfPlanId(plan.getPlan().getId());
+                            planDto.setStatus(CompanyPlanStatus.CANCELLED.name());
+                            planDto.setStartDate(plan.getStartDate());
+                            planDto.setEndDate(resource.getStartDate().minusDays(1));
+
+                            update(companyId, plan.getId(), planDto);
+                            return planDto;
+                        }).toList();
+
+            }
+        }
         CompanyPlan entity = CompanyPlanConverter.toEntityModel(resource, new CompanyPlan());
         entity.setCompany(companyEntity);
         entity.setPlan(lnfPlan);
@@ -89,7 +130,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
                 orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(companyId)));
     }
 
-    @Cacheable(value="companyPlan" ,key = "#planId")
+    @Cacheable(value = "companyPlan", key = "#planId")
     private Plan searchForPlan(UUID planId) {
         return lnfPlanRepository.findById(planId).
                 orElseThrow(() -> new LnFEntityNotFoundException("LnfPlan with id [%s] does not exist".formatted(planId)));
@@ -118,7 +159,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
                 orElseThrow(() -> new LnFEntityNotFoundException("CompanyPlan with id [%s] does not exist".formatted(companyPlanId)));
     }
 
-    @CacheEvict(value="companyPlan" ,key = "#companyPlanId")
+    @CacheEvict(value = "companyPlan", key = "#companyPlanId")
     public void deleteById(UUID companyId, UUID companyPlanId) {
         searchForCompany(companyId);
         CompanyPlan entity = searchForCompanyPlan(companyPlanId);
@@ -143,14 +184,14 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         }
     }
 
-    @Cacheable(value="companyPlan" ,key = "#companyId")
+    @Cacheable(value = "companyPlan", key = "#companyId")
     public List<CompanyPlanDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyPlan> entities = CompanyPlanRepository.findByCompanyId(companyId);
         return entities.stream().map(CompanyPlanConverter::toTransportModel).filter(Objects::nonNull).toList();
     }
 
-    @Cacheable(value="companyPlan" ,key = "#companyPlanId")
+    @Cacheable(value = "companyPlan", key = "#companyPlanId")
     public CompanyPlanDto findById(UUID companyId, UUID companyPlanId) {
         searchForCompany(companyId);
         return CompanyPlanConverter.toTransportModel(searchForCompanyPlan(companyPlanId));
@@ -168,6 +209,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         CompanyPlanAuditDto planAuditDto = new CompanyPlanAuditDto();
         planAuditDto.setCompanyPlanId(plan.getId());
         planAuditDto.setStartDate(plan.getStartDate());
+        planAuditDto.setEndDate(plan.getEndDate());
         planAuditDto.setStatus(plan.getStatus().name());
         lnfPlanAuditService.create(plan.getId(), planAuditDto);
     }

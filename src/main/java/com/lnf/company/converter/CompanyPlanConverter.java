@@ -24,6 +24,7 @@ public class CompanyPlanConverter {
         return CompanyPlanDto.builder()
                 .id(entity.getId())
                 .startDate(entity.getStartDate())
+                .endDate(entity.getEndDate())
                 .status(entity.getStatus().name())
                 .companyId(entity.getCompany().getId())
                 .lnfPlanId(entity.getPlan().getId())
@@ -39,6 +40,7 @@ public class CompanyPlanConverter {
 
         entity.setId(transport.getId());
         entity.setStartDate(transport.getStartDate());
+        entity.setEndDate(transport.getEndDate());
         entity.setStatus(CompanyPlanStatus.valueOf(transport.getStatus()));
         addCompanyPlanAuditToEntityModel(transport, entity);
         return entity;
