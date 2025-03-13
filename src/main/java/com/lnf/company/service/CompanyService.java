@@ -30,9 +30,12 @@ import com.lnf.util.RestUtil;
 import com.lnf.util.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -54,6 +57,9 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
     private final CompanyRepository repository;
     private final ImageService imageService;
     private final CacheManager cacheManager;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Override
     public Page<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -104,7 +110,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
         return SpecificationUtil.getFieldClass(Company.class, fieldName);
     }
 
-    @Cacheable(value="company" ,key = "#companyCode")
+    @Cacheable(value = "company", key = "#companyCode")
     public CompanyDto findByCompanyCode(String companyCode) {
         Company entity = search(companyCode);
         return findCompanyWithImage(entity);
@@ -123,6 +129,9 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
                 "Failed to create Company with null payload");
         Company entity = CompanyConverter.toEntityModel(resource);
         saveEntity(entity);
+        if (resource.getCode() != null) {
+            applicationContext.getBean(this.getClass()).findByCode(resource.getCode());
+        }
         log.debug("Company {} successfully created", entity.getCode());
     }
 
@@ -134,10 +143,24 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
         Company updatedEntity = CompanyConverter.toEntityModel(resource);
         updatedEntity.setId(entity.getId());
         saveEntity(updatedEntity);
+
+        if (resource.getCode() != null) {
+            applicationContext.getBean(this.getClass()).findByCode(resource.getCode());
+        }
+        if (entity.getCode() != null && !Objects.equals(resource.getCode(), entity.getCode())) {
+            applicationContext.getBean(this.getClass()).findByCode(entity.getCode());
+        }
+
         log.debug("Company {} successfully updated", companyId);
     }
 
-    @CacheEvict(value="company" ,key = "#companyId")
+    @CachePut(value = "company", key = "#companyCode")
+    public CompanyDto findByCode(String companyCode) {
+        Company entity = search(companyCode);
+        return findCompanyWithImage(entity);
+    }
+
+    @CacheEvict(value = "company", key = "#companyId")
     public void delete(UUID companyId) {
         Company entity = search(companyId);
         try {
