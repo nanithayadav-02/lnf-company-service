@@ -18,12 +18,9 @@ import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -46,8 +43,6 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
     private final PlanRepository lnfPlanRepository;
     private final CompanyPlanAuditService lnfPlanAuditService;
     private final CacheManager cacheManager;
-    @Autowired
-    private ApplicationContext applicationContext;
 
     @Override
     public Page<CompanyPlanDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -127,9 +122,6 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         entity.setCompany(companyEntity);
         entity.setPlan(lnfPlan);
         save(entity);
-        if (resource.getCompanyId() != null) {
-            applicationContext.getBean(this.getClass()).findById(companyId);
-        }
         log.debug("CompanyPlan for company {} successfully created", companyId);
     }
 
@@ -159,22 +151,7 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         searchForCompany(companyId);
         CompanyPlan entity = searchForCompanyPlan(companyPlanId);
         save(CompanyPlanConverter.toEntityModel(resource, entity));
-
-        if (resource.getCompanyId() != null) {
-            applicationContext.getBean(this.getClass()).findById(companyId);
-        }
-        if (entity.getCompany().getId() != null && !Objects.equals(resource.getCompanyId(), entity.getCompany().getId())) {
-            applicationContext.getBean(this.getClass()).findById(companyId);
-        }
-
-        log.debug("CompanyPlan for Employee {} successfully created", companyPlanId);
-    }
-
-    @CachePut(value = "companyPlan", key = "#companyId")
-    public List<CompanyPlanDto> findById(UUID companyId) {
-        searchForCompany(companyId);
-        List<CompanyPlan> entities = companyPlanRepository.findByCompanyId(companyId);
-        return entities.stream().map(CompanyPlanConverter::toTransportModel).filter(Objects::nonNull).toList();
+        log.debug("CompanyPlan for Plan {} successfully created", companyPlanId);
     }
 
     private CompanyPlan searchForCompanyPlan(UUID companyPlanId) {
@@ -207,7 +184,6 @@ public class CompanyPlanService implements PaginatedAndSortedService<CompanyPlan
         }
     }
 
-    @Cacheable(value = "companyPlan", key = "#companyId")
     public List<CompanyPlanDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyPlan> entities = companyPlanRepository.findByCompanyId(companyId);
