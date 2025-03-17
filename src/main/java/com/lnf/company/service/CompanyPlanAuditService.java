@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -52,8 +51,7 @@ public class CompanyPlanAuditService implements PaginatedAndSortedService<Compan
     public List<CompanyPlanAuditDto> findAllSorted(String sortBy, String sortOrder) {
         final Sort sortInfo = RestUtil.constructSort(sortBy, sortOrder);
         List<CompanyPlanAudit> entities = Lists.newArrayList(repository.findAll(sortInfo));
-        return entities.stream().map(CompanyPlanAuditConverter::toTransportModel)
-                .filter(Objects::nonNull)
+        return entities.stream().filter(Objects::nonNull).map(CompanyPlanAuditConverter::toTransportModel)
                 .toList();
     }
 
@@ -152,8 +150,8 @@ public class CompanyPlanAuditService implements PaginatedAndSortedService<Compan
     public List<CompanyPlanAuditDto> findByCompanyPlanId(UUID CompanyPlanId) {
         searchForCompanyPlan(CompanyPlanId);
         List<CompanyPlanAudit> entities = repository.findByCompanyPlanId(CompanyPlanId);
-        return entities.stream().map(CompanyPlanAuditConverter::toTransportModel).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        return entities.stream().filter(Objects::nonNull).map(CompanyPlanAuditConverter::toTransportModel)
+                .toList();
     }
 
     public CompanyPlanAuditDto findById(UUID CompanyPlanId, UUID CompanyPlanAuditId) {
@@ -167,6 +165,12 @@ public class CompanyPlanAuditService implements PaginatedAndSortedService<Compan
                     "requested page [%d] does not exist").formatted(resultPage.getTotalPages(), page));
         }
         return resultPage.map(CompanyPlanAuditConverter::toTransportModel);
+    }
+
+    public List<CompanyPlanAuditDto> findByCompanyId(UUID CompanyId) {
+        List<CompanyPlanAudit> entities = repository.findByCompanyId(CompanyId);
+        return entities.stream().filter(Objects::nonNull).map(CompanyPlanAuditConverter::toTransportModel)
+                .toList();
     }
 
 }

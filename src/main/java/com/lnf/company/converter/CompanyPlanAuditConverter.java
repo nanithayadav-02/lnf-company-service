@@ -17,6 +17,8 @@ public class CompanyPlanAuditConverter {
                 .endDate(entity.getEndDate())
                 .status(entity.getStatus())
                 .companyPlanId(entity.getCompanyPlan().getId())
+                .planName(entity.getCompanyPlan().getPlan().getPlanName())
+                .description(entity.getCompanyPlan().getPlan().getDescription())
                 .build();
     }
 
