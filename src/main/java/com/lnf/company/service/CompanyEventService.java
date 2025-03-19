@@ -146,7 +146,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         return companyEventRepository.findById(eventId).orElseThrow(() -> new LnFEntityNotFoundException("companyEvent with id [%s] does not exist".formatted(eventId)));
     }
 
-    @Cacheable(value="companyEvent" ,key = "#companyId")
+    @Cacheable(value="companyEvent" ,key = "#eventId")
     public CompanyEventDto findById(UUID companyId, UUID eventId) {
         searchForCompany(companyId);
         return CompanyEventConverter.toTransportModel(searchForCompanyEvent(eventId));
