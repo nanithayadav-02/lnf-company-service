@@ -3,7 +3,7 @@ spring:
     active: dev-ide
 
   redis:
-    host: ${REDIS_CACHE_HOST:localhost
+    host: ${REDIS_CACHE_HOST:localhost}
     port: ${REDIS_CACHE_PORT:6379}
   cache:
     redis:
