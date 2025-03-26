@@ -18,14 +18,14 @@ package com.lnf.company.service;
 
 import com.google.common.collect.Lists;
 import com.lnf.company.converter.CompanyNotesConverter;
-import com.lnf.company.exception.LnFBadRequestException;
-import com.lnf.company.exception.LnFEntityNotFoundException;
-import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyNotes;
 import com.lnf.company.repository.CompanyNotesRepository;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.NotesDto;
+import com.lnf.exception.LnFBadRequestException;
+import com.lnf.exception.LnFEntityNotFoundException;
+import com.lnf.exception.LnFException;
 import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
@@ -145,7 +145,8 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         return companyNotesRepository.findById(notesId).
                 orElseThrow(() -> new LnFEntityNotFoundException("notes with id [%s] does not exist".formatted(notesId)));
     }
-    @CacheEvict(value="companyNotes" ,key = "#notesId")
+
+    @CacheEvict(value = "companyNotes", key = "#notesId")
     public void deleteById(UUID companyId, UUID notesId) {
         searchForCompany(companyId);
         CompanyNotes entity = searchForNotes(notesId);
@@ -158,7 +159,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         }
     }
 
-    @CacheEvict(value="companyNotes" ,key = "#companyId")
+    @CacheEvict(value = "companyNotes", key = "#companyId")
     public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyNotes> entities = companyNotesRepository.findByCompanyId(companyId);
@@ -171,7 +172,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         }
     }
 
-    @Cacheable(value="companyNotes" ,key = "#companyId")
+    @Cacheable(value = "companyNotes", key = "#companyId")
     public List<NotesDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyNotes> entities = companyNotesRepository.findByCompanyId(companyId);
@@ -179,7 +180,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
                 .collect(Collectors.toList());
     }
 
-    @Cacheable(value="companyNotes" ,key = "#notesId")
+    @Cacheable(value = "companyNotes", key = "#notesId")
     public NotesDto findById(UUID companyId, UUID notesId) {
         searchForCompany(companyId);
         return CompanyNotesConverter.toTransportModel(searchForNotes(notesId));

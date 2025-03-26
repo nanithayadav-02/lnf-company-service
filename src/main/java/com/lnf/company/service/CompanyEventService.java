@@ -18,14 +18,14 @@ package com.lnf.company.service;
 
 import com.google.common.collect.Lists;
 import com.lnf.company.converter.CompanyEventConverter;
-import com.lnf.company.exception.LnFBadRequestException;
-import com.lnf.company.exception.LnFEntityNotFoundException;
-import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyEvent;
 import com.lnf.company.repository.CompanyEventRepository;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.CompanyEventDto;
+import com.lnf.exception.LnFBadRequestException;
+import com.lnf.exception.LnFEntityNotFoundException;
+import com.lnf.exception.LnFException;
 import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
@@ -89,7 +89,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         return resultPage.map(CompanyEventConverter::toTransportModel);
     }
 
-    @Cacheable(value="companyEvent" ,key = "#companyId")
+    @Cacheable(value = "companyEvent", key = "#companyId")
     public List<CompanyEventDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
@@ -146,7 +146,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         return companyEventRepository.findById(eventId).orElseThrow(() -> new LnFEntityNotFoundException("companyEvent with id [%s] does not exist".formatted(eventId)));
     }
 
-    @Cacheable(value="companyEvent" ,key = "#eventId")
+    @Cacheable(value = "companyEvent", key = "#eventId")
     public CompanyEventDto findById(UUID companyId, UUID eventId) {
         searchForCompany(companyId);
         return CompanyEventConverter.toTransportModel(searchForCompanyEvent(eventId));
@@ -160,7 +160,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         log.debug("companyEvent for Company {} successfully updated", companyId);
     }
 
-    @CacheEvict(value="companyEvent" ,key = "#eventId")
+    @CacheEvict(value = "companyEvent", key = "#eventId")
     public void deleteById(UUID companyId, UUID eventId) {
         searchForCompany(companyId);
         CompanyEvent entity = searchForCompanyEvent(eventId);
@@ -173,7 +173,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         }
     }
 
-    @CacheEvict(value="companyEvent" ,key = "#companyId")
+    @CacheEvict(value = "companyEvent", key = "#companyId")
     public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);

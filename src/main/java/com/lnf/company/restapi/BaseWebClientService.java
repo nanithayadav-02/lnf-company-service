@@ -27,13 +27,12 @@ import java.util.Optional;
 @Service
 public abstract class BaseWebClientService {
 
-    protected WebClient.RequestHeadersSpec<?> addJwtToken(WebClient.RequestHeadersSpec<?> spec) {
+    protected void addJwtToken(WebClient.RequestHeadersSpec<?> spec) {
         // Retrieve the JWT token value, if available
         Optional<String> jwtTokenValue = getJwtTokenValue();
 
         // If the token value is present, add it to the request headers
         jwtTokenValue.ifPresent(token -> spec.headers(header -> header.setBearerAuth(token)));
-        return spec;
     }
     private Optional<String> getJwtTokenValue() {
         return Optional.ofNullable(getJwtToken())

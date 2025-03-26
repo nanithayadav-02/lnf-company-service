@@ -2,12 +2,12 @@ package com.lnf.company.service;
 
 import com.google.common.collect.Lists;
 import com.lnf.company.converter.PlanConverter;
-import com.lnf.company.exception.LnFBadRequestException;
-import com.lnf.company.exception.LnFEntityNotFoundException;
-import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Plan;
 import com.lnf.company.repository.PlanRepository;
 import com.lnf.dto.company.PlanDto;
+import com.lnf.exception.LnFBadRequestException;
+import com.lnf.exception.LnFEntityNotFoundException;
+import com.lnf.exception.LnFException;
 import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
@@ -113,7 +113,8 @@ public class PlanService implements PaginatedAndSortedService<PlanDto> {
         return repository.findById(planId).
                 orElseThrow(() -> new LnFEntityNotFoundException("LnfPlan with id [%s] does not exist".formatted(planId)));
     }
-    @CacheEvict(value="company" ,key = "#planId")
+
+    @CacheEvict(value = "company", key = "#planId")
     public void deleteById(UUID planId) {
         Plan entity = searchForLnfPlan(planId);
         try {
@@ -125,7 +126,7 @@ public class PlanService implements PaginatedAndSortedService<PlanDto> {
         }
     }
 
-    @Cacheable(value="company" ,key = "#planId")
+    @Cacheable(value = "company", key = "#planId")
     public PlanDto findById(UUID planId) {
         return PlanConverter.toTransportModel(searchForLnfPlan(planId));
     }

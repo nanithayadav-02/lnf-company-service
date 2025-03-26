@@ -16,13 +16,12 @@
 
 package com.lnf.company.service;
 
-import com.lnf.company.exception.LnFBadRequestException;
-import com.lnf.company.exception.LnFEntityNotFoundException;
-import com.lnf.company.exception.LnFException;
-import com.lnf.company.model.Company;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.ImageDto;
 import com.lnf.dto.file.FileDto;
+import com.lnf.exception.LnFBadRequestException;
+import com.lnf.exception.LnFEntityNotFoundException;
+import com.lnf.exception.LnFException;
 import com.lnf.service.file.FileFolderService;
 import com.lnf.service.file.FileService;
 import lombok.RequiredArgsConstructor;
@@ -119,8 +118,8 @@ public class ImageService {
         log.debug("S3 object deleted for company");
     }
 
-    private Company searchForCompany(UUID companyId) {
-        return companyRepository.findByCompanyId(companyId).
+    private void searchForCompany(UUID companyId) {
+        companyRepository.findByCompanyId(companyId).
                 orElseThrow(() -> new LnFEntityNotFoundException("Company with id [%s] does not exist".formatted(
                         companyId)));
     }
