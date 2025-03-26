@@ -14,8 +14,11 @@ public class CompanyPlanAuditConverter {
         return CompanyPlanAuditDto.builder()
                 .id(entity.getId())
                 .startDate(entity.getStartDate())
+                .endDate(entity.getEndDate())
                 .status(entity.getStatus())
                 .companyPlanId(entity.getCompanyPlan().getId())
+                .planName(entity.getCompanyPlan().getPlan().getPlanName())
+                .description(entity.getCompanyPlan().getPlan().getDescription())
                 .build();
     }
 
@@ -26,6 +29,7 @@ public class CompanyPlanAuditConverter {
         entity.setId(transport.getId());
         entity.setStatus(transport.getStatus());
         entity.setStartDate(transport.getStartDate());
+        entity.setEndDate(transport.getEndDate());
         return entity;
     }
 

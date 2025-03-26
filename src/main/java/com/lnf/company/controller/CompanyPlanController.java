@@ -64,4 +64,10 @@ public class CompanyPlanController {
         service.deleteById(companyId, CompanyPlanId);
     }
 
+    @PostMapping("/company/plan/refresh")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void clearCaches() {
+        service.clearCaches();
+    }
+
 }

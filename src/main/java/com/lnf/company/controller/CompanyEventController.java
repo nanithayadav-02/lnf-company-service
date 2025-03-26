@@ -87,4 +87,10 @@ public class CompanyEventController {
         service.deleteById(companyId, eventId);
     }
 
+    @PostMapping("/company/event/refresh")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void clearCaches() {
+        service.clearCaches();
+    }
+
 }

@@ -82,4 +82,10 @@ public class CompanyNotesController {
     public void delete(@PathVariable final UUID companyId, @PathVariable final UUID notesId) {
         service.deleteById(companyId, notesId);
     }
+
+    @PostMapping("/company/notes/refresh")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void clearCaches() {
+        service.clearCaches();
+    }
 }

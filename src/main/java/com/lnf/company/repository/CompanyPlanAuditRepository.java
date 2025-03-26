@@ -12,4 +12,8 @@ public interface CompanyPlanAuditRepository extends JpaRepository<CompanyPlanAud
 
     @Query("select cp from CompanyPlanAudit cp where cp.companyPlan.id = :id")
     List<CompanyPlanAudit> findByCompanyPlanId(@Param("id") UUID id);
+
+    @Query("select cp from CompanyPlanAudit cp join cp.companyPlan cpl where cpl.company.id = :companyId")
+    List<CompanyPlanAudit> findByCompanyId(@Param("companyId") UUID companyId);
+
 }
