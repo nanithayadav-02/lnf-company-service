@@ -30,6 +30,9 @@ import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -50,6 +53,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
 
     private final CompanyRepository companyRepository;
     private final CompanyNotesRepository companyNotesRepository;
+    private final CacheManager cacheManager;
 
     @Override
     public Page<NotesDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -141,7 +145,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         return companyNotesRepository.findById(notesId).
                 orElseThrow(() -> new LnFEntityNotFoundException("notes with id [%s] does not exist".formatted(notesId)));
     }
-
+    @CacheEvict(value="companyNotes" ,key = "#notesId")
     public void deleteById(UUID companyId, UUID notesId) {
         searchForCompany(companyId);
         CompanyNotes entity = searchForNotes(notesId);
@@ -154,6 +158,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         }
     }
 
+    @CacheEvict(value="companyNotes" ,key = "#companyId")
     public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyNotes> entities = companyNotesRepository.findByCompanyId(companyId);
@@ -166,6 +171,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         }
     }
 
+    @Cacheable(value="companyNotes" ,key = "#companyId")
     public List<NotesDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyNotes> entities = companyNotesRepository.findByCompanyId(companyId);
@@ -173,6 +179,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value="companyNotes" ,key = "#notesId")
     public NotesDto findById(UUID companyId, UUID notesId) {
         searchForCompany(companyId);
         return CompanyNotesConverter.toTransportModel(searchForNotes(notesId));
@@ -184,6 +191,11 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
                     "requested page [%d] does not exist").formatted(resultPage.getTotalPages(), page));
         }
         return resultPage.map(CompanyNotesConverter::toTransportModel);
+    }
+
+    public void clearCaches() {
+        Objects.requireNonNull(cacheManager.getCache("companyNotes")).clear();
+        log.debug("companyNotes cache cleared.");
     }
 
 }

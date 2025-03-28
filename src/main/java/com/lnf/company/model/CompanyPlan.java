@@ -5,7 +5,7 @@ import com.lnf.model.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,7 +30,10 @@ public class CompanyPlan extends AuditableEntity {
     private Plan plan;
 
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(nullable = false, name = "status")
     @Enumerated(EnumType.STRING)

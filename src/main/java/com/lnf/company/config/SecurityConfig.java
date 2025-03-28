@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health/**", "/actuator/info", "/v3/api-docs/**",
                                 "/swagger-ui/**",
+                                "/lnf/company/*/image/**",
                                 "/swagger-ui.html",
                                 "/lnf-company/**").permitAll() // Allow health checks w/o authN
                         .anyRequest().authenticated())

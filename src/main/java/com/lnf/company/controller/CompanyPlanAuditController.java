@@ -64,4 +64,10 @@ public class CompanyPlanAuditController {
         service.deleteById(CompanyPlanId, historyId);
     }
 
+    @GetMapping(value = "/company/{CompanyId}/history")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CompanyPlanAuditDto> findByCompanyId(@PathVariable final UUID CompanyId) {
+        return service.findByCompanyId(CompanyId);
+    }
+
 }
