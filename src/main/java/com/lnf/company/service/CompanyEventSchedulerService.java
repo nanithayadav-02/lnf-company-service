@@ -17,11 +17,11 @@
 package com.lnf.company.service;
 
 import com.lnf.company.converter.CompanyEventConverter;
-import com.lnf.company.exception.LnFEntityNotFoundException;
 import com.lnf.company.model.CompanyEvent;
 import com.lnf.company.model.enums.EventType;
 import com.lnf.company.repository.CompanyEventRepository;
 import com.lnf.dto.company.CompanyEventDto;
+import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.util.RestUtil;
 import jakarta.annotation.PostConstruct;

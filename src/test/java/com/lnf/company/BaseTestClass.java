@@ -17,7 +17,6 @@
 package com.lnf.company;
 
 import com.lnf.company.service.*;
-import com.lnf.company.service.*;
 import com.lnf.service.common.page.PaginationAndSortingHandler;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
@@ -64,5 +63,14 @@ public abstract class BaseTestClass {
 
     @MockBean
     private CompanyFileService service;
+
+    @MockBean
+    private PlanService planService;
+
+    @MockBean
+    private CompanyPlanService companyPlanService;
+
+    @MockBean
+    private CompanyPlanAuditService companyPlanAuditService;
 
 }

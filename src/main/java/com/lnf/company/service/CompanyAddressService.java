@@ -17,14 +17,14 @@
 package com.lnf.company.service;
 
 import com.lnf.company.converter.AddressConverter;
-import com.lnf.company.exception.LnFBadRequestException;
-import com.lnf.company.exception.LnFEntityNotFoundException;
-import com.lnf.company.exception.LnFException;
 import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyAddress;
 import com.lnf.company.repository.CompanyAddressRepository;
 import com.lnf.company.repository.CompanyRepository;
 import com.lnf.dto.company.AddressDto;
+import com.lnf.exception.LnFBadRequestException;
+import com.lnf.exception.LnFEntityNotFoundException;
+import com.lnf.exception.LnFException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
