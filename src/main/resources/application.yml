@@ -37,11 +37,19 @@ server:
   servlet:
     context-path: /api/v3
 
+lnf:
+  audit:
+    enabled: ${AUDIT_ENABLED:false}
+
 file:
   service:
     url: "http://localhost:8081/api/v3"
 
 email:
+  service:
+    url: "http://localhost:8081/api/v3"
+
+audit:
   service:
     url: "http://localhost:8081/api/v3"
 
@@ -90,6 +98,7 @@ logging:
     org.springframework.data: WARN
     root: ERROR
     com.lnf.company.*: DEBUG
+    com.lnf.listener.audit.ChangeTrackerListener: DEBUG
 
 springdoc:
   api-docs:
