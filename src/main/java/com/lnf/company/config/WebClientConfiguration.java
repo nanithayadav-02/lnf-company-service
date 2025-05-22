@@ -48,6 +48,9 @@ public class WebClientConfiguration {
     @Value("${application.maxInMemorySize}")
     private int maxInMemorySize;
 
+    @Value("${audit.service.url}")
+    private String auditServiceUrl;
+
     @Value("${connection.timeout}")
     private int timeOut;
 
@@ -59,6 +62,11 @@ public class WebClientConfiguration {
     @Bean
     WebClient fileWebClient() {
         return createWebClient(fileServiceUrl);
+    }
+
+    @Bean
+    WebClient auditWebClient() {
+        return createWebClient(auditServiceUrl);
     }
 
     private WebClient createWebClient(String baseUrl) {
