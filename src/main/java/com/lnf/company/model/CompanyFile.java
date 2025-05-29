@@ -16,6 +16,7 @@
 
 package com.lnf.company.model;
 
+import com.lnf.model.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "company_file")
-public class CompanyFile extends AuditableEntity{
+public class CompanyFile extends AuditableEntity {
 
     @Column(name = "file_name", nullable = false)
     private String fileName;
