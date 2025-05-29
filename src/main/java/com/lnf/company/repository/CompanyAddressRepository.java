@@ -32,7 +32,7 @@ public interface CompanyAddressRepository extends JpaRepository<CompanyAddress, 
     List<CompanyAddress> findByCompanyId(@Param("id") UUID id);
 
     @Query("SELECT ad FROM CompanyAddress ad WHERE ad.company.id = :id AND ad.type = :type")
-    Optional<CompanyAddress> findByCompanyIdAndType(@Param("id") String UUID,
+    Optional<CompanyAddress> findByCompanyIdAndType(@Param("id") String uuid,
                                                     @Param("type") AddressType type);
 
 }

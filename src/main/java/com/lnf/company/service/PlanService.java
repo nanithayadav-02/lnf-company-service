@@ -67,8 +67,8 @@ public class PlanService implements PaginatedAndSortedService<PlanDto> {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
                 "Failed to create LnfPlan with null payload");
         List<Plan> entities = new ArrayList<>();
-        resource.stream().filter(Objects::nonNull).forEach(PlanDto -> {
-            Plan entity = PlanConverter.toEntityModel(PlanDto, new Plan());
+        resource.stream().filter(Objects::nonNull).forEach(planDto -> {
+            Plan entity = PlanConverter.toEntityModel(planDto, new Plan());
             entities.add(entity);
         });
         save(entities);
