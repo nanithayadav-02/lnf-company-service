@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,12 +52,12 @@ class CompanyFileControllerTest extends BaseTestClass {
     private CompanyFileController controller;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
     @Test
-     void testFindByCompanyId() throws Exception {
+    void testFindByCompanyId() throws Exception {
         UUID companyId = UUID.randomUUID();
         List<CompanyFileDto> files = Collections.singletonList(new CompanyFileDto());
 
@@ -70,7 +69,7 @@ class CompanyFileControllerTest extends BaseTestClass {
     }
 
     @Test
-     void testFindById() throws Exception {
+    void testFindById() throws Exception {
         UUID companyId = UUID.randomUUID();
         String fileName = "testfile.txt";
         byte[] fileContent = "file content".getBytes();
@@ -83,7 +82,7 @@ class CompanyFileControllerTest extends BaseTestClass {
     }
 
     @Test
-     void testDeleteByIdAndFileName() throws Exception {
+    void testDeleteByIdAndFileName() throws Exception {
         UUID companyId = UUID.randomUUID();
         String fileName = "testfile.txt";
 
@@ -92,17 +91,6 @@ class CompanyFileControllerTest extends BaseTestClass {
         mockMvc.perform(delete("/lnf/company/{companyId}/files", companyId)
                         .param("fileName", fileName))
                 .andExpect(status().isNoContent());
-    }
-
-    private CompanyFileDto createMockData(){
-        CompanyFileDto dto = new CompanyFileDto();
-        dto.setId(UUID.randomUUID());
-        dto.setDescription("File");
-        dto.setFileName("testfile.txt");
-        dto.setSize(20l);
-        dto.setLastModified( new Date(2020, 4, 25));
-        dto.setUrl("www.image.com");
-        return dto;
     }
 
 }

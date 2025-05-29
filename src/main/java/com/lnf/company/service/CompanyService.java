@@ -58,8 +58,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
     private final ImageService imageService;
     private final CacheManager cacheManager;
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     @Override
     public Page<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {

@@ -42,6 +42,6 @@ public class CompanyPlan extends AuditableEntity {
     @ToString.Exclude
     @Builder.Default
     @OneToMany(mappedBy = "companyPlan", cascade = CascadeType.ALL)
-    private Set<CompanyPlanAudit> CompanyPlanAudits = new HashSet<>();
+    private Set<CompanyPlanAudit> companyPlanAudits = new HashSet<>();
 
 }

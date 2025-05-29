@@ -31,7 +31,7 @@ import java.util.UUID;
 @Slf4j
 public class CompanyPlanAuditService implements PaginatedAndSortedService<CompanyPlanAuditDto> {
 
-    private final CompanyPlanRepository CompanyPlanRepository;
+    private final CompanyPlanRepository companyPlanRepository;
     private final CompanyPlanAuditRepository repository;
 
     @Override
@@ -63,33 +63,33 @@ public class CompanyPlanAuditService implements PaginatedAndSortedService<Compan
                 .toList();
     }
 
-    public void create(UUID CompanyPlanId, List<CompanyPlanAuditDto> resource) {
+    public void create(UUID companyPlanId, List<CompanyPlanAuditDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                "Failed to create CompanyPlanAudit for company [%s] with null payload".formatted(CompanyPlanId));
-        CompanyPlan companyEntity = searchForCompanyPlan(CompanyPlanId);
+                "Failed to create CompanyPlanAudit for company [%s] with null payload".formatted(companyPlanId));
+        CompanyPlan companyEntity = searchForCompanyPlan(companyPlanId);
         List<CompanyPlanAudit> entities = new ArrayList<>();
-        resource.stream().filter(Objects::nonNull).forEach(CompanyPlanAuditDto -> {
-            CompanyPlanAudit entity = CompanyPlanAuditConverter.toEntityModel(CompanyPlanAuditDto, new CompanyPlanAudit());
+        resource.stream().filter(Objects::nonNull).forEach(companyPlanAuditDto -> {
+            CompanyPlanAudit entity = CompanyPlanAuditConverter.toEntityModel(companyPlanAuditDto, new CompanyPlanAudit());
             entity.setCompanyPlan(companyEntity);
             entities.add(entity);
         });
         save(entities);
-        log.debug("CompanyPlanAudit for company {} successfully created", CompanyPlanId);
+        log.debug("CompanyPlanAudit for company {} successfully created", companyPlanId);
     }
 
-    public void create(UUID CompanyPlanId, CompanyPlanAuditDto resource) {
+    public void create(UUID companyPlanId, CompanyPlanAuditDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource,
-                "Failed to create CompanyPlanAudit for company [%s] with null payload".formatted(CompanyPlanId));
-        CompanyPlan companyEntity = searchForCompanyPlan(CompanyPlanId);
+                "Failed to create CompanyPlanAudit for company [%s] with null payload".formatted(companyPlanId));
+        CompanyPlan companyEntity = searchForCompanyPlan(companyPlanId);
         CompanyPlanAudit entity = CompanyPlanAuditConverter.toEntityModel(resource, new CompanyPlanAudit());
         entity.setCompanyPlan(companyEntity);
         save(entity);
-        log.debug("CompanyPlanAudit for company {} successfully created", CompanyPlanId);
+        log.debug("CompanyPlanAudit for company {} successfully created", companyPlanId);
     }
 
-    private CompanyPlan searchForCompanyPlan(UUID CompanyPlanId) {
-        return CompanyPlanRepository.findById(CompanyPlanId).
-                orElseThrow(() -> new LnFEntityNotFoundException("CompanyPlan with id [%s] does not exist".formatted(CompanyPlanId)));
+    private CompanyPlan searchForCompanyPlan(UUID companyPlanId) {
+        return companyPlanRepository.findById(companyPlanId).
+                orElseThrow(() -> new LnFEntityNotFoundException("CompanyPlan with id [%s] does not exist".formatted(companyPlanId)));
     }
 
     private void save(List<CompanyPlanAudit> entities) {
@@ -110,53 +110,53 @@ public class CompanyPlanAuditService implements PaginatedAndSortedService<Compan
         }
     }
 
-    public void update(UUID CompanyPlanId, UUID CompanyPlanAuditId, CompanyPlanAuditDto resource) {
+    public void update(UUID companyPlanId, UUID companyPlanAuditId, CompanyPlanAuditDto resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, "Failed to update CompanyPlanAudit with null payload");
-        searchForCompanyPlan(CompanyPlanId);
-        CompanyPlanAudit entity = searchForCompanyPlanAudit(CompanyPlanAuditId);
+        searchForCompanyPlan(companyPlanId);
+        CompanyPlanAudit entity = searchForCompanyPlanAudit(companyPlanAuditId);
         save(CompanyPlanAuditConverter.toEntityModel(resource, entity));
-        log.debug("CompanyPlanAudit for Employee {} successfully created", CompanyPlanAuditId);
+        log.debug("CompanyPlanAudit for Employee {} successfully created", companyPlanAuditId);
     }
 
-    private CompanyPlanAudit searchForCompanyPlanAudit(UUID CompanyPlanAuditId) {
-        return repository.findById(CompanyPlanAuditId).
-                orElseThrow(() -> new LnFEntityNotFoundException("CompanyPlanAudit with id [%s] does not exist".formatted(CompanyPlanAuditId)));
+    private CompanyPlanAudit searchForCompanyPlanAudit(UUID companyPlanAuditId) {
+        return repository.findById(companyPlanAuditId).
+                orElseThrow(() -> new LnFEntityNotFoundException("CompanyPlanAudit with id [%s] does not exist".formatted(companyPlanAuditId)));
     }
 
-    public void deleteById(UUID CompanyPlanId, UUID CompanyPlanAuditId) {
-        searchForCompanyPlan(CompanyPlanId);
-        CompanyPlanAudit entity = searchForCompanyPlanAudit(CompanyPlanAuditId);
+    public void deleteById(UUID companyPlanId, UUID companyPlanAuditId) {
+        searchForCompanyPlan(companyPlanId);
+        CompanyPlanAudit entity = searchForCompanyPlanAudit(companyPlanAuditId);
         try {
             repository.delete(entity);
-            log.debug("CompanyPlanAudit {} for company {} successfully deleted", CompanyPlanAuditId, CompanyPlanId);
+            log.debug("CompanyPlanAudit {} for company {} successfully deleted", companyPlanAuditId, companyPlanId);
         } catch (RuntimeException e) {
-            String errorMessage = "Failed to delete CompanyPlanAudit[%s] for company [%s]".formatted(CompanyPlanAuditId, CompanyPlanId);
+            String errorMessage = "Failed to delete CompanyPlanAudit[%s] for company [%s]".formatted(companyPlanAuditId, companyPlanId);
             throw new LnFException(errorMessage);
         }
     }
 
-    public void deleteByCompanyPlanId(UUID CompanyPlanId) {
-        searchForCompanyPlan(CompanyPlanId);
-        List<CompanyPlanAudit> entities = repository.findByCompanyPlanId(CompanyPlanId);
+    public void deleteByCompanyPlanId(UUID companyPlanId) {
+        searchForCompanyPlan(companyPlanId);
+        List<CompanyPlanAudit> entities = repository.findByCompanyPlanId(companyPlanId);
         try {
             repository.deleteAll(entities);
-            log.debug("CompanyPlanAudit for company {} successfully deleted", CompanyPlanId);
+            log.debug("CompanyPlanAudit for company {} successfully deleted", companyPlanId);
         } catch (RuntimeException e) {
-            String errorMessage = "Failed to delete CompanyPlanAudit for company [%s]".formatted(CompanyPlanId);
+            String errorMessage = "Failed to delete CompanyPlanAudit for company [%s]".formatted(companyPlanId);
             throw new LnFException(errorMessage);
         }
     }
 
-    public List<CompanyPlanAuditDto> findByCompanyPlanId(UUID CompanyPlanId) {
-        searchForCompanyPlan(CompanyPlanId);
-        List<CompanyPlanAudit> entities = repository.findByCompanyPlanId(CompanyPlanId);
+    public List<CompanyPlanAuditDto> findByCompanyPlanId(UUID companyPlanId) {
+        searchForCompanyPlan(companyPlanId);
+        List<CompanyPlanAudit> entities = repository.findByCompanyPlanId(companyPlanId);
         return entities.stream().filter(Objects::nonNull).map(CompanyPlanAuditConverter::toTransportModel)
                 .toList();
     }
 
-    public CompanyPlanAuditDto findById(UUID CompanyPlanId, UUID CompanyPlanAuditId) {
-        searchForCompanyPlan(CompanyPlanId);
-        return CompanyPlanAuditConverter.toTransportModel(searchForCompanyPlanAudit(CompanyPlanAuditId));
+    public CompanyPlanAuditDto findById(UUID companyPlanId, UUID companyPlanAuditId) {
+        searchForCompanyPlan(companyPlanId);
+        return CompanyPlanAuditConverter.toTransportModel(searchForCompanyPlanAudit(companyPlanAuditId));
     }
 
     private Page<CompanyPlanAuditDto> validateAndGetPages(int page, Page<CompanyPlanAudit> resultPage) {
@@ -167,8 +167,8 @@ public class CompanyPlanAuditService implements PaginatedAndSortedService<Compan
         return resultPage.map(CompanyPlanAuditConverter::toTransportModel);
     }
 
-    public List<CompanyPlanAuditDto> findByCompanyId(UUID CompanyId) {
-        List<CompanyPlanAudit> entities = repository.findByCompanyId(CompanyId);
+    public List<CompanyPlanAuditDto> findByCompanyId(UUID companyId) {
+        List<CompanyPlanAudit> entities = repository.findByCompanyId(companyId);
         return entities.stream().filter(Objects::nonNull).map(CompanyPlanAuditConverter::toTransportModel)
                 .toList();
     }
