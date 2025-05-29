@@ -17,6 +17,7 @@
 package com.lnf.company.model;
 
 import com.lnf.company.model.enums.ThemeType;
+import com.lnf.model.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
