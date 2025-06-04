@@ -16,24 +16,23 @@
 
 package com.lnf.company.model.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum EventType {
 
-    Birthday("Birthday"),
+    BIRTHDAY("Birthday"),
 
-    Anniversary("Anniversary"),
+    ANNIVERSARY("Anniversary"),
 
-    Release("Release"),
+    RELEASE("Release"),
 
-    MeetingTownHall("Meeting Town Hall");
+    MEETING_TOWN_HALL("Meeting Town Hall");
 
     private final String label;
 
     EventType(String label) {
         this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public static EventType valueOfLabel(String label) {

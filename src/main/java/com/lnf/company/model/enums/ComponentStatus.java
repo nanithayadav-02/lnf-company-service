@@ -16,20 +16,19 @@
 
 package com.lnf.company.model.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ComponentStatus {
 
-    Active("Active"),
+    ACTIVE("Active"),
 
-    InActive("InActive");
+    IN_ACTIVE("In Active");
 
     private final String label;
 
     ComponentStatus(String label) {
         this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public static ComponentStatus valueOfLabel(String label) {

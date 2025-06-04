@@ -16,22 +16,21 @@
 
 package com.lnf.company.model.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum AddressType {
 
     //@formatter:off
-    Primary("Primary"),
-    Secondary("Secondary"),
-    Other("Other");
+    PRIMARY("Primary"),
+    SECONDARY("Secondary"),
+    OTHER("Other");
     //@formatter:on
 
     private final String label;
 
     AddressType(String label) {
         this.label = label;
-    }
-
-    public String getLabel() {
-        return label;
     }
 
     public static AddressType valueOfLabel(String label) {
