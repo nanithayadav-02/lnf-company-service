@@ -99,7 +99,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
     @Test
     void findEventsByDate() throws Exception {
 
-        EventType eventType = EventType.Birthday;
+        EventType eventType = EventType.BIRTHDAY;
         LocalDate date = LocalDate.of(2024, 4, 2);
         CompanyEventDto event1 = mockEvent1();
         CompanyEventDto event2 = mockEvent2();
@@ -145,7 +145,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
     @Test
     void findEventsByEventTypeAndDateRange() throws Exception {
-        EventType eventType = EventType.Birthday;
+        EventType eventType = EventType.BIRTHDAY;
         LocalDate startDate = LocalDate.of(2024, 3, 25);
         LocalDate endDate = LocalDate.of(2024, 4, 2);
         CompanyEventDto event1 = mockEvent1();
@@ -169,7 +169,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
     @Test
     void findEventsByWeek() throws Exception {
-        EventType eventType = EventType.Birthday;
+        EventType eventType = EventType.BIRTHDAY;
         int week = 1;
         CompanyEventDto event1 = mockEvent1();
         CompanyEventDto event2 = mockEvent2();
@@ -192,7 +192,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
     @Test
     void findEventsByMonth() throws Exception {
-        EventType eventType = EventType.Birthday;
+        EventType eventType = EventType.BIRTHDAY;
         int month = 2;
         CompanyEventDto event1 = mockEvent1();
         CompanyEventDto event2 = mockEvent2();
@@ -215,7 +215,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
     @Test
     void findEventsByYear() throws Exception {
-        EventType eventType = EventType.Birthday;
+        EventType eventType = EventType.BIRTHDAY;
         int year = 2024;
         CompanyEventDto event1 = mockEvent1();
         CompanyEventDto event2 = mockEvent2();
@@ -238,7 +238,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
 
     @Test
     void findEventsByMonthAndYear() throws Exception {
-        EventType eventType = EventType.Birthday;
+        EventType eventType = EventType.BIRTHDAY;
         int month = 2;
         int year = 2024;
         CompanyEventDto event1 = mockEvent1();
