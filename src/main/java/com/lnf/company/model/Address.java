@@ -17,6 +17,7 @@
 package com.lnf.company.model;
 
 import com.lnf.company.model.enums.AddressType;
+import com.lnf.model.AuditableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

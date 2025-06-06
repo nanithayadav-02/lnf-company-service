@@ -38,7 +38,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
     }
 
     @Test
@@ -74,7 +74,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testFindByCompanyPlanId() throws Exception {
+    void testFindByCompanyPlanId() throws Exception {
         UUID companyPlanId = UUID.randomUUID();
         List<CompanyPlanAuditDto> mockAuditList = Arrays.asList(createMockCompanyPlanAuditDto());
 
@@ -86,7 +86,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testFindById() throws Exception {
+    void testFindById() throws Exception {
         UUID companyPlanId = UUID.randomUUID();
         UUID historyId = UUID.randomUUID();
         CompanyPlanAuditDto mockAudit = createMockCompanyPlanAuditDto();
@@ -99,7 +99,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testCreate() throws Exception {
+    void testCreate() throws Exception {
         UUID companyPlanId = UUID.randomUUID();
         CompanyPlanAuditDto newAudit = createMockCompanyPlanAuditDto();
 
@@ -112,7 +112,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    void testUpdate() throws Exception {
         UUID companyPlanId = UUID.randomUUID();
         UUID historyId = UUID.randomUUID();
         CompanyPlanAuditDto updatedAudit = createMockCompanyPlanAuditDto();
@@ -126,7 +126,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testDeleteByCompanyPlanId() throws Exception {
+    void testDeleteByCompanyPlanId() throws Exception {
         UUID companyPlanId = UUID.randomUUID();
 
         doNothing().when(service).deleteByCompanyPlanId(companyPlanId);
@@ -136,7 +136,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testDeleteByHistoryId() throws Exception {
+    void testDeleteByHistoryId() throws Exception {
         UUID companyPlanId = UUID.randomUUID();
         UUID historyId = UUID.randomUUID();
 
@@ -147,7 +147,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testFindByCompanyId() throws Exception {
+    void testFindByCompanyId() throws Exception {
         UUID companyId = UUID.randomUUID();
         List<CompanyPlanAuditDto> mockAuditList = Arrays.asList(createMockCompanyPlanAuditDto());
 
@@ -158,7 +158,7 @@ class CompanyPlanAuditControllerTest extends BaseTestClass {
                 .andExpect(jsonPath("$[0].status").value("Active"));
     }
 
-    public static CompanyPlanAuditDto createMockCompanyPlanAuditDto() {
+    private static CompanyPlanAuditDto createMockCompanyPlanAuditDto() {
         CompanyPlanAuditDto companyPlanAuditDto = new CompanyPlanAuditDto();
         companyPlanAuditDto.setId(UUID.randomUUID());
         companyPlanAuditDto.setCompanyPlanId(UUID.randomUUID());

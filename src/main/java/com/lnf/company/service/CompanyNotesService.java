@@ -177,7 +177,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         searchForCompany(companyId);
         List<CompanyNotes> entities = companyNotesRepository.findByCompanyId(companyId);
         return entities.stream().map(CompanyNotesConverter::toTransportModel).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Cacheable(value = "companyNotes", key = "#notesId")

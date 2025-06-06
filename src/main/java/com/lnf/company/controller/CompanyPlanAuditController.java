@@ -27,47 +27,47 @@ public class CompanyPlanAuditController {
         return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
     }
 
-    @GetMapping(value = "/company/{CompanyPlanId}/plan/history")
+    @GetMapping(value = "/company/{companyPlanId}/plan/history")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompanyPlanAuditDto> findByCompanyPlanId(@PathVariable final UUID CompanyPlanId) {
-        return service.findByCompanyPlanId(CompanyPlanId);
+    public List<CompanyPlanAuditDto> findByCompanyPlanId(@PathVariable final UUID companyPlanId) {
+        return service.findByCompanyPlanId(companyPlanId);
     }
 
-    @GetMapping(value = "/company/{CompanyPlanId}/plan/history/{historyId}")
+    @GetMapping(value = "/company/{companyPlanId}/plan/history/{historyId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompanyPlanAuditDto findById(@PathVariable final UUID CompanyPlanId, @PathVariable final UUID historyId) {
-        return service.findById(CompanyPlanId, historyId);
+    public CompanyPlanAuditDto findById(@PathVariable final UUID companyPlanId, @PathVariable final UUID historyId) {
+        return service.findById(companyPlanId, historyId);
     }
 
-    @PostMapping(value = "/company/{CompanyPlanId}/plan/history")
+    @PostMapping(value = "/company/{companyPlanId}/plan/history")
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@PathVariable final UUID CompanyPlanId, @RequestBody final CompanyPlanAuditDto resource) {
-        service.create(CompanyPlanId, resource);
+    public void create(@PathVariable final UUID companyPlanId, @RequestBody final CompanyPlanAuditDto resource) {
+        service.create(companyPlanId, resource);
     }
 
-    @PutMapping(value = "/company/{CompanyPlanId}/plan/history/{historyId}")
+    @PutMapping(value = "/company/{companyPlanId}/plan/history/{historyId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable final UUID CompanyPlanId, @PathVariable final UUID historyId,
+    public void update(@PathVariable final UUID companyPlanId, @PathVariable final UUID historyId,
                        @RequestBody final CompanyPlanAuditDto resource) {
-        service.update(CompanyPlanId, historyId, resource);
+        service.update(companyPlanId, historyId, resource);
     }
 
-    @DeleteMapping(value = "/company/{CompanyPlanId}/plan/history")
+    @DeleteMapping(value = "/company/{companyPlanId}/plan/history")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID CompanyPlanId) {
-        service.deleteByCompanyPlanId(CompanyPlanId);
+    public void delete(@PathVariable final UUID companyPlanId) {
+        service.deleteByCompanyPlanId(companyPlanId);
     }
 
-    @DeleteMapping(value = "/company/{CompanyPlanId}/plan/history/{historyId}")
+    @DeleteMapping(value = "/company/{companyPlanId}/plan/history/{historyId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID CompanyPlanId, @PathVariable final UUID historyId) {
-        service.deleteById(CompanyPlanId, historyId);
+    public void delete(@PathVariable final UUID companyPlanId, @PathVariable final UUID historyId) {
+        service.deleteById(companyPlanId, historyId);
     }
 
-    @GetMapping(value = "/company/{CompanyId}/history")
+    @GetMapping(value = "/company/{companyId}/history")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompanyPlanAuditDto> findByCompanyId(@PathVariable final UUID CompanyId) {
-        return service.findByCompanyId(CompanyId);
+    public List<CompanyPlanAuditDto> findByCompanyId(@PathVariable final UUID companyId) {
+        return service.findByCompanyId(companyId);
     }
 
 }

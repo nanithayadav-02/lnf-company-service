@@ -59,15 +59,15 @@ public class CompanyPlanConverter {
         return entity;
     }
 
-    private static void addCompanyPlanAuditToEntityModel(CompanyPlanDto transport, CompanyPlan CompanyPlan) {
+    private static void addCompanyPlanAuditToEntityModel(CompanyPlanDto transport, CompanyPlan companyPlan) {
         if (transport.getCompanyPlanAudits() != null) {
-            List<CompanyPlanAudit> CompanyPlans = new ArrayList<>();
+            List<CompanyPlanAudit> companyPlans = new ArrayList<>();
             transport.getCompanyPlanAudits().stream().filter(Objects::nonNull).forEach(dto -> {
                 CompanyPlanAudit entity = CompanyPlanAuditConverter.toEntityModel(dto, new CompanyPlanAudit());
-                entity.setCompanyPlan(CompanyPlan);
-                CompanyPlans.add(entity);
+                entity.setCompanyPlan(companyPlan);
+                companyPlans.add(entity);
             });
-            CompanyPlan.getCompanyPlanAudits().addAll(CompanyPlans);
+            companyPlan.getCompanyPlanAudits().addAll(companyPlans);
         }
     }
 

@@ -30,7 +30,7 @@ import lombok.*;
 public class CompanyAddress extends Address {
 
     @Column(name = "branch_name")
-    private String branch_name;
+    private String branchName;
 
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)

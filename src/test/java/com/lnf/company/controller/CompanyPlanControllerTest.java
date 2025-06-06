@@ -31,7 +31,7 @@ class CompanyPlanControllerTest extends BaseTestClass {
     private MockMvc mockMvc;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
     }
 
     @Test

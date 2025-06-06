@@ -33,10 +33,10 @@ public class CompanyPlanController {
         return service.findByCompanyId(companyId);
     }
 
-    @GetMapping(value = "/company/{companyId}/plan/{CompanyPlanId}")
+    @GetMapping(value = "/company/{companyId}/plan/{companyPlanId}")
     @ResponseStatus(HttpStatus.OK)
-    public CompanyPlanDto findById(@PathVariable final UUID companyId, @PathVariable final UUID CompanyPlanId) {
-        return service.findById(companyId, CompanyPlanId);
+    public CompanyPlanDto findById(@PathVariable final UUID companyId, @PathVariable final UUID companyPlanId) {
+        return service.findById(companyId, companyPlanId);
     }
 
     @PostMapping(value = "/company/{companyId}/plan")
@@ -45,11 +45,11 @@ public class CompanyPlanController {
         service.create(companyId, resource);
     }
 
-    @PutMapping(value = "/company/{companyId}/plan/{CompanyPlanId}")
+    @PutMapping(value = "/company/{companyId}/plan/{companyPlanId}")
     @ResponseStatus(HttpStatus.OK)
-    public void update(@PathVariable final UUID companyId, @PathVariable final UUID CompanyPlanId,
+    public void update(@PathVariable final UUID companyId, @PathVariable final UUID companyPlanId,
                        @RequestBody final CompanyPlanDto resource) {
-        service.update(companyId, CompanyPlanId, resource);
+        service.update(companyId, companyPlanId, resource);
     }
 
     @DeleteMapping(value = "/company/{companyId}/plan")
@@ -58,10 +58,10 @@ public class CompanyPlanController {
         service.deleteByCompanyId(companyId);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/plan/{CompanyPlanId}")
+    @DeleteMapping(value = "/company/{companyId}/plan/{companyPlanId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID companyId, @PathVariable final UUID CompanyPlanId) {
-        service.deleteById(companyId, CompanyPlanId);
+    public void delete(@PathVariable final UUID companyId, @PathVariable final UUID companyPlanId) {
+        service.deleteById(companyId, companyPlanId);
     }
 
     @PostMapping("/company/plan/refresh")

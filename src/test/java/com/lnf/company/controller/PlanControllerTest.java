@@ -67,7 +67,7 @@ public class PlanControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testFindById() throws Exception {
+    void testFindById() throws Exception {
         UUID planId = UUID.randomUUID();
         PlanDto mockPlan = new PlanDto();
         mockPlan.setId(planId);
@@ -84,7 +84,7 @@ public class PlanControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testCreate() throws Exception {
+    void testCreate() throws Exception {
         PlanDto newPlan = new PlanDto();
         newPlan.setPlanName("New Plan");
         newPlan.setDescription("New Plan Description");
@@ -98,7 +98,7 @@ public class PlanControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    void testUpdate() throws Exception {
         UUID planId = UUID.randomUUID();
         PlanDto updatedPlan = new PlanDto();
         updatedPlan.setPlanName("Updated Plan");
@@ -113,7 +113,7 @@ public class PlanControllerTest extends BaseTestClass {
     }
 
     @Test
-    public void testDelete() throws Exception {
+    void testDelete() throws Exception {
         UUID planId = UUID.randomUUID();
 
         doNothing().when(service).deleteById(planId);

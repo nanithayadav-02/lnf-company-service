@@ -42,6 +42,7 @@ public class CompanyNotesConverter {
     }
 
     public static CompanyNotes toEntityModel(NotesDto transport) {
+        if (transport == null) return null;
         return toEntityModel(transport, new CompanyNotes());
     }
 

@@ -27,6 +27,7 @@ public class CompanyEventConverter {
     }
 
     public static CompanyEventDto toTransportModel(CompanyEvent entity) {
+        if (entity == null) return null;
         return CompanyEventDto.builder()
                 .id(entity.getId())
                 .eventType(entity.getEventType().name())
