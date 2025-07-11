@@ -2,6 +2,13 @@ spring:
   profiles:
     active: dev-ide
 
+  tenant:
+    datasource:
+      url: jdbc:postgresql://${database.host:localhost}:${database.port:5432}/${database.name:tenant_core_db}
+      username: ${database.username:tenant_core_user}
+      password: ${database.password:tenant_core@12345}
+      driverClassName: ${database.drive:org.postgresql.Driver}
+
   redis:
     host: ${REDIS_CACHE_HOST:localhost}
     port: ${REDIS_CACHE_PORT:6379}
@@ -40,6 +47,13 @@ server:
 lnf:
   audit:
     enabled: ${AUDIT_ENABLED:false}
+
+  tenant:
+    enabled: ${TENANT_ENABLED:false}
+    default: ${TENANT_DEFAULT:LNF}
+    databaseName: ${TENANT_DATABASE_NAME:company}
+
+  entity-package: "com.lnf.company.model"
 
 file:
   service:
