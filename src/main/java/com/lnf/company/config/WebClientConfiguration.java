@@ -46,7 +46,7 @@ public class WebClientConfiguration {
     @Value("${email.service.url}")
     private String emailServiceUrl;
 
-    @Value("${lnf.tenant.enabled:true}")
+    @Value("${lnf.tenant.enabled}")
     private boolean tenantEnabled;
 
     @Value("${application.maxInMemorySize}")
