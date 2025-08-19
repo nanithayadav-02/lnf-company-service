@@ -33,7 +33,7 @@ public class CompanyGst extends AuditableEntity {
     @Column(name = "location", nullable = false)
     private String location;
 
-    @Column(name = "number", nullable = false)
+    @Column(name = "number")
     private String number;
 
     @ToString.Exclude
