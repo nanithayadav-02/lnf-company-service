@@ -58,9 +58,9 @@ public class ImageController {
         service.update(companyId, image);
     }
 
-    @DeleteMapping(value = "/company/{companyId}/image/{fileName}")
+    @DeleteMapping(value = "/company/{companyId}/image")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID companyId, @PathVariable String fileName) {
+    public void delete(@PathVariable final UUID companyId, @RequestParam String fileName) {
         service.deleteById(companyId, fileName);
     }
 
