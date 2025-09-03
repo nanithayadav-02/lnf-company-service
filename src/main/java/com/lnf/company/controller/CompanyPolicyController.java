@@ -58,7 +58,7 @@ public class CompanyPolicyController {
 
     @DeleteMapping(value = "/company/{companyId}/policies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable final UUID companyId, @RequestParam final String fileName) {
+    public void delete(@PathVariable final UUID companyId, @RequestParam String fileName) {
         service.deleteById(companyId, fileName);
     }
 
