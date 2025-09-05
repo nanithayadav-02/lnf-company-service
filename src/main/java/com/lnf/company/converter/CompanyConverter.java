@@ -62,9 +62,6 @@ public class CompanyConverter {
                 .address(safeConvert(entity.getAddress(), AddressConverter::toTransportModel))
                 .gst(safeConvert(entity.getGst(), GstConverter::toTransportModel))
                 .theme(safeConvert(entity.getTheme(), ThemeConverter::toTransportModel))
-                .notes(safeConvert(entity.getCompanyNotes(), CompanyNotesConverter::toTransportModel))
-                .companyEvent(safeConvert(entity.getCompanyEvent(), CompanyEventConverter::toTransportModel))
-                .companyHoliday(safeConvert(entity.getCompanyHoliday(), CompanyHolidayConverter::toTransportModel))
                 .build();
     }
 
