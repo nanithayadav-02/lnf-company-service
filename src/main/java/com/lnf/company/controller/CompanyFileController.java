@@ -37,8 +37,13 @@ public class CompanyFileController {
 
     @GetMapping(value = "/company/{companyId}/files")
     @ResponseStatus(HttpStatus.OK)
-    public List<CompanyFileDto> findByCompanyId(@PathVariable UUID companyId) {
-        return service.findByCompanyId(companyId);
+    public List<CompanyFileDto> findByCompanyId(@PathVariable UUID companyId,
+                                                @RequestParam(required = false) Integer month,
+                                                @RequestParam(required = false) Integer year) {
+        if (month == null || year == null) {
+            return service.findByCompanyId(companyId);
+        }
+        return service.findByCompanyIdAndMonthYear(companyId, month, year);
     }
 
     @GetMapping(value = "/company/{companyId}/files/{fileName}")
