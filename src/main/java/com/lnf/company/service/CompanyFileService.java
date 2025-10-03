@@ -38,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -59,18 +61,38 @@ public class CompanyFileService {
     private final FileService fileService;
     private final FileFolderService fileFolderService;
 
+    public List<CompanyFileDto> findByCompanyIdAndMonthYear(UUID companyId, Integer month, Integer year) {
+        return buildCompanyDtos(companyId, month, year);
+    }
+
     public List<CompanyFileDto> findByCompanyId(UUID companyId) {
+        return buildCompanyDtos(companyId, null, null);
+    }
+
+    private List<CompanyFileDto> buildCompanyDtos(UUID companyId, Integer month, Integer year) {
         String filePath = S_S_S.formatted(folderName, companyId, FILES);
         List<FileDto> files = fileFolderService.findFiles(filePath);
-        List<CompanyFileDto> companyFileDtos = new ArrayList<>();
-        files.forEach(file -> {
-            String fileName = StringUtils.substringAfterLast(file.getFileName(), "/");
-            String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/lnf/company/%s/files/%s".formatted(companyId, fileName))
-                    .toUriString();
 
-            setCompanyFile(companyFileDtos, file, fileName, downloadURL);
-        });
+        List<CompanyFileDto> companyFileDtos = new ArrayList<>();
+        files.stream()
+                .filter(file -> {
+                    if (month == null || year == null) return true;
+                    LocalDateTime modifiedDate = file.getLastModified()
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime();
+
+                    return modifiedDate.getYear() == year && modifiedDate.getMonthValue() == month;
+                })
+                .forEach(file -> {
+                    String fileName = StringUtils.substringAfterLast(file.getFileName(), "/");
+                    String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+                            .path("/lnf/company/%s/files/%s".formatted(companyId, fileName))
+                            .toUriString();
+
+                    setCompanyFile(companyFileDtos, file, fileName, downloadURL);
+                });
+
         return companyFileDtos;
     }
 
@@ -97,6 +119,7 @@ public class CompanyFileService {
         }
     }
 
+    @Transactional
     public void create(UUID companyId, MultipartFile[] files, List<CompanyFileDto> resource) {
         LnFBadRequestException.throwOnCondition(Objects::isNull, resource, FAILED_TO_CREATE_COMPANY_FILE_NULL_PAYLOAD.formatted(companyId));
         Company company = searchForCompany(companyId);
@@ -120,6 +143,7 @@ public class CompanyFileService {
         });
     }
 
+    @Transactional
     public void update(UUID companyId, String fileName, MultipartFile file, CompanyFileDto resource) {
         com.lnf.exception.LnFBadRequestException.throwOnCondition(Objects::isNull, file,
                 "Failed to update file for company [%s] with null payload".formatted(companyId));
@@ -140,6 +164,7 @@ public class CompanyFileService {
         }
     }
 
+    @Transactional
     public void deleteByIdAndFileName(UUID companyId, String fileName) {
         searchForCompany(companyId);
         CompanyFile entity = searchForFileName(fileName);
