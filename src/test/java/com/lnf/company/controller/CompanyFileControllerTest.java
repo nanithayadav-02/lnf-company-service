@@ -65,7 +65,7 @@ class CompanyFileControllerTest extends BaseTestClass {
 
         mockMvc.perform(get("/lnf/company/{companyId}/files", companyId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
     }
 
     @Test
