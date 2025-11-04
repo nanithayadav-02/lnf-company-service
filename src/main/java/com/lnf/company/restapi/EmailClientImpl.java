@@ -18,6 +18,7 @@ package com.lnf.company.restapi;
 
 import com.lnf.dto.email.ThymeleafDocumentDto;
 import com.lnf.dto.email.ThymeleafEmailDto;
+import com.lnf.dto.email.ThymeleafEmailsDto;
 import com.lnf.exception.LnFException;
 import com.lnf.service.email.ThymeleafDocumentService;
 import com.lnf.service.email.ThymeleafEmailService;
@@ -60,11 +61,15 @@ public class EmailClientImpl extends BaseWebClientService implements ThymeleafDo
     @Override
     public void sendEmail(ThymeleafEmailDto resource) {
         // To be implemented
-
     }
 
     @Override
     public void sendEmailWithPdf(ThymeleafEmailDto resource) {
+        // To be implemented
+    }
+
+    @Override
+    public void sendEmailWithPdfs(ThymeleafEmailsDto resource) {
         // To be implemented
     }
 
