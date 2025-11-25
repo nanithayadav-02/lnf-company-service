@@ -91,9 +91,9 @@ public class CompanyEventSchedulerService implements PaginatedAndSortedService<C
     public List<CompanyEventDto> findEventsByCurrentDate(EventType eventType, boolean myEvents) {
         if (eventType == null) {
             String email = myEvents ? companyUtil.getEmail() : null;
-            return fetchAndTransform(() -> companyEventRepository.findEventsByCurrentDate(email));
+            return fetchAndTransform(() -> companyEventRepository.findEventsByCurrentDateAndEmail(email));
         } else {
-            return fetchAndTransform(() -> companyEventRepository.findEventsByCurrentDate(eventType));
+            return fetchAndTransform(() -> companyEventRepository.findEventsByCurrentDateAndEmail(eventType));
         }
     }
 

@@ -16,7 +16,6 @@
 
 package com.lnf.company.repository;
 
-import com.lnf.company.model.CompanyNotes;
 import com.lnf.company.model.enums.EventType;
 import com.lnf.company.model.CompanyEvent;
 import org.springframework.data.domain.Page;
@@ -34,13 +33,13 @@ public interface CompanyEventRepository extends JpaRepository<CompanyEvent, UUID
     @Query("SELECT ce FROM CompanyEvent ce WHERE ce.company.id = :id")
     List<CompanyEvent> findByCompanyId(@Param("id") UUID id);
 
-    @Query("SELECT ce FROM CompanyEvent ce WHERE EXTRACT(DATE FROM ce.dateAndTime) = CURRENT_DATE And " +
-            "(:email IS NULL OR ce.createdBy) = :email)")
-    List<CompanyEvent> findEventsByCurrentDate(String email);
+    @Query("SELECT ce FROM CompanyEvent ce WHERE (:email IS NULL OR ce.createdBy = :email) AND" +
+            " EXTRACT(DATE FROM ce.dateAndTime) = CURRENT_DATE")
+    List<CompanyEvent> findEventsByCurrentDateAndEmail(String email);
 
     @Query("SELECT ce FROM CompanyEvent ce WHERE ce.eventType = :eventType AND" +
             " EXTRACT(DATE FROM ce.dateAndTime) = CURRENT_DATE")
-    List<CompanyEvent> findEventsByCurrentDate(@Param("eventType") EventType eventType);
+    List<CompanyEvent> findEventsByCurrentDateAndEmail(@Param("eventType") EventType eventType);
 
     @Query(value = "SELECT ce FROM CompanyEvent ce WHERE ce.eventType = :eventType AND" +
             " ce.dateAndTime = :dateAndTime")
