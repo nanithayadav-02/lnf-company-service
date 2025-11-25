@@ -129,7 +129,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
         CompanyEventDto event2 = mockEvent2();
         List<CompanyEventDto> events = List.of(event1, event2);
 
-        given(service.findEventsByCurrentDate(null)).willReturn(events);
+        given(service.findEventsByCurrentDate(null, false)).willReturn(events);
 
         String resultContent = new String(Files
                 .readAllBytes(Path.of(ClassLoader.getSystemResource("testdata/company-events-scheduler.json")
@@ -140,7 +140,7 @@ class CompanyEventSchedulerControllerTest extends BaseTestClass {
                 .andExpect(status().isOk())
                 .andExpect(content().json(resultContent));
 
-        verify(service, times(1)).findEventsByCurrentDate(null);
+        verify(service, times(1)).findEventsByCurrentDate(null, false);
     }
 
     @Test

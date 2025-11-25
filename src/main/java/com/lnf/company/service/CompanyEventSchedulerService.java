@@ -20,6 +20,7 @@ import com.lnf.company.converter.CompanyEventConverter;
 import com.lnf.company.model.CompanyEvent;
 import com.lnf.company.model.enums.EventType;
 import com.lnf.company.repository.CompanyEventRepository;
+import com.lnf.company.utils.CompanyUtil;
 import com.lnf.dto.company.CompanyEventDto;
 import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.service.common.page.PaginatedAndSortedService;
@@ -46,6 +47,7 @@ import java.util.function.Supplier;
 public class CompanyEventSchedulerService implements PaginatedAndSortedService<CompanyEventDto> {
 
     private final CompanyEventRepository companyEventRepository;
+    private final CompanyUtil companyUtil;
 
     private BiFunction<EventType, Integer, List<CompanyEvent>> eventsByWeek;
     private BiFunction<EventType, Integer, List<CompanyEvent>> eventsByMonth;
@@ -86,11 +88,12 @@ public class CompanyEventSchedulerService implements PaginatedAndSortedService<C
         return fetchAndTransform(() -> companyEventRepository.findEventsByDate(eventType, dateAndTime));
     }
 
-    public List<CompanyEventDto> findEventsByCurrentDate(EventType eventType) {
+    public List<CompanyEventDto> findEventsByCurrentDate(EventType eventType, boolean myEvents) {
         if (eventType == null) {
-            return fetchAndTransform(companyEventRepository::findEventsByCurrentDate);
+            String email = myEvents ? companyUtil.getEmail() : null;
+            return fetchAndTransform(() -> companyEventRepository.findEventsByCurrentDateAndEmail(email));
         } else {
-            return fetchAndTransform(() -> companyEventRepository.findEventsByCurrentDate(eventType));
+            return fetchAndTransform(() -> companyEventRepository.findEventsByCurrentDateAndEmail(eventType));
         }
     }
 

@@ -22,6 +22,8 @@ import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyEvent;
 import com.lnf.company.repository.CompanyEventRepository;
 import com.lnf.company.repository.CompanyRepository;
+import com.lnf.company.utils.CompanyUtil;
+import com.lnf.dto.common.PageRequestDto;
 import com.lnf.dto.company.CompanyEventDto;
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
@@ -35,6 +37,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +58,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
     private final CompanyEventRepository companyEventRepository;
     private final CompanyRepository companyRepository;
     private final CacheManager cacheManager;
+    private final CompanyUtil companyUtil;
 
     @Override
     public Page<CompanyEventDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -94,6 +98,13 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         searchForCompany(companyId);
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
         return entities.stream().map(CompanyEventConverter::toTransportModel).filter(Objects::nonNull).toList();
+    }
+
+    public Page<CompanyEventDto> findCompanyEventsWithPagination(PageRequestDto pageRequest) {
+        Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(),
+                RestUtil.constructSort(pageRequest.getSortBy(), pageRequest.getSortOrder()));
+        return companyEventRepository.findCompanyEventsWithPagination(companyUtil.getEmail(), pageable)
+                .map(CompanyEventConverter::toTransportModel);
     }
 
     private Company searchForCompany(UUID companyId) {

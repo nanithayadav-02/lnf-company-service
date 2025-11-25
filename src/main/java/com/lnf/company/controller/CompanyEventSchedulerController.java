@@ -24,10 +24,7 @@ import com.lnf.service.common.page.PageableAsQueryParam;
 import com.lnf.service.common.page.PaginationAndSortingHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -51,8 +48,9 @@ public class CompanyEventSchedulerController {
     }
 
     @GetMapping({"/company/events/{eventType}/currentDate", "/company/events/currentDate"})
-    public List<CompanyEventDto> findEventsByCurrentDate(@PathVariable(required = false) EventType eventType) {
-        return service.findEventsByCurrentDate(eventType);
+    public List<CompanyEventDto> findEventsByCurrentDate(@PathVariable(required = false) EventType eventType,
+                                                         @RequestParam(required = false) boolean myEvents) {
+        return service.findEventsByCurrentDate(eventType, myEvents);
     }
 
     @GetMapping("/company/events/{eventType}/range/{startDate}/{endDate}")
