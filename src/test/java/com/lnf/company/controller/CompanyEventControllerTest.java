@@ -85,7 +85,7 @@ class CompanyEventControllerTest extends BaseTestClass {
 
         CompanyEventController controller = new CompanyEventController(service, paginationAndSortingHandler);
         // Test for paginated and sorted request
-        ResponseEntity<?> response = controller.findAll(pageRequest);
+        ResponseEntity<?> response = controller.findAll(pageRequest, false);
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
         // Pagination with  sortBy and sortOrder

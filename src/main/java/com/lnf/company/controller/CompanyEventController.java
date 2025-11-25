@@ -38,7 +38,11 @@ public class CompanyEventController {
     private final PaginationAndSortingHandler paginationAndSortingHandler;
 
     @GetMapping(value = "/company/event")
-    public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest) {
+    public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest,
+                                     @RequestParam(required = false) boolean myEvents) {
+        if (myEvents) {
+            return ResponseEntity.ok(service.findCompanyEventsWithPagination(pageRequest));
+        }
         return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
     }
 

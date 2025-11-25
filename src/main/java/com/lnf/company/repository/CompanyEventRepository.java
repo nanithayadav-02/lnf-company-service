@@ -16,8 +16,11 @@
 
 package com.lnf.company.repository;
 
+import com.lnf.company.model.CompanyNotes;
 import com.lnf.company.model.enums.EventType;
 import com.lnf.company.model.CompanyEvent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,8 +34,9 @@ public interface CompanyEventRepository extends JpaRepository<CompanyEvent, UUID
     @Query("SELECT ce FROM CompanyEvent ce WHERE ce.company.id = :id")
     List<CompanyEvent> findByCompanyId(@Param("id") UUID id);
 
-    @Query("SELECT ce FROM CompanyEvent ce WHERE EXTRACT(DATE FROM ce.dateAndTime) = CURRENT_DATE")
-    List<CompanyEvent> findEventsByCurrentDate();
+    @Query("SELECT ce FROM CompanyEvent ce WHERE EXTRACT(DATE FROM ce.dateAndTime) = CURRENT_DATE And " +
+            "(:email IS NULL OR ce.createdBy) = :email)")
+    List<CompanyEvent> findEventsByCurrentDate(String email);
 
     @Query("SELECT ce FROM CompanyEvent ce WHERE ce.eventType = :eventType AND" +
             " EXTRACT(DATE FROM ce.dateAndTime) = CURRENT_DATE")
@@ -71,4 +75,8 @@ public interface CompanyEventRepository extends JpaRepository<CompanyEvent, UUID
 
     @Query("SELECT e FROM CompanyEvent e WHERE e.eventType = :eventType")
     List<CompanyEvent> findEventsByType(@Param("eventType") EventType eventType);
+
+    @Query("select ce from CompanyEvent ce where ce.createdBy = :email")
+    Page<CompanyEvent> findCompanyEventsWithPagination(String email, Pageable pageable);
+
 }

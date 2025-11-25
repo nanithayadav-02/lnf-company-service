@@ -38,7 +38,11 @@ public class CompanyNotesController {
     private final PaginationAndSortingHandler paginationAndSortingHandler;
 
     @GetMapping(value = "/company/notes")
-    public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest) {
+    public ResponseEntity<?> findAll(@PageableAsQueryParam PageRequestDto pageRequest,
+                                     @RequestParam(required = false) boolean myNotes) {
+        if (myNotes) {
+            return ResponseEntity.ok(service.findCompanyNotesWithPagination(pageRequest));
+        }
         return paginationAndSortingHandler.handleFindAllRequest(pageRequest, service);
     }
 

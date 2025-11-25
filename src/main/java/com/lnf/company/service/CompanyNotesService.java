@@ -22,6 +22,8 @@ import com.lnf.company.model.Company;
 import com.lnf.company.model.CompanyNotes;
 import com.lnf.company.repository.CompanyNotesRepository;
 import com.lnf.company.repository.CompanyRepository;
+import com.lnf.company.utils.CompanyUtil;
+import com.lnf.dto.common.PageRequestDto;
 import com.lnf.dto.company.NotesDto;
 import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
@@ -35,6 +37,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +46,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -54,6 +56,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
     private final CompanyRepository companyRepository;
     private final CompanyNotesRepository companyNotesRepository;
     private final CacheManager cacheManager;
+    private final CompanyUtil companyUtil;
 
     @Override
     public Page<NotesDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -79,10 +82,18 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
 
     @Override
     public List<NotesDto> findAll() {
-        return companyNotesRepository.findAll().stream().
+        return companyNotesRepository.findAll()
+                .stream().
                 map(CompanyNotesConverter::toTransportModel)
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    public Page<NotesDto> findCompanyNotesWithPagination(PageRequestDto pageRequest) {
+        Pageable pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize(),
+                RestUtil.constructSort(pageRequest.getSortBy(), pageRequest.getSortOrder()));
+        return companyNotesRepository.findCompanyNotesWithPagination(companyUtil.getEmail(), pageable)
+                .map(CompanyNotesConverter::toTransportModel);
     }
 
     public void create(UUID companyId, List<NotesDto> resource) {

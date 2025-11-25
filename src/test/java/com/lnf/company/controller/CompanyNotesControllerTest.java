@@ -84,7 +84,7 @@ class CompanyNotesControllerTest extends BaseTestClass {
 
         CompanyNotesController controller = new CompanyNotesController(service, paginationAndSortingHandler);
         // Test for paginated and sorted request
-        ResponseEntity<?> response = controller.findAll(pageRequest);
+        ResponseEntity<?> response = controller.findAll(pageRequest, false);
         assertEquals(ResponseEntity.ok(mockedPage), response);
 
         // Pagination with  sortBy and sortOrder
