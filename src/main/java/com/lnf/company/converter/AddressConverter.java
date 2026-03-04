@@ -38,6 +38,7 @@ public class AddressConverter {
                 .city(entity.getCity())
                 .state(entity.getState())
                 .country(entity.getCountry())
+                .countryCode(entity.getCountryCode())
                 .postCode(entity.getPostCode())
                 .type(entity.getType().name())
                 .build();
@@ -55,6 +56,7 @@ public class AddressConverter {
         entity.setCity(transport.getCity());
         entity.setState(transport.getState());
         entity.setCountry(transport.getCountry());
+        entity.setCountryCode(transport.getCountryCode());
         entity.setPostCode(transport.getPostCode());
         entity.setType(AddressType.valueOf(transport.getType()));
 
