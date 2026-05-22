@@ -25,6 +25,7 @@ import com.lnf.service.email.ThymeleafEmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -69,8 +70,8 @@ public class EmailClientImpl extends BaseWebClientService implements ThymeleafDo
     }
 
     @Override
-    public void sendEmailWithPdfs(ThymeleafEmailsDto resource) {
-        // To be implemented
+    public void sendEmailWithPdfs(ThymeleafEmailsDto resource, MultipartFile[] files) {
+
     }
 
 }

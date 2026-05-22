@@ -196,7 +196,7 @@ class CompanyControllerTest extends BaseTestClass {
         assertEquals(updatedCompany.getPan(), actualType.getPan(), "Company PAN should match");
         assertEquals(updatedCompany.getArn(), actualType.getArn(), "Company ARN should match");
         assertEquals(updatedCompany.getArnIssueDate(), actualType.getArnIssueDate(), "Company ARN issue date should match");
-        assertEquals(updatedCompany.getSacCode(), actualType.getSacCode(), "Company SAC code should match");
+        assertEquals(updatedCompany.getSac(), actualType.getSac(), "Company SAC code should match");
     }
 
     @Test
@@ -228,7 +228,7 @@ class CompanyControllerTest extends BaseTestClass {
         dto.setPan("YUGFJ2046S");
         dto.setArn("123456789");
         dto.setArnIssueDate(LocalDate.parse("2021-01-01"));
-        dto.setSacCode(Long.valueOf("123456789"));
+        dto.setSac(Long.valueOf("123456789"));
 
         return dto;
     }
@@ -251,9 +251,8 @@ class CompanyControllerTest extends BaseTestClass {
                 .andExpect(jsonPath("$.pan").value(expectedDto.getPan()))
                 .andExpect(jsonPath("$.arn").value(expectedDto.getArn()))
                 .andExpect(jsonPath("$.arnIssueDate").value(expectedDto.getArnIssueDate().toString()))
-                .andExpect(jsonPath("$.sacCode").value(expectedDto.getSacCode()));
+                .andExpect(jsonPath("$.sac").value(expectedDto.getSac()));
     }
-
 
     private static String asJsonString(final Object obj) {
         try {

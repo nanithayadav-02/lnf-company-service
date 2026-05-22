@@ -29,9 +29,13 @@ import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.exception.LnFException;
 import com.lnf.service.common.page.PaginatedAndSortedService;
+import com.lnf.tenant.core.context.TenantContext;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,13 +43,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 @Transactional
@@ -59,6 +68,12 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
     private final CompanyRepository companyRepository;
     private final CacheManager cacheManager;
     private final CompanyUtil companyUtil;
+
+    @Value("${lnf.tenant.enabled:true}")
+    private boolean tenantEnabled;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Page<CompanyEventDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -93,7 +108,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         return resultPage.map(CompanyEventConverter::toTransportModel);
     }
 
-    @Cacheable(value = "companyEvent", key = "#companyId")
+    @Cacheable(value = "companyEvent", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#companyId)")
     public List<CompanyEventDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
@@ -157,7 +172,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         return companyEventRepository.findById(eventId).orElseThrow(() -> new LnFEntityNotFoundException("companyEvent with id [%s] does not exist".formatted(eventId)));
     }
 
-    @Cacheable(value = "companyEvent", key = "#eventId")
+    @Cacheable(value = "companyEvent", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#eventId)")
     public CompanyEventDto findById(UUID companyId, UUID eventId) {
         searchForCompany(companyId);
         return CompanyEventConverter.toTransportModel(searchForCompanyEvent(eventId));
@@ -171,7 +186,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         log.debug("companyEvent for Company {} successfully updated", companyId);
     }
 
-    @CacheEvict(value = "companyEvent", key = "#eventId")
+    @CacheEvict(value = "companyEvent", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#eventId)")
     public void deleteById(UUID companyId, UUID eventId) {
         searchForCompany(companyId);
         CompanyEvent entity = searchForCompanyEvent(eventId);
@@ -184,7 +199,7 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
         }
     }
 
-    @CacheEvict(value = "companyEvent", key = "#companyId")
+    @CacheEvict(value = "companyEvent", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#companyId)")
     public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyEvent> entities = companyEventRepository.findByCompanyId(companyId);
@@ -198,8 +213,45 @@ public class CompanyEventService implements PaginatedAndSortedService<CompanyEve
     }
 
     public void clearCaches() {
-        Objects.requireNonNull(cacheManager.getCache("companyEvent")).clear();
-        log.debug("CompanyEvent cache cleared.");
+        String tenantId = TenantContext.getCurrentTenant();
+
+        // If tenant mode is disabled or Redis is not used, clear in-memory caches
+        if (!tenantEnabled || !(cacheManager instanceof RedisCacheManager)) {
+            log.info("Clearing all in-memory caches (Redis disabled or tenant mode off).");
+            cacheManager.getCacheNames().forEach(name -> {
+                Cache cache = cacheManager.getCache(name);
+                if (cache != null) {
+                    cache.clear();
+                }
+            });
+            return;
+        }
+
+        // Skip Redis cache clearing if tenant context is missing
+        if (!StringUtils.hasText(tenantId)) {
+            log.warn("TenantContext is not set. Skipping Redis cache clearing.");
+            return;
+        }
+
+        log.info("Clearing Redis cache for tenant '{}'", tenantId);
+
+        String pattern = "*::" + tenantId + ":*";
+
+        Set<String> keysToDelete = redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = new HashSet<>();
+            try (Cursor<byte[]> cursor = connection.scan(
+                    ScanOptions.scanOptions().match(pattern).count(1000).build())) {
+                cursor.forEachRemaining(key -> keys.add(new String(key, StandardCharsets.UTF_8)));
+            }
+            return keys;
+        });
+
+        if (!CollectionUtils.isEmpty(keysToDelete)) {
+            redisTemplate.delete(keysToDelete);
+            log.info("Deleted {} Redis keys for tenant '{}'", keysToDelete.size(), tenantId);
+        } else {
+            log.info("No Redis keys found for tenant '{}'", tenantId);
+        }
     }
 
 }

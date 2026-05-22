@@ -57,7 +57,7 @@ public class CompanyConverter {
                 .pan(entity.getPan())
                 .arn(entity.getArn())
                 .arnIssueDate(entity.getArnIssueDate())
-                .sacCode(entity.getSacCode())
+                .sac(entity.getSacCode())
                 .planName(planName)
                 .address(safeConvert(entity.getAddress(), AddressConverter::toTransportModel))
                 .gst(safeConvert(entity.getGst(), GstConverter::toTransportModel))
@@ -100,7 +100,7 @@ public class CompanyConverter {
         entity.setPan(transport.getPan());
         entity.setArn(transport.getArn());
         entity.setArnIssueDate(transport.getArnIssueDate());
-        entity.setSacCode(transport.getSacCode());
+        entity.setSacCode(transport.getSac());
     }
 
     private static void addAddressToEntityModel(CompanyDto transport, Company company) {

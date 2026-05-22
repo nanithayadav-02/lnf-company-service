@@ -51,4 +51,10 @@ public class PlanController {
         service.deleteById(planId);
     }
 
+    @PostMapping("/company/plans/refresh")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void clearCaches() {
+        service.clearCaches();
+    }
+
 }

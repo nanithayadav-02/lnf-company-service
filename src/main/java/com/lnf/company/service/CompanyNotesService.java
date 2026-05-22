@@ -29,9 +29,13 @@ import com.lnf.exception.LnFBadRequestException;
 import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.exception.LnFException;
 import com.lnf.service.common.page.PaginatedAndSortedService;
+import com.lnf.tenant.core.context.TenantContext;
 import com.lnf.util.RestUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,13 +43,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 @Transactional
@@ -57,6 +66,12 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
     private final CompanyNotesRepository companyNotesRepository;
     private final CacheManager cacheManager;
     private final CompanyUtil companyUtil;
+
+    @Value("${lnf.tenant.enabled:true}")
+    private boolean tenantEnabled;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Page<NotesDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -157,7 +172,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
                 orElseThrow(() -> new LnFEntityNotFoundException("notes with id [%s] does not exist".formatted(notesId)));
     }
 
-    @CacheEvict(value = "companyNotes", key = "#notesId")
+    @CacheEvict(value = "companyNotes", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#notesId)")
     public void deleteById(UUID companyId, UUID notesId) {
         searchForCompany(companyId);
         CompanyNotes entity = searchForNotes(notesId);
@@ -170,7 +185,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         }
     }
 
-    @CacheEvict(value = "companyNotes", key = "#companyId")
+    @CacheEvict(value = "companyNotes", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#companyId)")
     public void deleteByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyNotes> entities = companyNotesRepository.findByCompanyId(companyId);
@@ -183,7 +198,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
         }
     }
 
-    @Cacheable(value = "companyNotes", key = "#companyId")
+    @Cacheable(value = "companyNotes", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#companyId)")
     public List<NotesDto> findByCompanyId(UUID companyId) {
         searchForCompany(companyId);
         List<CompanyNotes> entities = companyNotesRepository.findByCompanyId(companyId);
@@ -191,7 +206,7 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
                 .toList();
     }
 
-    @Cacheable(value = "companyNotes", key = "#notesId")
+    @Cacheable(value = "companyNotes", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#notesId)")
     public NotesDto findById(UUID companyId, UUID notesId) {
         searchForCompany(companyId);
         return CompanyNotesConverter.toTransportModel(searchForNotes(notesId));
@@ -206,8 +221,45 @@ public class CompanyNotesService implements PaginatedAndSortedService<NotesDto> 
     }
 
     public void clearCaches() {
-        Objects.requireNonNull(cacheManager.getCache("companyNotes")).clear();
-        log.debug("companyNotes cache cleared.");
+        String tenantId = TenantContext.getCurrentTenant();
+
+        // If tenant mode is disabled or Redis is not used, clear in-memory caches
+        if (!tenantEnabled || !(cacheManager instanceof RedisCacheManager)) {
+            log.info("Clearing all in-memory caches (Redis disabled or tenant mode off).");
+            cacheManager.getCacheNames().forEach(name -> {
+                Cache cache = cacheManager.getCache(name);
+                if (cache != null) {
+                    cache.clear();
+                }
+            });
+            return;
+        }
+
+        // Skip Redis cache clearing if tenant context is missing
+        if (!StringUtils.hasText(tenantId)) {
+            log.warn("TenantContext is not set. Skipping Redis cache clearing.");
+            return;
+        }
+
+        log.info("Clearing Redis cache for tenant '{}'", tenantId);
+
+        String pattern = "*::" + tenantId + ":*";
+
+        Set<String> keysToDelete = redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = new HashSet<>();
+            try (Cursor<byte[]> cursor = connection.scan(
+                    ScanOptions.scanOptions().match(pattern).count(1000).build())) {
+                cursor.forEachRemaining(key -> keys.add(new String(key, StandardCharsets.UTF_8)));
+            }
+            return keys;
+        });
+
+        if (!CollectionUtils.isEmpty(keysToDelete)) {
+            redisTemplate.delete(keysToDelete);
+            log.info("Deleted {} Redis keys for tenant '{}'", keysToDelete.size(), tenantId);
+        } else {
+            log.info("No Redis keys found for tenant '{}'", tenantId);
+        }
     }
 
 }
