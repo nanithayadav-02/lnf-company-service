@@ -26,11 +26,14 @@ import com.lnf.exception.LnFEntityNotFoundException;
 import com.lnf.exception.LnFException;
 import com.lnf.service.common.page.PaginatedAndSortedService;
 import com.lnf.service.specification.GenericSpecificationBuilder;
+import com.lnf.tenant.core.context.TenantContext;
 import com.lnf.util.RestUtil;
 import com.lnf.util.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -40,12 +43,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -59,6 +68,12 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
     private final CacheManager cacheManager;
 
     private final ApplicationContext applicationContext;
+
+    @Value("${lnf.tenant.enabled:true}")
+    private boolean tenantEnabled;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Page<CompanyDto> findPaginatedAndSorted(int page, int size, String sortBy, String sortOrder) {
@@ -109,7 +124,7 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
         return SpecificationUtil.getFieldClass(Company.class, fieldName);
     }
 
-    @Cacheable(value = "company", key = "#companyCode")
+    @Cacheable(value = "company", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#companyCode)")
     public CompanyDto findByCompanyCode(String companyCode) {
         Company entity = search(companyCode);
         return findCompanyWithImage(entity);
@@ -153,13 +168,13 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
         log.debug("Company {} successfully updated", companyId);
     }
 
-    @CachePut(value = "company", key = "#companyCode")
+    @CachePut(value = "company", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#companyCode)")
     public CompanyDto findByCode(String companyCode) {
         Company entity = search(companyCode);
         return findCompanyWithImage(entity);
     }
 
-    @CacheEvict(value = "company", key = "#companyId")
+    @CacheEvict(value = "company", key = "T(com.lnf.tenant.core.util.CacheKeyUtils).tenantAwareKey(#companyId)")
     public void delete(UUID companyId) {
         Company entity = search(companyId);
         try {
@@ -201,8 +216,45 @@ public class CompanyService implements PaginatedAndSortedService<CompanyDto> {
     }
 
     public void clearCaches() {
-        Objects.requireNonNull(cacheManager.getCache("company")).clear();
-        log.debug("Company cache cleared.");
+        String tenantId = TenantContext.getCurrentTenant();
+
+        // If tenant mode is disabled or Redis is not used, clear in-memory caches
+        if (!tenantEnabled || !(cacheManager instanceof RedisCacheManager)) {
+            log.info("Clearing all in-memory caches (Redis disabled or tenant mode off).");
+            cacheManager.getCacheNames().forEach(name -> {
+                Cache cache = cacheManager.getCache(name);
+                if (cache != null) {
+                    cache.clear();
+                }
+            });
+            return;
+        }
+
+        // Skip Redis cache clearing if tenant context is missing
+        if (!StringUtils.hasText(tenantId)) {
+            log.warn("TenantContext is not set. Skipping Redis cache clearing.");
+            return;
+        }
+
+        log.info("Clearing Redis cache for tenant '{}'", tenantId);
+
+        String pattern = "*::" + tenantId + ":*";
+
+        Set<String> keysToDelete = redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            Set<String> keys = new HashSet<>();
+            try (Cursor<byte[]> cursor = connection.scan(
+                    ScanOptions.scanOptions().match(pattern).count(1000).build())) {
+                cursor.forEachRemaining(key -> keys.add(new String(key, StandardCharsets.UTF_8)));
+            }
+            return keys;
+        });
+
+        if (!CollectionUtils.isEmpty(keysToDelete)) {
+            redisTemplate.delete(keysToDelete);
+            log.info("Deleted {} Redis keys for tenant '{}'", keysToDelete.size(), tenantId);
+        } else {
+            log.info("No Redis keys found for tenant '{}'", tenantId);
+        }
     }
 
 }

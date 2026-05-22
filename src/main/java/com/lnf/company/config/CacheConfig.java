@@ -16,8 +16,10 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.Jedis;
 
 import java.time.Duration;
@@ -27,20 +29,26 @@ import java.time.Duration;
 @EnableCaching
 public class CacheConfig {
 
-    @Value("${spring.redis.host}")
+    @Value("${spring.data.redis.host}")
     private String redisHost;
+    @Value("${spring.data.redis.port}")
 
-    @Value("${spring.redis.port}")
     private int redisPort;
-
-    @Value("${spring.cache.redis.time-to-live}")
+    @Value("${spring.data.cache.redis.time-to-live}")
     private long timeToLive;
-
-    @Value("${spring.cache.redis.cache-null-values}")
+    @Value("${spring.data.cache.redis.cache-null-values}")
     private boolean cacheNullValues;
-
-    @Value("${spring.cache.redis.use-key-prefix}")
+    @Value("${spring.data.cache.redis.use-key-prefix}")
     private boolean useKeyPrefix;
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // must match your cache config
+        return template;
+    }
 
     @Bean
     public CacheManager cacheManager() {

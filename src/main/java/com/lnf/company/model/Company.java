@@ -55,10 +55,10 @@ public class Company extends AuditableEntity {
     @Column
     private String website;
 
-    @Column
+    @Column(name = "business_category")
     private String businessCategory;
 
-    @Column
+    @Column(name = "business_description")
     private String businessDescription;
 
     @Column(unique = true, nullable = false)
@@ -67,10 +67,10 @@ public class Company extends AuditableEntity {
     @Column
     private String arn;
 
-    @Column
+    @Column(name = "arn_issue_date")
     private LocalDate arnIssueDate;
 
-    @Column
+    @Column(name = "sac_code")
     private Long sacCode;
 
     @ToString.Exclude
