@@ -70,11 +70,6 @@ public class EmailClientImpl extends BaseWebClientService implements ThymeleafDo
     }
 
     @Override
-    public void sendEmailWithPdfs(ThymeleafEmailsDto resource) {
-        // To be implemented
-    }
-
-    @Override
     public void sendEmailWithPdfs(ThymeleafEmailsDto resource, MultipartFile[] attachments) {
         // To be implemented
     }
