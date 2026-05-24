@@ -20,6 +20,7 @@ import com.lnf.dto.email.ThymeleafDocumentDto;
 import com.lnf.dto.email.ThymeleafEmailDto;
 import com.lnf.dto.email.ThymeleafEmailsDto;
 import com.lnf.exception.LnFException;
+import org.springframework.web.multipart.MultipartFile;
 import com.lnf.service.email.ThymeleafDocumentService;
 import com.lnf.service.email.ThymeleafEmailService;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +71,11 @@ public class EmailClientImpl extends BaseWebClientService implements ThymeleafDo
 
     @Override
     public void sendEmailWithPdfs(ThymeleafEmailsDto resource) {
+        // To be implemented
+    }
+
+    @Override
+    public void sendEmailWithPdfs(ThymeleafEmailsDto resource, MultipartFile[] attachments) {
         // To be implemented
     }
 
