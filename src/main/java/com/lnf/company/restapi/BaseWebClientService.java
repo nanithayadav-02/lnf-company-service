@@ -28,12 +28,25 @@ import java.util.Optional;
 public abstract class BaseWebClientService {
 
     protected void addJwtToken(WebClient.RequestHeadersSpec<?> spec) {
-        // Retrieve the JWT token value, if available
         Optional<String> jwtTokenValue = getJwtTokenValue();
-
-        // If the token value is present, add it to the request headers
         jwtTokenValue.ifPresent(token -> spec.headers(header -> header.setBearerAuth(token)));
+
+        String tenantId = extractTenantIdFromJwt();
+        if (tenantId != null) {
+            spec.headers(header -> header.set("X-TenantID", tenantId));
+        }
     }
+
+    private String extractTenantIdFromJwt() {
+        Jwt jwt = getJwtToken();
+        if (jwt == null) return null;
+        String issuer = jwt.getClaimAsString("iss");
+        if (issuer != null && issuer.contains("/realms/")) {
+            return issuer.substring(issuer.lastIndexOf("/realms/") + "/realms/".length());
+        }
+        return null;
+    }
+
     private Optional<String> getJwtTokenValue() {
         return Optional.ofNullable(getJwtToken())
                 .map(Jwt::getTokenValue);
