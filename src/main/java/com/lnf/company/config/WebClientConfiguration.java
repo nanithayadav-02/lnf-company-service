@@ -84,7 +84,7 @@ public class WebClientConfiguration {
     private boolean circuitBreakerEnabled;
 
     private static final Set<HttpMethod> RETRYABLE_METHODS = Set.of(
-            HttpMethod.GET, HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.DELETE, HttpMethod.PUT);
+            HttpMethod.GET, HttpMethod.HEAD, HttpMethod.POST,HttpMethod.OPTIONS, HttpMethod.DELETE, HttpMethod.PUT);
 
     private static final String RETRY_ATTEMPT_MESSAGE =
             "Retrying call to {} service: {} {} (attempt {}/{}) after transient failure: {}";
